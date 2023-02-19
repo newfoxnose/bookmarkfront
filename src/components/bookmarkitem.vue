@@ -1,19 +1,22 @@
+<script>
+export default {
+  props: ['title','icon','url']
+}
+</script>
 <template>
   <div class="item">
-    <i>
-      <slot name="icon"></slot>
-    </i>
-    <div class="details">
-      <div name="heading">
-      </div>
-    </div>
-</div>
+    <img :src="icon" style="width:16px;height:16px;">
+    <a :href="url">
+      {{title.substr(0,10)}}
+    </a>
+  </div>
 </template>
 
 <style scoped>
 .item {
   margin-top: 2rem;
-  display: flex;
+  display: inline-block;
+  width:300px;
 }
 
 .details {

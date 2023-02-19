@@ -6,24 +6,24 @@ import HelloWorld from './components/HelloWorld.vue'
 
  
 <script>
- 
+
 export default {
   methods: {
-    // 点击按钮，获取图书列表数据
-    async btnGetBooks () {
-      const { data: res } = await this.$http.get('/index/')
-      console.log(res)
+    async btnGetBooks() {
+      //const { data: res } = await this.$http.get('/index/')
+      console.log("button clicked")
     }
   }
- 
+
 }
 </script>
 <template>
+  <div>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld msg="张三"/>
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
@@ -32,13 +32,15 @@ export default {
     </div>
   </header>
   <button @click="btnGetBooks">获取图书列表</button>
-  <RouterView />
+</div>
+<RouterView />
 </template>
 
 <style scoped>
 header {
   line-height: 1.5;
   max-height: 100vh;
+  display: block;
 }
 
 .logo {
