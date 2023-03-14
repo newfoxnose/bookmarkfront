@@ -1,9 +1,9 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
+import home from '../components/home.vue'
 </script>
 
 <template>
   <div>
-    <TheWelcome />
+    <home />
   </div>
 </template>
