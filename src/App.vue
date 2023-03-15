@@ -7,22 +7,28 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <template>
   <div>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <header>
+      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
-    <div class="wrapper">
-      <HelloWorld msg="书签网"/>
+      <div class="wrapper">
+        <HelloWorld msg="书签网" />
 
-      <nav>
-        <RouterLink to="/">首页</RouterLink>
-        <RouterLink to="/login" v-if="$cookies.get('login') != 'yes'">登入</RouterLink>
-        <RouterLink to="/user" v-if="$cookies.get('login') == 'yes'">我的书签</RouterLink>
-        <RouterLink to="/logout" v-if="$cookies.get('login') == 'yes'">退出</RouterLink>
-      </nav>
-    </div>
-  </header>
-</div>
-<RouterView />
+        <nav>
+          <RouterLink to="/">首页</RouterLink>
+
+          <span v-if="$cookies.get('login') == 'yes'">
+            <RouterLink to="/user">我的书签</RouterLink>
+            <RouterLink to="/manage">管理目录</RouterLink>
+            <RouterLink to="/logout">退出</RouterLink>
+          </span>
+          <span v-else>
+            <RouterLink to="/login">登入</RouterLink>
+          </span>
+        </nav>
+      </div>
+    </header>
+  </div>
+  <RouterView />
 </template>
 
 <style scoped>

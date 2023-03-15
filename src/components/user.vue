@@ -3,7 +3,7 @@
 import bookmarkitem from './bookmarkitem.vue'
 import subfolder from './subfolder.vue'
 import {
-  CloseOutlined, SearchOutlined,StarOutlined
+  CloseOutlined, SearchOutlined, StarOutlined, PlusOutlined
 } from '@ant-design/icons-vue';
 import { defineComponent, ref, reactive } from 'vue';
 import { message } from 'ant-design-vue';
@@ -18,6 +18,7 @@ export default defineComponent({
     CloseOutlined,
     StarOutlined,
     SearchOutlined,
+    PlusOutlined,
   },
   setup() {
     const visible = ref(false);
@@ -48,6 +49,8 @@ export default defineComponent({
       folder_list: {},
       clicked: false,
       editId: '',
+      new_folder: '',
+      new_folder_clicked: false,
       is_private: false
     }
   },
@@ -152,7 +155,7 @@ export default defineComponent({
           params.append("id", id);
           ajax_url = '/user/delete_bookmark_ajax';
         }
-        else if (id!=''){
+        else if (id != '') {
           params.append("id", id);
           ajax_url = '/user/edit_bookmark_ajax';
         }
@@ -176,6 +179,45 @@ export default defineComponent({
       else {
         message.info("请填写必要项目");
       }
+    },
+    newFolder() {
+      if (this.new_folder == '') {
+        message.info('新目录名称不能为空');
+      }
+      else {
+        if (this.new_folder_clicked == false) {
+          this.new_folder_clicked = true;
+          message.info('创建新目录中，请稍等');
+          let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+          params.append("new_folder", this.new_folder);
+          params.append("folder_id", this.folder_id);
+          params.append("teacher_id", $cookies.get('teacher_id'));
+          params.append("login", $cookies.get('login'));
+          params.append("level", $cookies.get('level'));
+          const { data: res } = this.$http.post('/user/new_folder_ajax', params)
+            .then(res => {
+              // obj.success ? obj.success(res) : null
+              console.log(res.data)
+              if (res.data.msg == "新建目录成功") {
+                message.info("新建目录成功");
+                this.folder_list = res.data.data;
+                this.folder_id = String(res.data.inserted_id);
+              }
+              else {
+                message.info(res.data.msg);
+              }
+              this.new_folder_clicked = false;
+            })
+            .catch(error => {
+              // obj.error ? obj.error(error) : null;
+              console.log(error);
+              this.new_folder_clicked = false;
+            })
+        }
+        else {
+          message.info("正在请求数据，请勿重复点击");
+        }
+      }
     }
   },
   async mounted() {
@@ -185,7 +227,6 @@ export default defineComponent({
     params.append("level", $cookies.get('level'));
     const { data: res } = await this.$http.post('/user/home_ajax/', params)
     this.items = res.data
-    console.log(res.data);
     const { data: folder_res } = await this.$http.post('/user/get_folder_ajax/', params)
     this.folder_list = folder_res.data.data
     this.folder_id = folder_res.data.data[0].value;
@@ -246,6 +287,14 @@ console.log($cookies.get('login'))
       <a-select style="width: 100%" v-model:value="folder_id" v-if="folder_list">
         <a-select-option v-for="item in folder_list" :value="item.value" :lv="item.lv"> {{ item.name }}</a-select-option>
       </a-select>
+    </p>
+    <p>
+      <a-input v-model:value="new_folder" placeholder="新目录">
+        <template #addonAfter>
+          <plus-outlined @click="newFolder" v-if="!new_folder_clicked" />
+          <a-spin size="small" v-if="new_folder_clicked" />
+        </template>
+      </a-input>
     </p>
     <p>
       <a-checkbox v-model:checked="is_private">私有</a-checkbox>
