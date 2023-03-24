@@ -110,7 +110,7 @@ export default defineComponent({
           params.append("teacher_id", $cookies.get('teacher_id'));
           params.append("login", $cookies.get('login'));
           params.append("level", $cookies.get('level'));
-          const { data: res } = this.$http.post('/user/url_title', params)
+          const { data: res } = this.$http.post('/ajax/url_title', params)
             .then(res => {
               console.log(res.data);
               // obj.success ? obj.success(res) : null
@@ -153,14 +153,14 @@ export default defineComponent({
         let ajax_url = '';
         if (id != '' && action == "删除") {
           params.append("id", id);
-          ajax_url = '/user/delete_bookmark_ajax';
+          ajax_url = '/ajax/delete_bookmark_ajax';
         }
         else if (id != '') {
           params.append("id", id);
-          ajax_url = '/user/edit_bookmark_ajax';
+          ajax_url = '/ajax/edit_bookmark_ajax';
         }
         else {
-          ajax_url = '/user/add_bookmark_ajax';
+          ajax_url = '/ajax/add_bookmark_ajax';
         }
         const { data: res } = this.$http.post(ajax_url, params)
           .then(res => {
@@ -194,7 +194,7 @@ export default defineComponent({
           params.append("teacher_id", $cookies.get('teacher_id'));
           params.append("login", $cookies.get('login'));
           params.append("level", $cookies.get('level'));
-          const { data: res } = this.$http.post('/user/new_folder_ajax', params)
+          const { data: res } = this.$http.post('/ajax/new_folder_ajax', params)
             .then(res => {
               // obj.success ? obj.success(res) : null
               console.log(res.data)
@@ -225,19 +225,17 @@ export default defineComponent({
     params.append("teacher_id", $cookies.get('teacher_id'));
     params.append("login", $cookies.get('login'));
     params.append("level", $cookies.get('level'));
-    const { data: res } = await this.$http.post('/user/home_ajax/', params)
+    const { data: res } = await this.$http.post('/ajax/home_ajax/', params)
     this.items = res.data
-    const { data: folder_res } = await this.$http.post('/user/get_folder_ajax/', params)
+    const { data: folder_res } = await this.$http.post('/ajax/get_folder_ajax/', params)
     this.folder_list = folder_res.data.data
     this.folder_id = folder_res.data.data[0].value;
   },
 });
-console.log($cookies.get('teacher_id'))
-console.log($cookies.get('level'))
-console.log($cookies.get('login'))
 </script>
 
 <template>
+  <h3 style="margin-top:15px;">根目录</h3>
   <div>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
@@ -251,6 +249,8 @@ console.log($cookies.get('login'))
     </subfolder>
   </div>
 
+  <div style="margin-bottom:20px;">
+  </div>
 
   <div class="search-div">
     <div class="search">

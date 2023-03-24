@@ -15,41 +15,23 @@ export default {
       items: {},
       question: '',
       search: '',
-      editable:'no',
-      answer: 'Questions usually contain a question mark. ;-)'
+      editable:'no'
     }
   },
   watch: {
     // 每当 question 改变时，这个函数就会执行
     question(newQuestion, oldQuestion) {
       this.search = newQuestion
-      if (newQuestion.includes('?')) {
-        this.getAnswer()
-      }
     }
   },
   methods: {
-    async getAnswer() {
-      this.answer = 'Thinking...'
-      try {
-        this.items.forEach(function (item) {
-
-        })
-        const res = await fetch('https://yesno.wtf/api')
-        this.answer = (await res.json()).answer
-
-      } catch (error) {
-        this.answer = 'Error! Could not reach the API. ' + error
-      }
-    },
     clearQuestion() {
       this.question = ''
       this.search = ''
     }
   },
   async mounted() {
-    const { data: res } = await this.$http.get('/index/home/338')
-    console.log(res)
+    const { data: res } = await this.$http.get('/ajax/index_ajax/338')
     this.items = res.data
   },
   defineComponent() {
@@ -57,16 +39,11 @@ export default {
       CloseOutlined
     }
   },
-  setup() {
-    const userName = ref < string > ('');
-    return {
-      userName,
-    };
-  },
 }
 
 </script>
 <template>
+   <h3 style="margin-top:15px;">根目录</h3>
   <div>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :url="bookmarkitem.url" :title="bookmarkitem.title"
       :short_title="bookmarkitem.short_title" :icon="bookmarkitem.icon_display" :search="search" :editable="editable" />
@@ -77,6 +54,8 @@ export default {
       </subfolder>
   </div>
 
+  <div style="margin-bottom:20px;">
+  </div>
 
   <div class="search-div">
     <div class="search">
@@ -92,64 +71,7 @@ export default {
 </template>
 
 
-<style scoped>
-.folder-name {
-  margin-top: 2rem;
-  display: flex;
-}
-
-.folder-name i {
-  display: flex;
-  place-items: center;
-  place-content: center;
-  width: 32px;
-  height: 32px;
-  color: var(--color-text);
-}
-
-@media (min-width: 1024px) {
-  .folder-name {
-    margin-top: 0;
-    padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
-  }
-
-  .folder-name i {
-    top: calc(50% - 25px);
-    left: -26px;
-    position: absolute;
-    border: 1px solid var(--color-border);
-    background: var(--color-background);
-    border-radius: 8px;
-    width: 80px;
-    height: 50px;
-  }
-
-  .folder-name:before {
-    content: ' ';
-    border-left: 1px solid var(--color-border);
-    position: absolute;
-    left: 0;
-    bottom: calc(50% + 25px);
-    height: calc(50% - 25px);
-  }
-
-  .folder-name:after {
-    content: ' ';
-    border-left: 1px solid var(--color-border);
-    position: absolute;
-    left: 0;
-    top: calc(50% + 25px);
-    height: calc(50% - 25px);
-  }
-
-  .folder-name:first-of-type:before {
-    display: none;
-  }
-
-  .folder-name:last-of-type:after {
-    display: none;
-  }
-}
+<style>
 
 
 .search-div {
@@ -175,5 +97,4 @@ export default {
   border-width: 2px;
 }
 
-.input {}
 </style>

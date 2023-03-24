@@ -34,6 +34,11 @@ const router = createRouter({
       path: '/manage',
       name: 'manage',
       component: () => import('../views/ManageView.vue')
+    },
+    {
+      path: '/upload',
+      name: 'upload',
+      component: () => import('../views/UploadView.vue')
     }
   ]
 })

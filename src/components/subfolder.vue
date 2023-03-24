@@ -53,14 +53,3 @@ export default {
       </subfolder>
   </div>
 </template>
-
-<style scoped>
-h3 {
-  padding: 0.4rem 0 0 0;
-}
-@media (min-width: 1024px) {
-  h3 {
-  padding: 0.4rem 0 0.4rem calc(var(--section-gap) / 2);
-}
-}
-</style>

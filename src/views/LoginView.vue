@@ -1,4 +1,5 @@
 <template>
+  <div style="margin-top:15px;"></div>
   <a-form :model="formState" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
     @finish="getList" @finishFailed="onFinishFailed">
 
@@ -49,7 +50,7 @@ export default defineComponent({
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("email", values.email);
       params.append("password", values.password);
-      const { data: res } = this.$http.post('/index/login', params)
+      const { data: res } = this.$http.post('/ajax/login_ajax', params)
         .then(res => {
           // obj.success ? obj.success(res) : null
           if (res.data.msg == "登入成功") {
