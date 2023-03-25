@@ -49,8 +49,8 @@ export default {
 <template>
   <h3>{{ folder_name }}</h3>
     <div class="item" v-show="isShow(bookmarkitem.title, bookmarkitem.url)" v-for="bookmarkitem in folder_bookmark">
-      <img v-if="editable == 'yes'" :src="bookmarkitem.icon" style="width:16px;height:16px;margin-right:3px;" @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private)">
-      <img v-else :src="bookmarkitem.icon" style="width:16px;height:16px;" @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private)">
+      <img v-if="editable == 'yes'" :src="bookmarkitem.icon_display" style="width:16px;height:16px;margin-right:3px;" @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private)">
+      <img v-else :src="bookmarkitem.icon_display" style="width:16px;height:16px;" @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private)">
       <a :href="bookmarkitem.url" :title="bookmarkitem.title" target="_blank">
         {{ bookmarkitem.short_title }}
       </a>
