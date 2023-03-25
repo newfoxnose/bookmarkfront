@@ -1,10 +1,10 @@
 <script>
-import {  EyeInvisibleTwoTone } from '@ant-design/icons-vue';
+import { EyeInvisibleTwoTone } from '@ant-design/icons-vue';
 export default {
   components: {
     EyeInvisibleTwoTone
   },
-  props: ['title', 'icon', 'id','url', 'short_title', 'search', 'editable','folder_id','is_private'],
+  props: ['title', 'icon', 'id', 'url', 'short_title', 'search', 'editable', 'folder_id', 'is_private'],
   emits: ['editbookmark'],
   methods: {
     isShow: function (str, url) {
@@ -18,15 +18,14 @@ export default {
 }
 </script>
 <template>
-  <!--<div class="item" v-show="isShow(title, url)">-->
-    <hr>
-  <div class="item">
-    <img v-if="editable == 'yes'" :src="icon" style="width:16px;height:16px;margin-right:3px;" @click="$emit('editbookmark','编辑书签',id,url,title,folder_id,is_private)">
+  <div class="item" v-show="isShow(title, url)">
+    <img v-if="editable == 'yes'" :src="icon" style="width:16px;height:16px;margin-right:3px;"
+      @click="$emit('editbookmark', '编辑书签', id, url, title, folder_id, is_private)">
     <img v-else :src="icon" style="width:16px;height:16px;">
     <a :href="url" :title="title" target="_blank">
       {{ short_title }}
     </a>
-    <eye-invisible-two-tone v-if="is_private == '1'" style="margin-left:3px;"/>
+    <eye-invisible-two-tone v-if="is_private == '1'" style="margin-left:3px;" />
   </div>
 </template>
 

@@ -242,7 +242,7 @@ export default defineComponent({
       :is_private="bookmarkitem.is_private" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
       @editbookmark="fatherMethod"></bookmarkitem>
   </div>
- 
+
   <div v-for="item in items.folder">
     <subfolder :folder_name="item.folder_name" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
       :search="search" :editable="editable" :fatherMethod="fatherMethod">
