@@ -47,8 +47,6 @@ export default {
   <bookmarkitem v-for="bookmarkitem in folder_bookmark" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id" :url="bookmarkitem.url" :title="bookmarkitem.title"
     :icon="bookmarkitem.icon_display" :short_title="bookmarkitem.short_title" :is_private="bookmarkitem.is_private" :search="search" :editable="editable" @editbookmark="fatherMethod" />
   </div>
-  <hr v-for="item in folder_bookmark">
-
     <div v-for="item in subfolder">
       <subfolder :folder_name="item.folder_name" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
         :search="search" :editable="editable" :fatherMethod="fatherMethod">
