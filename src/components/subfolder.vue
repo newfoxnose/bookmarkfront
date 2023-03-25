@@ -28,26 +28,41 @@ defineProps({
 })
 </script >
 <script>
-import bookmarkitem from './bookmarkitem.vue';
-
+//import bookmarkitem from './bookmarkitem.vue';
+import { EyeInvisibleTwoTone } from '@ant-design/icons-vue';
 export default {
   components: {
-    bookmarkitem
-  }
+    EyeInvisibleTwoTone,
+    //bookmarkitem
+  },
+  methods: {
+    isShow: function (str, url) {
+      if (str.toUpperCase().includes(this.search.toUpperCase()) || url.toUpperCase().includes(this.search.toUpperCase())) {
+        return true
+      } else {
+        return false
+      }
+    }
+  },
 };
 </script>
 <template>
   <h3>{{ folder_name }}</h3>
-  <div>
-    <bookmarkitem v-for="bookmarkitem in folder_bookmark" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
-      :url="bookmarkitem.url" :title="bookmarkitem.title" :icon="bookmarkitem.icon_display"
-      :short_title="bookmarkitem.short_title" :is_private="bookmarkitem.is_private" :search="search" :editable="editable"
-      @editbookmark="fatherMethod">
-    </bookmarkitem>
-
+  <div v-for="bookmarkitem in folder_bookmark">
+    <div class="item" v-show="isShow(bookmarkitem.title, bookmarkitem.url)">
+      <img v-if="bookmarkitem.editable == 'yes'" :src="bookmarkitem.icon" style="width:16px;height:16px;margin-right:3px;"
+        @click="$emit('editbookmark', '编辑书签', id, url, title, folder_id, is_private)">
+      <img v-else :src="bookmarkitem.icon" style="width:16px;height:16px;">
+      <a :href="bookmarkitem.url" :title="bookmarkitem.title" target="_blank">
+        {{ bookmarkitem.short_title }}
+      </a>
+      <eye-invisible-two-tone v-if="bookmarkitem.is_private == '1'" style="margin-left:3px;" />
+    </div>
   </div>
+
   <div v-for="item in subfolder">
     <subfolder :folder_name="item.folder_name" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
       :search="search" :editable="editable" :fatherMethod="fatherMethod">
     </subfolder>
-  </div></template>
+  </div>
+</template>
