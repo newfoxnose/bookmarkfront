@@ -19,10 +19,12 @@ import HelloWorld from './components/HelloWorld.vue'
             <RouterLink to="/user">我的书签</RouterLink>
             <RouterLink to="/manage">管理目录</RouterLink>
             <RouterLink to="/upload">导入</RouterLink>
+            <RouterLink to="/export">导出</RouterLink>
             <RouterLink to="/logout">退出</RouterLink>
           </span>
           <span v-else>
             <RouterLink to="/login">登入</RouterLink>
+            <RouterLink to="/reg">注册</RouterLink>
           </span>
         </nav>
       </div>
