@@ -1,7 +1,14 @@
-<script setup>
+<script>
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import { defineComponent } from 'vue';
+import { DownOutlined } from '@ant-design/icons-vue';
 
+export default defineComponent({
+  components: {
+    DownOutlined,
+  },
+});
 </script>
 
 <template>
@@ -17,9 +24,26 @@ import HelloWorld from './components/HelloWorld.vue'
 
           <span v-if="$cookies.get('login') == 'yes'">
             <RouterLink to="/user">我的书签</RouterLink>
-            <RouterLink to="/manage">管理目录</RouterLink>
-            <RouterLink to="/upload">导入</RouterLink>
-            <RouterLink to="/export">导出</RouterLink>
+            <RouterLink to="/note">随手记</RouterLink>
+            <a-dropdown style="display:inline !important">
+    <a class="ant-dropdown-link" @click.prevent >
+      更多
+      <DownOutlined />
+    </a>
+    <template #overlay>
+      <a-menu>
+        <a-menu-item>
+          <RouterLink to="/manage">管理目录</RouterLink>
+        </a-menu-item>
+        <a-menu-item>
+          <RouterLink to="/upload">导入</RouterLink>
+        </a-menu-item>
+        <a-menu-item>
+          <RouterLink to="/export">导出</RouterLink>
+        </a-menu-item>
+      </a-menu>
+    </template>
+  </a-dropdown>
             <RouterLink to="/logout">退出</RouterLink>
           </span>
           <span v-else>
@@ -46,7 +70,6 @@ header {
 }
 
 nav {
-  width: 100%;
   font-size: 14px;
   text-align: center;
   margin-top: 2rem;
