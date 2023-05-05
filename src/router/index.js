@@ -54,6 +54,11 @@ const router = createRouter({
       path: '/note',
       name: 'note',
       component: () => import('../views/NoteView.vue')
+    },
+    {
+      path: '/qiniu',
+      name: 'qiniu',
+      component: () => import('../views/QiniuView.vue')
     }
   ]
 })

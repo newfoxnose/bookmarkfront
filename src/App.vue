@@ -25,6 +25,7 @@ export default defineComponent({
           <span v-if="$cookies.get('login') == 'yes'">
             <RouterLink to="/user">我的书签</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
+            <RouterLink to="/qiniu">文件</RouterLink>
             <a-dropdown style="display:inline !important">
     <a class="ant-dropdown-link" @click.prevent >
       更多
