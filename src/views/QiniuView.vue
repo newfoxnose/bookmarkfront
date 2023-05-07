@@ -2,8 +2,8 @@
   <h3 style="margin-top:15px;">文件</h3>
   <div>
     <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" action="http://up-cn-east-2.qiniup.com"
-      :data={token:qiniu_token,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
-      @drop=" handleDrop ">
+      :data={token:qiniu_token,key:file_key} @change="handleChange" :before-upload="handleBeforeUpload"
+      @drop="handleDrop">
       <p class="ant-upload-drag-icon">
         <inbox-outlined></inbox-outlined>
       </p>
@@ -15,22 +15,39 @@
     </a-upload-dragger>
   </div>
   <div>
-    <div v-for="item in fileitems">
+    <div v-for="item in fileitems" style="margin-bottom:5px;">
 
-    <img style="width:16px;height:16px;margin-right:3px;">
-    <a target="_blank" :href="'https://bookmark-files.o-oo.net.cn/'+item.key">
-      {{ item.key }}
-    </a>
-<span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }})</span>
+      <span class="ext">{{ item.key.split(".").pop() }}</span>
+      <a target="_blank" :href="'https://bookmark-files.o-oo.net.cn/' + item.key" style="margin-left:5px;">
+        {{ item.key }}
+      </a>
+      <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime) }})</span>
+      <a style="margin-left:20px;" @click="deletefile(item.key)">删除</a>
+
     </div>
   </div>
 </template>
-
+<style scoped>
+.ext {
+  text-align: center;
+  display: inline-block;
+  width: 40px;
+  margin-right: 3px;
+  color: coral;
+  font-weight: bold;
+  border-style: solid;
+  border-width: thin;
+  border-color: crimson;
+  padding: 2px;
+  margin: 3px;
+}
+</style>
 <script>
 import { message } from 'ant-design-vue';
 import { InboxOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import * as qiniu from 'qiniu-js';
+import { Base64 } from "js-base64";
 
 
 export default {
@@ -38,11 +55,11 @@ export default {
     InboxOutlined,
   },
   setup() {
-
     const { proxy } = getCurrentInstance()
     const qiniu_token = ref('')
     const file_key = ref('')
     const fileitems = ref([])
+
     // 获取token和列表
     onMounted(() => {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
@@ -51,12 +68,10 @@ export default {
       params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
         qiniu_token.value = res.data.data.qiniu_token
-        fileitems.value=res.data.data.documents
-        console.log(fileitems.value)
+        fileitems.value = res.data.data.documents
       });
     })
     const handleBeforeUpload = (file) => {
-      console.log(file.name)
       file_key.value = file.name;
     }
     const handleChange = info => {
@@ -66,10 +81,30 @@ export default {
         //console.log(info.file, info.fileList);
       }
       if (status === 'done') {
-        message.success(`${info.file.name} file uploaded successfully.`);
+        message.success(`${info.file.name} 上传成功.`);
+        let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+        params.append("teacher_id", $cookies.get('teacher_id'));
+        params.append("login", $cookies.get('login'));
+        params.append("level", $cookies.get('level'));
+        proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
+          qiniu_token.value = res.data.data.qiniu_token
+          fileitems.value = res.data.data.documents
+        });
+
       } else if (status === 'error') {
-        message.error(`${info.file.name} file upload failed.`);
+        message.error(`${info.file.name} 上传失败.`);
       }
+    };
+    const deletefile = (file) => {
+      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+      params.append("teacher_id", $cookies.get('teacher_id'));
+      params.append("login", $cookies.get('login'));
+      params.append("level", $cookies.get('level'));
+      params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
+      proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
+        qiniu_token.value = res.data.data.qiniu_token
+        fileitems.value = res.data.data.documents
+      });
     };
     return {
       qiniu_token,
@@ -77,6 +112,7 @@ export default {
       fileitems,
       handleBeforeUpload,
       handleChange,
+      deletefile,
       fileList: ref([]),
       handleDrop: e => {
         console.log(e);
