@@ -77,18 +77,6 @@ export default defineComponent({
   }
 });
 
-//完善版判断变量类型
-var getVarType = function (val = 0) {
-  var type = typeof val
-  // object需要使用Object.prototype.toString.call判断
-  if (type === 'object') {
-    var typeStr = Object.prototype.toString.call(val)
-    // 解析[object String]
-    typeStr = typeStr.split(' ')[1]
-    type = typeStr.substring(0, typeStr.length - 1)
-  }
-  return type
-}
 
 
 //要使用jquery，必须修改vite.config.js并把下面两句加上

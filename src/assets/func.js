@@ -54,4 +54,15 @@ export default {
       res.s
     );
   },
+  getVarType(val) {
+    var type = typeof val;
+    // object需要使用Object.prototype.toString.call判断
+    if (type === "object") {
+      var typeStr = Object.prototype.toString.call(val);
+      // 解析[object String]
+      typeStr = typeStr.split(" ")[1];
+      type = typeStr.substring(0, typeStr.length - 1);
+    }
+    return type;
+  },
 };
