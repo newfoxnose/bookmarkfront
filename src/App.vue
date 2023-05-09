@@ -37,10 +37,16 @@ export default defineComponent({
           <RouterLink to="/manage">管理目录</RouterLink>
         </a-menu-item>
         <a-menu-item>
+          <RouterLink to="/profile">个人设置</RouterLink>
+        </a-menu-item>
+        <a-menu-item>
           <RouterLink to="/upload">导入</RouterLink>
         </a-menu-item>
         <a-menu-item>
-          <RouterLink to="/export">导出</RouterLink>
+          <RouterLink to="/export">导出至本地</RouterLink>
+        </a-menu-item>
+        <a-menu-item>
+          <RouterLink to="/email">发送至邮箱</RouterLink>
         </a-menu-item>
       </a-menu>
     </template>

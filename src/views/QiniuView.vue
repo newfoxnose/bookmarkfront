@@ -1,7 +1,7 @@
 <template>
   <h3 style="margin-top:15px;">文件</h3>
   <div>
-    <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" action="http://up-cn-east-2.qiniup.com"
+    <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" action="https://up-cn-east-2.qiniup.com"
       :data={token:qiniu_token,key:file_key} @change="handleChange" :before-upload="handleBeforeUpload"
       @drop="handleDrop">
       <p class="ant-upload-drag-icon">

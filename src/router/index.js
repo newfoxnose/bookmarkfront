@@ -60,6 +60,18 @@ const router = createRouter({
       name: 'qiniu',
       component: () => import('../views/QiniuView.vue')
     }
+    ,
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue')
+    }
+    ,
+    {
+      path: '/email',
+      name: 'email',
+      component: () => import('../components/email.vue')
+    }
   ]
 })
 
