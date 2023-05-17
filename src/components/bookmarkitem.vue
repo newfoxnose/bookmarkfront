@@ -18,7 +18,7 @@ export default {
 }
 </script>
 <template>
-  <div class="item" v-show="isShow(title, url)">
+  <div class="item" v-show="isShow(title, url)" :itemid=id>
     <img v-if="editable == 'yes'" :src="icon" style="width:16px;height:16px;margin-right:3px;"
       @click="$emit('editbookmark', '编辑书签', id, url, title, folder_id, is_private)">
     <img v-else :src="icon" style="width:16px;height:16px;">

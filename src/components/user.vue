@@ -168,7 +168,21 @@ export default defineComponent({
             // obj.success ? obj.success(res) : null
             message.info(res.data.msg);
             if (res.data.data != null) {
-              window.location.href = "/user"
+              let temp_item=res.data.data;
+              let folder_path=res.data.data.folder_path;
+              if (id != '' && action == "删除") {
+                this.items=this.$func.insert_item(this.items,folder_path,temp_item,"delete");
+                //document.querySelector("[itemid='" + id + "']").remove();
+              }
+              else if (id != ''){
+                let old_folder_path=res.data.data.old_folder_path;
+                this.items=this.$func.insert_item(this.items,old_folder_path,temp_item,"delete");   //删除旧的
+                this.items=this.$func.insert_item(this.items,folder_path,temp_item);                //插入新的
+              }
+              else{
+                this.items=this.$func.insert_item(this.items,folder_path,temp_item);
+              }
+              this.onClose();
             }
           })
           .catch(error => {
@@ -200,8 +214,12 @@ export default defineComponent({
               console.log(res.data)
               if (res.data.msg == "新建目录成功") {
                 message.info("新建目录成功");
-                this.folder_list = res.data.data;
+                this.folder_list = res.data.select_folder;
                 this.folder_id = String(res.data.inserted_id);
+                let temp_folder=res.data.data;
+                let folder_path=temp_folder.folder_path;
+                folder_path.pop();
+                this.items=this.$func.insert_item(this.items,folder_path,temp_folder,"newfolder");
               }
               else {
                 message.info(res.data.msg);
@@ -227,24 +245,35 @@ export default defineComponent({
     params.append("level", $cookies.get('level'));
     const { data: res } = await this.$http.post('/ajax/home_ajax/', params)
     this.items = res.data
+    console.log(res.data);
+    /*
+    var temp=res.data;
+    temp=this.$func.remove_item(temp, 3056) 
+    temp=this.$func.remove_item(temp, 3199) 
+    console.log(temp)
+    */
+    //document.querySelector("[itemid='"+id+"']");
+    //console.log(document.querySelector("[itemid='3199']"));
+
     const { data: folder_res } = await this.$http.post('/ajax/get_folder_ajax/', params)
     this.folder_list = folder_res.data.data
     this.folder_id = folder_res.data.data[0].value;
+
   },
 });
 </script>
  
 <template>
+  <div :folderid="-1">
   <h3 style="margin-top:15px;">根目录</h3>
-  <div>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
       :is_private="bookmarkitem.is_private" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
       @editbookmark="fatherMethod"></bookmarkitem>
   </div>
- 
+
   <div v-for="item in items.folder">
-    <subfolder :folder_name="item.folder_name" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
+    <subfolder :folder_name="item.folder_name" :folder_id="item.id" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
       :search="search" :editable="editable" :fatherMethod="fatherMethod">
     </subfolder>
   </div>

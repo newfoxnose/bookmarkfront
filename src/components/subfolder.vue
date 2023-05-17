@@ -12,6 +12,10 @@ defineProps({
     type: String,
     required: false
   },
+  folder_id: {
+    type: String,
+    required: true
+  },
   folder_bookmark: {
     type: Array,
     required: false
@@ -55,15 +59,15 @@ export default {
         let temp2=refs.innerHTML.match(/class\=\"item\"/g);
         if (temp != null) {
           if (temp.length ==temp2.length) {
-            console.log("aaa")
+            //console.log("aaa")
             return false
           }
           else {
-            console.log("bbb")
+            //console.log("bbb")
             return true
           }
         } else {
-          console.log("ccc")
+          //console.log("ccc")
           return true
         }
       }
@@ -73,9 +77,9 @@ export default {
 
 </script>
 <template>
-  <div ref="subFolderRefs" v-show="showTitle(subFolderRefs)">
+  <div ref="subFolderRefs" v-show="showTitle(subFolderRefs)" :folderid=folder_id>
     <h3>{{ folder_name }}</h3>
-    <div class="item" v-show="isShow(bookmarkitem.title, bookmarkitem.url)" v-for="bookmarkitem in folder_bookmark">
+    <div class="item" v-show="isShow(bookmarkitem.title, bookmarkitem.url)" v-for="bookmarkitem in folder_bookmark" :itemid=bookmarkitem.id>
       <img v-if="editable == 'yes'" :src="bookmarkitem.icon_display" style="width:16px;height:16px;margin-right:3px;"
         @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private)">
       <img v-else :src="bookmarkitem.icon_display" style="width:16px;height:16px;"
@@ -87,7 +91,7 @@ export default {
     </div>
   </div>
   <div v-for="item in subfolder">
-    <subfolder :folder_name="item.folder_name" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
+    <subfolder :folder_name="item.folder_name" :folder_id="item.id" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
       :search="search" :editable="editable" :fatherMethod="fatherMethod">
     </subfolder>
   </div>
