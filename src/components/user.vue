@@ -274,7 +274,7 @@ export default defineComponent({
 
   <div v-for="item in items.folder">
     <subfolder :folder_name="item.folder_name" :folder_id="item.id" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
-      :search="search" :editable="editable" :fatherMethod="fatherMethod">
+      :search="search" :editable="editable" :fatherMethod="fatherMethod" :display_offset="item.display_offset">
     </subfolder>
   </div>
 
