@@ -1,6 +1,5 @@
 <script setup>
 import bookmarkitem from './bookmarkitem.vue'
-import subfolder from './subfolder.vue'
 import { defineComponent, ref } from 'vue';
 import {
   CloseOutlined,
@@ -43,17 +42,11 @@ export default {
 
 </script>
 <template>
-   <h3 style="margin-top:15px;">根目录</h3>
+   <h3 style="margin-top:15px;">随机公开书签</h3>
   <div>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :url="bookmarkitem.url" :title="bookmarkitem.title"
       :short_title="bookmarkitem.short_title" :icon="bookmarkitem.icon_display" :search="search" :editable="editable" />
   </div>
-  <div v-for="item in items.folder">
-      <subfolder :folder_name="item.folder_name" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
-        :search="search" :editable="editable">
-      </subfolder>
-  </div>
-
   <div style="margin-bottom:20px;">
   </div>
 
