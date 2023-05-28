@@ -59,29 +59,20 @@ export default {
     },
     showTitle: function (refs) {
       if (this.$func.getVarType(refs) == "HTMLDivElement") {
-        let temp = refs.innerHTML.match(/display\:\ none/g);
-        let temp2=refs.innerHTML.match(/class\=\"item\"/g);
-        if (temp != null) {
-          if (temp.length ==temp2.length) {
-            //console.log("aaa")
-            return false
-          }
-          else {
-            //console.log("bbb")
-            return true
-          }
-        } else {
-          //console.log("ccc")
-          return true
-        }
+      let str=refs.innerHTML
+      if (str.toUpperCase().includes(this.search.toUpperCase())) {
+        return true
+      } else {
+        return false
       }
     }
+    },
   },
 };
 
 </script>
 <template>
-  <div ref="subFolderRefs" v-show="showTitle(subFolderRefs)" :folderid=folder_id :display_offset="display_offset" :style="{ 'margin-left': display_offset*10 + 'px' }">
+  <div ref="subFolderRefs" v-show="showTitle(subFolderRefs)" :folderid=folder_id :display_offset="display_offset" :style="{ 'margin-left': display_offset*15 + 'px' }">
     <h3>{{ folder_name }}</h3>
     <div class="item" v-show="isShow(bookmarkitem.title, bookmarkitem.url)" v-for="bookmarkitem in folder_bookmark" :itemid=bookmarkitem.id>
       <img v-if="editable == 'yes'" :src="bookmarkitem.icon_display" style="width:16px;height:16px;margin-right:3px;"
