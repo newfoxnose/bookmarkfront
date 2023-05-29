@@ -50,8 +50,10 @@ export default {
   {{ item.id }}
 </li>
   <div>
-    <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :url="bookmarkitem.url" :title="bookmarkitem.title"
-      :short_title="bookmarkitem.short_title" :icon="bookmarkitem.icon_display" :search="search" :editable="editable" />
+    <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
+      :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
+      :is_private="bookmarkitem.is_private" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"></bookmarkitem>
+
   </div>
   <div style="margin-bottom:20px;">
   </div>
