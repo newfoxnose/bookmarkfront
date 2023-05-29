@@ -30,8 +30,11 @@ export default {
     }
   },
   async mounted() {
+    console.log("mounted")
     const { data: res } = await this.$http.get('/ajax/index_ajax')
+    console.log(res.data)
     this.items = res.data
+    console.log("ajax requested")
   },
   defineComponent() {
     components: {
