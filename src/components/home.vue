@@ -46,6 +46,9 @@ export default {
 </script>
 <template>
    <h3 style="margin-top:15px;">随机公开书签</h3>
+   <li v-for="item in items.root_bookmarks">
+  {{ item.id }}
+</li>
   <div>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :url="bookmarkitem.url" :title="bookmarkitem.title"
       :short_title="bookmarkitem.short_title" :icon="bookmarkitem.icon_display" :search="search" :editable="editable" />
