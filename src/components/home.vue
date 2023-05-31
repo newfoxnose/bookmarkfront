@@ -46,9 +46,13 @@ export default {
 </script>
 <template>
    <h3 style="margin-top:15px;">随机公开书签</h3>
-   <li v-for="item in items.root_bookmarks">
-  {{ item.id }}
-</li>
+   <div v-for="item in items.root_bookmarks" class="item">
+    <img :src="item.icon" style="width:16px;height:16px;margin-right:3px;">
+    <a :href="item.url" :title="item.title" target="_blank">
+      {{ item.short_title }}
+    </a>
+  </div>
+
   <div>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
@@ -72,30 +76,18 @@ export default {
 </template>
 
 
-<style>
-
-
-.search-div {
-  display: flex;
-  flex-direction: column;
+<style scoped>
+.item {
+  margin-top: 2rem;
+  width: 300px;
+  display: inline-block;
 }
 
-.search {
-  align-self: center;
-  position: fixed;
-  bottom: 0;
-  z-index: 2;
-  display: inline;
-  width: 200px;
-}
 
-.search-div button {
-  height: 34px !important;
+@media (min-width: 1024px) {
+  .item {
+    margin-top: 0;
+    padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
+  }
 }
-
-#search {
-  border-color: #4cae4c;
-  border-width: 2px;
-}
-
 </style>
