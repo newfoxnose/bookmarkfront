@@ -297,7 +297,7 @@ export default defineComponent({
   </div>
 
   <a-drawer :width="500" :title="updatedDrawerTitle" placement="bottom" :visible="visible" @close="onClose">
-    <template #extra>
+    <template #extra v-if="updatedDrawerTitle=='编辑书签'">
       <a-button type="primary" danger @click="addBookmark(editId, '删除')">删除</a-button>
     </template>
 
