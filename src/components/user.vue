@@ -243,9 +243,14 @@ export default defineComponent({
       params.append("login", $cookies.get('login'));
       params.append("level", $cookies.get('level'));
       this.$http.post('/ajax/home_stream_ajax/' + folder_index, params).then((res) => {
-        if (res.data.data.next_folder_index!=-1) {
-          this.items.folder[folder_index]=res.data.data.folder[folder_index];
+        if (res.data.data.next_folder_index != -1) {
+          this.items.folder[folder_index] = res.data.data.folder[folder_index];
           this.home_stream_ajax(res.data.data.next_folder_index);
+        }
+        else {
+          this.$http.post('/ajax/update_http_code/', params).then((res) => {
+            console.log(res.data);
+          })
         }
       })
     }
