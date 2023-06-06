@@ -168,19 +168,19 @@ export default defineComponent({
             // obj.success ? obj.success(res) : null
             message.info(res.data.msg);
             if (res.data.data != null) {
-              let temp_item=res.data.data;
-              let folder_path=res.data.data.folder_path;
+              let temp_item = res.data.data;
+              let folder_path = res.data.data.folder_path;
               if (id != '' && action == "删除") {
-                this.items=this.$func.insert_item(this.items,folder_path,temp_item,"delete");
+                this.items = this.$func.insert_item(this.items, folder_path, temp_item, "delete");
                 //document.querySelector("[itemid='" + id + "']").remove();
               }
-              else if (id != ''){
-                let old_folder_path=res.data.data.old_folder_path;
-                this.items=this.$func.insert_item(this.items,old_folder_path,temp_item,"delete");   //删除旧的
-                this.items=this.$func.insert_item(this.items,folder_path,temp_item);                //插入新的
+              else if (id != '') {
+                let old_folder_path = res.data.data.old_folder_path;
+                this.items = this.$func.insert_item(this.items, old_folder_path, temp_item, "delete");   //删除旧的
+                this.items = this.$func.insert_item(this.items, folder_path, temp_item);                //插入新的
               }
-              else{
-                this.items=this.$func.insert_item(this.items,folder_path,temp_item);
+              else {
+                this.items = this.$func.insert_item(this.items, folder_path, temp_item);
               }
               this.onClose();
             }
@@ -216,10 +216,10 @@ export default defineComponent({
                 message.info("新建目录成功");
                 this.folder_list = res.data.select_folder;
                 this.folder_id = String(res.data.inserted_id);
-                let temp_folder=res.data.data;
-                let folder_path=temp_folder.folder_path;
+                let temp_folder = res.data.data;
+                let folder_path = temp_folder.folder_path;
                 folder_path.pop();
-                this.items=this.$func.insert_item(this.items,folder_path,temp_folder,"newfolder");
+                this.items = this.$func.insert_item(this.items, folder_path, temp_folder, "newfolder");
               }
               else {
                 message.info(res.data.msg);
@@ -236,6 +236,18 @@ export default defineComponent({
           message.info("正在请求数据，请勿重复点击");
         }
       }
+    },
+    home_stream_ajax(folder_index) {
+      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+      params.append("teacher_id", $cookies.get('teacher_id'));
+      params.append("login", $cookies.get('login'));
+      params.append("level", $cookies.get('level'));
+      this.$http.post('/ajax/home_stream_ajax/' + folder_index, params).then((res) => {
+        if (res.data.data.next_folder_index!=-1) {
+          this.items.folder[folder_index]=res.data.data.folder[folder_index];
+          this.home_stream_ajax(res.data.data.next_folder_index);
+        }
+      })
     }
   },
   async mounted() {
@@ -243,18 +255,12 @@ export default defineComponent({
     params.append("teacher_id", $cookies.get('teacher_id'));
     params.append("login", $cookies.get('login'));
     params.append("level", $cookies.get('level'));
-    const { data: res } = await this.$http.post('/ajax/home_ajax/', params)
+    const { data: res } = await this.$http.post('/ajax/home_stream_ajax/', params)
+    console.log(res.data)
     this.items = res.data
-    console.log(res.data);
-    /*
-    var temp=res.data;
-    temp=this.$func.remove_item(temp, 3056) 
-    temp=this.$func.remove_item(temp, 3199) 
-    console.log(temp)
-    */
-    //document.querySelector("[itemid='"+id+"']");
-    //console.log(document.querySelector("[itemid='3199']"));
-
+    if (res.data.next_folder_index != -1) {
+      this.home_stream_ajax(0);
+    }
     const { data: folder_res } = await this.$http.post('/ajax/get_folder_ajax/', params)
     this.folder_list = folder_res.data.data
     this.folder_id = folder_res.data.data[0].value;
@@ -265,7 +271,7 @@ export default defineComponent({
  
 <template>
   <div :folderid="-1">
-  <h3 style="margin-top:15px;">根目录</h3>
+    <h3 style="margin-top:15px;">根目录</h3>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
       :is_private="bookmarkitem.is_private" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
@@ -273,8 +279,9 @@ export default defineComponent({
   </div>
 
   <div v-for="item in items.folder">
-    <subfolder :folder_name="item.folder_name" :folder_id="item.id" :folder_bookmark="item.bookmarks" :subfolder="item.subfolder"
-      :search="search" :editable="editable" :fatherMethod="fatherMethod" :display_offset="item.display_offset">
+    <subfolder :folder_name="item.folder_name" :folder_id="item.id" :folder_bookmark="item.bookmarks"
+      :subfolder="item.subfolder" :search="search" :editable="editable" :fatherMethod="fatherMethod"
+      :display_offset="item.display_offset">
     </subfolder>
   </div>
 
@@ -297,7 +304,7 @@ export default defineComponent({
   </div>
 
   <a-drawer :width="500" :title="updatedDrawerTitle" placement="bottom" :visible="visible" @close="onClose">
-    <template #extra v-if="updatedDrawerTitle=='编辑书签'">
+    <template #extra v-if="updatedDrawerTitle == '编辑书签'">
       <a-button type="primary" danger @click="addBookmark(editId, '删除')">删除</a-button>
     </template>
 
