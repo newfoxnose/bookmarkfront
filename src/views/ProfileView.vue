@@ -70,7 +70,7 @@ export default defineComponent({
       <a-input-password v-model:value="formState.pwd_repeat" />
     </a-form-item>
     <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_domain" />
+      <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/"/>
     </a-form-item>
     <a-form-item label="七牛ACCESSKEY" name="qiniu_accesskey" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_accesskey" />

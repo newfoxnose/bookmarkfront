@@ -164,7 +164,7 @@ export default defineComponent({
         }
         const { data: res } = this.$http.post(ajax_url, params)
           .then(res => {
-            console.log(res.data);
+            //console.log(res.data);
             // obj.success ? obj.success(res) : null
             message.info(res.data.msg);
             if (res.data.data != null) {
@@ -261,7 +261,7 @@ export default defineComponent({
     params.append("login", $cookies.get('login'));
     params.append("level", $cookies.get('level'));
     const { data: res } = await this.$http.post('/ajax/home_stream_ajax/', params)
-    console.log(res.data)
+    //console.log(res.data)
     this.items = res.data
     if (res.data.next_folder_index != -1) {
       this.home_stream_ajax(0);

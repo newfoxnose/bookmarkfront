@@ -1,6 +1,6 @@
 <template>
   <h3 style="margin-top:15px;">文件</h3>
-  <div>
+  <div v-if="fileitems!=null">
     <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" action="https://up-cn-east-2.qiniup.com"
       :data={token:qiniu_token,key:file_key} @change="handleChange" :before-upload="handleBeforeUpload"
       @drop="handleDrop">
@@ -14,11 +14,14 @@
       </p>
     </a-upload-dragger>
   </div>
+  <div v-else>
+    <h5>七牛云账号信息未填写或错误。</h5>
+  </div>
   <div>
     <div v-for="item in fileitems" style="margin-bottom:5px;">
 
       <span class="ext">{{ item.key.split(".").pop() }}</span>
-      <a target="_blank" :href="'https://bookmark-files.o-oo.net.cn/' + item.key" style="margin-left:5px;">
+      <a target="_blank" :href="qiniu_domain +'/' + item.key" style="margin-left:5px;">
         {{ item.key }}
       </a>
       <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime) }})</span>
@@ -57,6 +60,7 @@ export default {
   setup() {
     const { proxy } = getCurrentInstance()
     const qiniu_token = ref('')
+    const qiniu_domain = ref('')
     const file_key = ref('')
     const fileitems = ref([])
 
@@ -68,6 +72,7 @@ export default {
       params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
         qiniu_token.value = res.data.data.qiniu_token
+        qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
       });
     })
@@ -88,6 +93,7 @@ export default {
         params.append("level", $cookies.get('level'));
         proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
           qiniu_token.value = res.data.data.qiniu_token
+          qiniu_domain.value = res.data.data.qiniu_domain
           fileitems.value = res.data.data.documents
         });
 
@@ -103,11 +109,13 @@ export default {
       params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
       proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
         qiniu_token.value = res.data.data.qiniu_token
+        qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
       });
     };
     return {
       qiniu_token,
+      qiniu_domain,
       file_key,
       fileitems,
       handleBeforeUpload,

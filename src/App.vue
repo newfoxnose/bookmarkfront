@@ -1,6 +1,5 @@
 <script>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 import { defineComponent } from 'vue';
 import { DownOutlined } from '@ant-design/icons-vue';
 
@@ -17,8 +16,6 @@ export default defineComponent({
       <img alt="Vue logo" class="logo" src="@/assets/logo.png" width="100" />
 
       <div class="wrapper">
-        <HelloWorld msg="书签网" />
-
         <nav>
           <RouterLink to="/">首页</RouterLink>
 
