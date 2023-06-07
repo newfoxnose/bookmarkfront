@@ -14,6 +14,8 @@ export default {
 
 </script>
 <template>
+
+
    <h3 style="margin-top:15px;">随机公开书签</h3>
    <div v-for="(item, index) in items.root_bookmarks" class="item">
     <img :src="item.icon_display" style="width:16px;height:16px;margin-right:3px;">

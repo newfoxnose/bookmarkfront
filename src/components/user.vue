@@ -30,11 +30,22 @@ export default defineComponent({
     const onClose = () => {
       visible.value = false;
     };
+    const defaultPercent = ref(10);
+    const increaseloading = () => {
+      const percent = defaultPercent.value + 10;
+      defaultPercent.value = percent > 95 ? 95 : percent;
+    };
+    const finishloading = () => {
+      defaultPercent.value = 100;
+    };
     return {
       visible,
       showDrawer,
       updatedDrawerTitle,
       onClose,
+      defaultPercent,
+      increaseloading,
+      finishloading
     };
   },
   data() {
@@ -51,7 +62,8 @@ export default defineComponent({
       editId: '',
       new_folder: '',
       new_folder_clicked: false,
-      is_private: false
+      is_private: false,
+      loadingdone:false
     }
   },
   watch: {
@@ -246,8 +258,11 @@ export default defineComponent({
         if (res.data.data.next_folder_index != -1) {
           this.items.folder[folder_index] = res.data.data.folder[folder_index];
           this.home_stream_ajax(res.data.data.next_folder_index);
+          this.increaseloading()
         }
         else {
+          this.finishloading()
+          this.loadingdone=true
           this.$http.post('/ajax/update_http_code/', params).then((res) => {
             console.log(res.data);
           })
@@ -275,6 +290,14 @@ export default defineComponent({
 </script>
  
 <template>
+    <div class="loadingbar" v-show="loadingdone==false">
+    <a-progress :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
+        from: '#108ee9',
+        to: '#87d068',
+      }"/>
+  </div>
+
+
   <div :folderid="-1">
     <h3 style="margin-top:15px;">根目录</h3>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
@@ -429,5 +452,20 @@ export default defineComponent({
 #search {
   border-color: #4cae4c;
   border-width: 2px;
+}
+
+
+.loadingbar {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  z-index: 10;
+  margin:0;
+  padding:0;
+}
+.loadingbar * {
+  margin:0;
+  padding:0;
 }
 </style>
