@@ -30,7 +30,7 @@ export default defineComponent({
     const onClose = () => {
       visible.value = false;
     };
-    const defaultPercent = ref(10);
+    const defaultPercent = ref(5);
     const increaseloading = () => {
       const percent = defaultPercent.value + 10;
       defaultPercent.value = percent > 95 ? 95 : percent;
@@ -291,9 +291,9 @@ export default defineComponent({
  
 <template>
     <div class="loadingbar" v-show="loadingdone==false">
-    <a-progress :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-        from: '#108ee9',
-        to: '#87d068',
+    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
+        '0%': '#108ee9',
+        '100%': '#87d068',
       }"/>
   </div>
 
@@ -457,15 +457,10 @@ export default defineComponent({
 
 .loadingbar {
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
+  top:50%;
+left:50%;
+transform: translate(-50%,-50%);
   z-index: 10;
-  margin:0;
-  padding:0;
 }
-.loadingbar * {
-  margin:0;
-  padding:0;
-}
+
 </style>
