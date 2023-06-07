@@ -83,6 +83,7 @@ export default {
         {{ bookmarkitem.short_title }}
       </a>
       <eye-invisible-two-tone v-if="bookmarkitem.is_private == '1'" style="margin-left:3px;" />
+      <span class="http_code" v-if="bookmarkitem.http_code != 200 && bookmarkitem.http_code != ''">{{ bookmarkitem.http_code }}</span>
     </div>
   </div>
   <div v-for="item in subfolder">
@@ -94,6 +95,14 @@ export default {
 
 
 <style scoped>
+.http_code {
+  transform: rotate(-5deg) ;
+  display:inline-block;
+  margin-left:5px;
+  font-weight:bold;
+  color:red;
+  text-decoration: underline;
+}
 .item {
   margin-top: 2rem;
   width: 300px;
@@ -104,7 +113,7 @@ export default {
 @media (min-width: 1024px) {
   .item {
     margin-top: 0;
-    padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
+    padding: 0.4rem 0 1rem 3rem;
   }
 }
 </style>

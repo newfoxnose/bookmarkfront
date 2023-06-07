@@ -279,7 +279,7 @@ export default defineComponent({
     <h3 style="margin-top:15px;">根目录</h3>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
-      :is_private="bookmarkitem.is_private" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
+      :is_private="bookmarkitem.is_private" :http_code="bookmarkitem.http_code" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
       @editbookmark="fatherMethod"></bookmarkitem>
   </div>
 
