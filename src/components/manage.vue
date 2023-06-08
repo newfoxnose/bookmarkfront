@@ -3,13 +3,13 @@ if ($cookies.get('login') != "yes") {
   window.location.href = "/login"
 }
 import {
-  HomeOutlined, PlusCircleOutlined
+  HomeOutlined
 } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { defineComponent, ref } from 'vue';
 export default defineComponent({
   components: {
-    HomeOutlined, PlusCircleOutlined
+    HomeOutlined
   },
   setup() {
     const visible = ref(false);
@@ -72,18 +72,13 @@ export default defineComponent({
         title: 'lv',
         dataIndex: 'lv'
       }, {
-        title: '目录名称',
-        dataIndex: 'name'
-      }, {
         title: '书签数量',
         dataIndex: 'amount'
       }, {
         title: '操作'
       }],
-      columns_addnew: [{
-        title: '添加目录'
-      }, {
-        title: '目录名称'
+      columns_addnew: [ {
+        title: '新目录名称'
       }, {
         title: '父目录',
       }, {
@@ -91,7 +86,7 @@ export default defineComponent({
       }],
       data_addnew: [{}],   //这里至少要有一条空记录
       new_folder_name: '',
-      new_father_id: '根目录',
+      new_father_id: '根目录',     
     }
   },
   methods: {
@@ -220,6 +215,9 @@ export default defineComponent({
       params.append("level", $cookies.get('level'));
       const { data: folder_res } = await this.$http.post('/ajax/manage_folder_ajax/', params)
       this.data = folder_res.data.data
+      if (folder_res.data.data[0]['name'] == '工作') {
+        this.new_father_id = folder_res.data.data[0]['value'];
+      }
     },
   },
   async mounted() {
@@ -239,10 +237,7 @@ export default defineComponent({
     <template #headerCell="{ column }">
     </template>
     <template #bodyCell="{ column, record }">
-      <template v-if="column.title == '添加目录'">
-        <plus-circle-outlined />
-      </template>
-      <template v-else-if="column.title == '目录名称'">
+      <template v-if="column.title == '新目录名称'">
         <a-input v-model:value="new_folder_name" />
       </template>
       <template v-else-if="column.title == '父目录'">
@@ -266,17 +261,14 @@ export default defineComponent({
     </template>
     <template #bodyCell="{ column, record }">
       <template v-if="column.title === 'lv'">
-        <span v-if="record.lv == -1">
+        <span v-if="record.lv == -1" style="margin-right:3px;">
           <home-outlined />
         </span>
         <span v-for="n in record.lv + 1" v-if="record.lv > -1">
           &nbsp;&nbsp;&nbsp;&nbsp;
         </span>
-        <img src="@/assets/expansion.png" width="20" height="20" v-if="record.lv > -1">
-      </template>
-      <template v-else-if="column.title === '目录名称'">
-        <a-input v-model:value="new_folder_name" v-if="record.lv == -2" />
-        <span v-else>{{ record.label }}</span>
+        <img src="@/assets/expansion.png?555" width="20" height="20" v-if="record.lv > -1">
+        <span style="margin-left:3px;">{{ record.name }}</span>
       </template>
       <template v-else-if="column.title === '操作'">
         <span v-if="record.lv == -1">

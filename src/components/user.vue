@@ -299,7 +299,7 @@ export default defineComponent({
 
 
   <div :folderid="-1">
-    <h3 style="margin-top:15px;">根目录</h3>
+    <h3 style="margin-top:15px;" v-if="$cookies.get('level')!='work'">根目录</h3>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
       :is_private="bookmarkitem.is_private" :http_code="bookmarkitem.http_code" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"

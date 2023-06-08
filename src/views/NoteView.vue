@@ -1,6 +1,7 @@
 <template>
   <h3 style="margin-top:15px;">随手记</h3>
   <a-button type="primary" @click="save">保存</a-button>
+  <span style="float:right" v-if="auto_save_count_down<10">距离下次自动保存还有{{ auto_save_count_down }}秒</span>
   <div style="border: 1px solid #ccc">
     <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
     <Editor style="height: 500px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig" :mode="mode"
@@ -9,7 +10,8 @@
 </template>
 
 <script>
-import { message } from 'ant-design-vue'; import '@wangeditor/editor/dist/css/style.css' // 引入 css
+import { message } from 'ant-design-vue';
+import '@wangeditor/editor/dist/css/style.css' // 引入 css
 
 import { onBeforeUnmount, ref, shallowRef, onMounted, getCurrentInstance } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
@@ -23,6 +25,7 @@ export default {
     const valueHtml = ref('<p>hello</p>')
 
     const { proxy } = getCurrentInstance()
+    const auto_save_count_down=ref(30)
     // ajax 异步获取内容
     onMounted(() => {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
@@ -36,11 +39,15 @@ export default {
         //valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
       }, 1500)
       setInterval(() => {
-        params.append("content", valueHtml.value);
-        proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
-          //valueHtml.value = res.data.data.note
-        });
-      }, 30000)   //每30秒自动保存一次
+        auto_save_count_down.value = auto_save_count_down.value - 1;
+        if (auto_save_count_down.value ==0) {
+          params.append("content", valueHtml.value);
+          proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
+            //valueHtml.value = res.data.data.note
+          });
+          auto_save_count_down.value =60;
+        }
+      }, 1000)  
     })
 
     const toolbarConfig = {}
@@ -65,9 +72,9 @@ export default {
       params.append("login", $cookies.get('login'));
       params.append("level", $cookies.get('level'));
       params.append("content", valueHtml.value);
-        proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
-          message.info("已保存");
-        });
+      proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
+        message.info("已保存");
+      });
     }
 
     return {
@@ -77,7 +84,8 @@ export default {
       toolbarConfig,
       editorConfig,
       handleCreated,
-      save
+      save,
+      auto_save_count_down
     };
   },
 }

@@ -21,6 +21,7 @@
   </a-form>
 </template>
 <script>
+import { message } from 'ant-design-vue'; 
 import { defineComponent, reactive } from 'vue';
 if ($cookies.get('login')=="yes"){
   window.location.href ="/user"
@@ -59,7 +60,10 @@ export default defineComponent({
             $cookies.set('level',res.data.data.level,"720h")  
             window.location.href ="/user"
           }
-          console.log(res.data);
+          else{
+            message.info("登入失败");
+          }
+          //console.log(res.data);
         })
         .catch(error => {
           // obj.error ? obj.error(error) : null;
