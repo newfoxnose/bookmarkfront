@@ -6,7 +6,7 @@ import {
   HomeOutlined
 } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-import { defineComponent, ref } from 'vue';
+import { onMounted,defineComponent, ref } from 'vue';
 export default defineComponent({
   components: {
     HomeOutlined
@@ -42,6 +42,15 @@ export default defineComponent({
     const close_movebookmark_drawer = () => {
       movebookmark_drawer_visible.value = false;
     };
+    onMounted(() => {
+      const interval=setInterval(() => {
+        const percent = defaultPercent.value + 10;
+        defaultPercent.value = percent > 95 ? 95 : percent;
+        if (defaultPercent.value>90){
+          clearInterval(interval);
+        }
+      }, 100)
+    })
     return {
       visible,
       showDrawer,
@@ -228,12 +237,6 @@ export default defineComponent({
   },
   async mounted() {
     this.load_data()
-    const interval=setInterval(() => {
-        this.defaultPercent = (this.defaultPercent+10) > 95 ? 95 : this.defaultPercent;
-        if (this.defaultPercent>90){
-          clearInterval(interval);
-        }
-      }, 10)
   },
 });
 </script>
