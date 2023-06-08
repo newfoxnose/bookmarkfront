@@ -12,6 +12,8 @@ export default defineComponent({
     HomeOutlined
   },
   setup() {
+    const defaultPercent = ref(10);
+    const loadingdone = ref(false);
     const visible = ref(false);
     const prompt_visible = ref(false);
     const empty_prompt_visible = ref(false);
@@ -52,7 +54,9 @@ export default defineComponent({
       close_movebookmark_drawer,
       empty_prompt_visible,
       show_empty_prompt,
-      hide_empty_prompt
+      hide_empty_prompt,
+      defaultPercent,
+      loadingdone
     };
   },
   data() {
@@ -215,6 +219,8 @@ export default defineComponent({
       params.append("level", $cookies.get('level'));
       const { data: folder_res } = await this.$http.post('/ajax/manage_folder_ajax/', params)
       this.data = folder_res.data.data
+      this.defaultPercent = 95;
+      this.loadingdone=true;
       if (folder_res.data.data[0]['name'] == '工作') {
         this.new_father_id = folder_res.data.data[0]['value'];
       }
@@ -226,6 +232,12 @@ export default defineComponent({
 });
 </script>
 <template>
+    <div class="loadingbar" v-show="loadingdone==false">
+    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
+        '0%': '#108ee9',
+        '100%': '#87d068',
+      }"/>
+  </div>
   <a-modal v-model:visible="prompt_visible" title="操作确认" ok-text="确认" cancel-text="取消" @ok="submitModify('删除')">
     <p>此操作将删除所选择的目录及其子目录、所有书签</p>
   </a-modal>
@@ -329,3 +341,13 @@ export default defineComponent({
     </a-form>
   </a-drawer>
 </template>
+<style scoped>
+
+.loadingbar {
+  position:fixed;
+  top:50%;
+left:50%;
+transform: translate(-50%,-50%);
+  z-index: 10;
+}
+</style>

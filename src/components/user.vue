@@ -21,6 +21,7 @@ export default defineComponent({
     PlusOutlined,
   },
   setup() {
+    const iconLoading = ref(false);
     const visible = ref(false);
     const updatedDrawerTitle = ref(String);
     const showDrawer = (drawerTitle) => {
@@ -45,7 +46,8 @@ export default defineComponent({
       onClose,
       defaultPercent,
       increaseloading,
-      finishloading
+      finishloading,
+      iconLoading
     };
   },
   data() {
@@ -149,6 +151,7 @@ export default defineComponent({
     },
     addBookmark(id, action) {
       if (this.url != '' && this.title != '' && this.folder_id != '') {
+        this.iconLoading = true;
         let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
         params.append("url", this.url);
         params.append("title", this.title);
@@ -176,6 +179,7 @@ export default defineComponent({
         }
         const { data: res } = this.$http.post(ajax_url, params)
           .then(res => {
+            this.iconLoading = false;
             //console.log(res.data);
             // obj.success ? obj.success(res) : null
             message.info(res.data.msg);
@@ -333,7 +337,7 @@ export default defineComponent({
 
   <a-drawer :width="500" :title="updatedDrawerTitle" placement="bottom" :visible="visible" @close="onClose">
     <template #extra v-if="updatedDrawerTitle == '编辑书签'">
-      <a-button type="primary" danger @click="addBookmark(editId, '删除')">删除</a-button>
+      <a-button type="primary" danger @click="addBookmark(editId, '删除')" :loading="iconLoading">删除</a-button>
     </template>
 
     <p>
@@ -364,7 +368,7 @@ export default defineComponent({
       <a-checkbox v-model:checked="is_private">私有</a-checkbox>
     </p>
     <p>
-      <a-button type="primary" @click="addBookmark(editId)">提交</a-button>
+      <a-button type="primary" @click="addBookmark(editId)" :loading="iconLoading">提交</a-button>
       &nbsp;
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </p>
