@@ -233,7 +233,7 @@ export default defineComponent({
         if (this.defaultPercent>90){
           clearInterval(interval);
         }
-      }, 100)
+      }, 5)
   },
 });
 </script>
