@@ -21,7 +21,7 @@ export default {
         if (this.defaultPercent>90){
           clearInterval(interval);
         }
-      }, 5)
+      }, 10)
     const { data: res } = await this.$http.get('/ajax/index_ajax')
     this.items = res.data
     this.defaultPercent = 95;
