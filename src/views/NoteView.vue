@@ -1,7 +1,7 @@
 <template>
   <h3 style="margin-top:15px;">随手记</h3>
   <a-button type="primary" @click="save">保存</a-button>
-  <span style="float:right" v-if="auto_save_count_down<10">距离下次自动保存还有{{ auto_save_count_down }}秒</span>
+  <span style="float:right" v-if="auto_save_count_down<10">距离下次自动保存还有<i style="color:red">{{ auto_save_count_down }}</i>秒</span>
   <div style="border: 1px solid #ccc">
     <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
     <Editor style="height: 500px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig" :mode="mode"
@@ -44,6 +44,9 @@ export default {
           params.append("content", valueHtml.value);
           proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
             //valueHtml.value = res.data.data.note
+            if (res.data.message=="保存成功"){
+              message.info("已自动保存");
+            }
           });
           auto_save_count_down.value =60;
         }
