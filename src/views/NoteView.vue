@@ -49,6 +49,7 @@ export default {
     // ajax 异步获取内容
     onMounted(() => {
       const interval=setInterval(() => {
+        console.log("aaa")
         const percent = defaultPercent.value + 10;
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value>90){
