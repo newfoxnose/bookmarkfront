@@ -86,7 +86,7 @@ export default {
     // 获取token和列表
     onMounted(() => {
       const interval=setInterval(() => {
-        const percent = defaultPercent.value + 10;
+        const percent = defaultPercent.value + 5;
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value>90){
           clearInterval(interval);
