@@ -54,7 +54,7 @@ export default {
         if (defaultPercent.value>90){
           clearInterval(interval);
         }
-      }, 1500)
+      }, 1000)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
