@@ -48,6 +48,13 @@ export default {
     const loadingdone = ref(false);
     // ajax 异步获取内容
     onMounted(() => {
+      const interval=setInterval(() => {
+        const percent = defaultPercent.value + 10;
+        defaultPercent.value = percent > 95 ? 95 : percent;
+        if (defaultPercent.value>90){
+          clearInterval(interval);
+        }
+      }, 1500)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));

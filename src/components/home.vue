@@ -16,8 +16,11 @@ export default {
     }
   },
   async mounted() {
-    setInterval(() => {
+    const interval=setInterval(() => {
         this.defaultPercent = (this.defaultPercent+10) > 95 ? 95 : this.defaultPercent;
+        if (this.defaultPercent>90){
+          clearInterval(interval);
+        }
       }, 1500)
     const { data: res } = await this.$http.get('/ajax/index_ajax')
     this.items = res.data
