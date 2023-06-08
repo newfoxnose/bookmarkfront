@@ -228,6 +228,9 @@ export default defineComponent({
   },
   async mounted() {
     this.load_data()
+    setInterval(() => {
+        this.defaultPercent = (this.defaultPercent+10) > 95 ? 95 : this.defaultPercent;
+      }, 1500)
   },
 });
 </script>

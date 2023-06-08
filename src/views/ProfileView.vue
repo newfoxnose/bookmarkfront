@@ -6,6 +6,7 @@ import { message } from 'ant-design-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 export default defineComponent({
   setup() {
+    const iconLoading = ref(false);
     const { proxy } = getCurrentInstance()
     const formState = ref([])
     onMounted(() => {
@@ -18,6 +19,7 @@ export default defineComponent({
       });
     })
     const onFinish = values => {
+      iconLoading.value = true;
       //console.log('提交数据Success:', values);
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
@@ -32,6 +34,7 @@ export default defineComponent({
       proxy.$http.post('/ajax/update_profile_ajax/', params).then(res => {
         formState.value=res.data.data;
         if (res.data.msg!=''){
+          iconLoading.value = false;
           if (res.data.msg!='修改成功!'){
             message.error(res.data.msg);
           }
@@ -49,6 +52,7 @@ export default defineComponent({
       formState,
       onFinish,
       onFinishFailed,
+      iconLoading
     };
   }
 });
@@ -85,8 +89,8 @@ export default defineComponent({
       <a-input-password v-model:value="formState.current_pwd" />
     </a-form-item>
 
-    <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
-      <a-button type="primary" html-type="submit">提交</a-button>
+    <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
+      <a-button type="primary" html-type="submit" :loading="iconLoading">提交</a-button>
     </a-form-item>
   </a-form>
 </template>
