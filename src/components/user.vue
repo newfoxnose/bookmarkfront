@@ -29,7 +29,7 @@ export default defineComponent({
       updatedDrawerTitle.value = drawerTitle;
     };
     const onClose = () => {
-      this.iconLoading = false;
+      iconLoading.value = false;
       visible.value = false;
     };
     const defaultPercent = ref(5);
