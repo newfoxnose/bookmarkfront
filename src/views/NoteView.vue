@@ -44,7 +44,7 @@ export default {
     const valueHtml = ref('<p>hello</p>')
 
     const { proxy } = getCurrentInstance()
-    const auto_save_count_down = ref(30)
+    const auto_save_count_down = ref(60)
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
     // ajax 异步获取内容
@@ -68,24 +68,29 @@ export default {
       setTimeout(() => {
         //valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
       }, 1500)
-      setInterval(() => {
-        auto_save_count_down.value = auto_save_count_down.value - 1;
-        if (auto_save_count_down.value == 0) {
-          params.append("content", valueHtml.value);
-          proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
-            //这个提示不会生效，但不要去掉，否则会重复多次请求
-            if (res.data.message == "保存成功") {
-              message.info("已自动保存");
-            }
-          });
-          auto_save_count_down.value = 60;
-        }
-      }, 1000)
+      /*
+                //停用自动保存，在一个用户多地登陆时会导致内容保存错误
+            setInterval(() => {
+              auto_save_count_down.value = auto_save_count_down.value - 1;
+              if (auto_save_count_down.value == 0) {
+                
+                params.append("content", valueHtml.value);
+                proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
+                  //这个提示不会生效，但不要去掉，否则会重复多次请求
+                  if (res.data.message == "保存成功") {
+                    message.info("已自动保存");
+                  }
+                });
+                
+                auto_save_count_down.value = 60;
+              }
+            }, 1000)
+      */
     })
     //编辑器配置
     const toolbarConfig = {
       excludeKeys: [
-        'emotion','uploadImage','uploadVideo'
+        'emotion', 'uploadImage', 'uploadVideo'
       ]
     }
     const editorConfig = {
