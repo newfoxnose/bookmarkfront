@@ -6,6 +6,7 @@ import { message } from 'ant-design-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 export default defineComponent({
   setup() {
+    const testuser = ref(false);
     const iconLoading = ref(false);
     const { proxy } = getCurrentInstance()
     const formState = ref([])
@@ -16,6 +17,9 @@ export default defineComponent({
       params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/get_profile_ajax/', params).then(res => {
         formState.value=res.data.data;
+        if (res.data.data.email=='test@test.com'){
+          testuser.value=true;
+        }
       });
     })
     const onFinish = values => {
@@ -52,7 +56,8 @@ export default defineComponent({
       formState,
       onFinish,
       onFinishFailed,
-      iconLoading
+      iconLoading,
+      testuser
     };
   }
 });
@@ -65,13 +70,13 @@ export default defineComponent({
       <a-input v-model:value="formState.name" />
     </a-form-item>
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
-      <a-input v-model:value="formState.email" />
+      <a-input v-model:value="formState.email" :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
-      <a-input-password v-model:value="formState.pwd" />
+      <a-input-password v-model:value="formState.pwd"  :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="重复新密码（不修改请留空）" name="pwd_repeat" :rules="[{ required:false }]">
-      <a-input-password v-model:value="formState.pwd_repeat" />
+      <a-input-password v-model:value="formState.pwd_repeat"  :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/"/>

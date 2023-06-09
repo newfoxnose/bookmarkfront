@@ -1,15 +1,16 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone==false">
+  <div class="loadingbar" v-show="loadingdone == false">
     <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-        '0%': '#108ee9',
-        '100%': '#87d068',
-      }"/>
+      '0%': '#108ee9',
+      '100%': '#87d068',
+    }" />
   </div>
 
 
   <h3 style="margin-top:15px;">随手记</h3>
-  <a-button type="primary" @click="save" :loading="iconLoading" >保存</a-button>
-  <span style="float:right" v-if="auto_save_count_down<10">距离自动保存还有<i style="color:red">{{ auto_save_count_down }}</i>秒</span>
+  <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
+  <span style="float:right" v-if="auto_save_count_down < 10">距离自动保存还有<i style="color:red">{{ auto_save_count_down
+  }}</i>秒</span>
   <div style="border: 1px solid #ccc">
     <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
     <Editor style="height: 500px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig" :mode="mode"
@@ -17,12 +18,11 @@
   </div>
 </template>
 <style scoped>
-
 .loadingbar {
-  position:fixed;
-  top:50%;
-left:50%;
-transform: translate(-50%,-50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 10;
 }
 </style>
@@ -35,6 +35,7 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 export default {
   components: { Editor, Toolbar },
   setup() {
+
     const iconLoading = ref(false);
     // 编辑器实例，必须用 shallowRef
     const editorRef = shallowRef()
@@ -43,15 +44,15 @@ export default {
     const valueHtml = ref('<p>hello</p>')
 
     const { proxy } = getCurrentInstance()
-    const auto_save_count_down=ref(30)
+    const auto_save_count_down = ref(30)
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
     // ajax 异步获取内容
     onMounted(() => {
-      const interval=setInterval(() => {
+      const interval = setInterval(() => {
         const percent = defaultPercent.value + 10;
         defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
+        if (defaultPercent.value > 90) {
           clearInterval(interval);
         }
       }, 100)
@@ -62,27 +63,31 @@ export default {
       proxy.$http.post('/ajax/note_ajax/', params).then(res => {
         valueHtml.value = res.data.data.note
         defaultPercent.value = 95;
-        loadingdone.value=true
+        loadingdone.value = true
       });
       setTimeout(() => {
         //valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
       }, 1500)
       setInterval(() => {
         auto_save_count_down.value = auto_save_count_down.value - 1;
-        if (auto_save_count_down.value ==0) {
+        if (auto_save_count_down.value == 0) {
           params.append("content", valueHtml.value);
           proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
             //这个提示不会生效，但不要去掉，否则会重复多次请求
-            if (res.data.message=="保存成功"){
+            if (res.data.message == "保存成功") {
               message.info("已自动保存");
             }
           });
-          auto_save_count_down.value =60;
+          auto_save_count_down.value = 60;
         }
-      }, 1000)  
+      }, 1000)
     })
-
-    const toolbarConfig = {}
+    //编辑器配置
+    const toolbarConfig = {
+      excludeKeys: [
+        'emotion','uploadImage','uploadVideo'
+      ]
+    }
     const editorConfig = {
       placeholder: '请输入内容...'
     }
