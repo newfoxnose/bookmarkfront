@@ -29,6 +29,7 @@ export default defineComponent({
       updatedDrawerTitle.value = drawerTitle;
     };
     const onClose = () => {
+      this.iconLoading = false;
       visible.value = false;
     };
     const defaultPercent = ref(5);
@@ -204,8 +205,7 @@ export default defineComponent({
           .catch(error => {
             // obj.error ? obj.error(error) : null;
             console.log(error);
-            message.info("出错了，请刷新");
-            this.iconLoading = false;
+            message.info("出错了，请刷新");            
             this.onClose();
           })
       }
