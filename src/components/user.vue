@@ -204,7 +204,9 @@ export default defineComponent({
           .catch(error => {
             // obj.error ? obj.error(error) : null;
             console.log(error);
-            message.info("出错了，请刷新本页");
+            message.info("出错了，请刷新");
+            this.iconLoading = false;
+            this.onClose();
           })
       }
       else {

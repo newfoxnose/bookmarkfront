@@ -1,15 +1,16 @@
 
 <script>
-import { onMounted,ref } from 'vue'
+import { message } from 'ant-design-vue';
+import { onMounted, ref } from 'vue'
 export default {
   setup() {
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
     onMounted(() => {
-      const interval=setInterval(() => {
+      const interval = setInterval(() => {
         const percent = defaultPercent.value + 10;
         defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
+        if (defaultPercent.value > 90) {
           clearInterval(interval);
         }
       }, 100)
@@ -25,20 +26,15 @@ export default {
     }
   },
   async mounted() {
-/*
-    this.proxy.$http.get('/ajax/index_ajax/').then(res => {
-
-      this.items = res.data
+    this.$http.get('/ajax/index_ajax').then(res => {
+      this.items = res.data.data
       this.defaultPercent = 95;
       this.loadingdone = true
+    }).catch(error => {
+      // obj.error ? obj.error(error) : null;
+      console.log(error);
+      message.info("出错了，请刷新");      //其他几个页面也要参考这个写出错提示
     });
-*/
-  
-  const { data: res } = await this.$http.get('/ajax/index_ajax')
-  this.items = res.data
-  this.defaultPercent = 95;
-  this.loadingdone=true
- 
   },
 }
 

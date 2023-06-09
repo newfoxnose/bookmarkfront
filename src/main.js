@@ -19,6 +19,8 @@ const app = createApp(App);
 axios.defaults.baseURL = "https://bm.gm.ws";
 //axios.defaults.baseURL = "http://bookmark.com";
 
+axios.defaults.timeout = 30000;   //axios全局超时时间
+
 /* 将 axios 挂载到全局，今后，每个组件中，
 都可以直接通过this.$http 代替 axios 发起 Ajax 请求 */
 app.config.globalProperties.$http = axios;
