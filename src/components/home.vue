@@ -8,7 +8,7 @@ export default {
     const loadingdone = ref(false);
     onMounted(() => {
       const interval = setInterval(() => {
-        const percent = defaultPercent.value + 10;
+        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value > 90) {
           clearInterval(interval);
@@ -28,7 +28,7 @@ export default {
   async mounted() {
     this.$http.get('/ajax/index_ajax').then(res => {
       this.items = res.data.data
-      this.defaultPercent = 95;
+      this.defaultPercent = 100;
       this.loadingdone = true
     }).catch(error => {
       // obj.error ? obj.error(error) : null;

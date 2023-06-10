@@ -44,7 +44,7 @@ export default defineComponent({
     };
     onMounted(() => {
       const interval=setInterval(() => {
-        const percent = defaultPercent.value + 10;
+        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value>90){
           clearInterval(interval);
@@ -228,7 +228,7 @@ export default defineComponent({
       params.append("level", $cookies.get('level'));
       const { data: folder_res } = await this.$http.post('/ajax/manage_folder_ajax/', params)
       this.data = folder_res.data.data
-      this.defaultPercent = 95;
+      this.defaultPercent = 100;
       this.loadingdone=true;
       if (folder_res.data.data[0]['name'] == '工作') {
         this.new_father_id = folder_res.data.data[0]['value'];

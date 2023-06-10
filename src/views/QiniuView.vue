@@ -86,7 +86,7 @@ export default {
     // 获取token和列表
     onMounted(() => {
       const interval=setInterval(() => {
-        const percent = defaultPercent.value + 5;
+        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value>90){
           clearInterval(interval);
@@ -100,7 +100,7 @@ export default {
         qiniu_token.value = res.data.data.qiniu_token
         qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
-        defaultPercent.value = 95;
+        defaultPercent.value = 100;
         loadingdone.value = true
       });
     })

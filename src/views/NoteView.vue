@@ -50,7 +50,7 @@ export default {
     // ajax 异步获取内容
     onMounted(() => {
       const interval = setInterval(() => {
-        const percent = defaultPercent.value + 10;
+        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value > 90) {
           clearInterval(interval);
@@ -62,7 +62,7 @@ export default {
       params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/note_ajax/', params).then(res => {
         valueHtml.value = res.data.data.note
-        defaultPercent.value = 95;
+        defaultPercent.value = 100;
         loadingdone.value = true
       });
       setTimeout(() => {
