@@ -72,7 +72,12 @@ const router = createRouter({
       name: 'email',
       component: () => import('../components/email.vue')
     }
-  ]
+  ],
+})
+router.onError((error, to) => {
+  if (error.message.includes('Failed to fetch dynamically imported module')) {
+    window.location = to.fullPath
+  }
 })
 
 export default router
