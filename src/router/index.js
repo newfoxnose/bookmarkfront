@@ -74,6 +74,8 @@ const router = createRouter({
     }
   ],
 })
+
+//这里是为了避免出现Failed to fetch dynamically imported module错误打不开网页
 router.onError((error, to) => {
   if (error.message.includes('Failed to fetch dynamically imported module')) {
     window.location = to.fullPath
