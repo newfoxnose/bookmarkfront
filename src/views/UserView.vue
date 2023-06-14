@@ -321,6 +321,7 @@ export default defineComponent({
   </div>
 
   <div style="margin-bottom:20px;">
+    &nbsp;
   </div>
 
   <div class="search-div">
