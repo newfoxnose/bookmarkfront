@@ -18,7 +18,7 @@ export default defineComponent({
     CloseOutlined,
     StarOutlined,
     SearchOutlined,
-    PlusOutlined,
+    PlusOutlined
   },
   setup() {
     const iconLoading = ref(false);
@@ -66,6 +66,9 @@ export default defineComponent({
       new_folder: '',
       new_folder_clicked: false,
       is_private: false,
+      is_published: false,
+      is_recommend: false,
+      is_friendlink: false,
       loadingdone:false
     }
   },
@@ -76,7 +79,7 @@ export default defineComponent({
     }
   },
   methods: {
-    fatherMethod(drawerTitle, id, url, title, folder_id, is_private) {
+    fatherMethod(drawerTitle, id, url, title, folder_id, is_private, is_published,is_recommend,is_friendlink) {
       if (drawerTitle == '编辑书签') {
         this.showDrawer(drawerTitle);
         this.editId = id;
@@ -87,6 +90,24 @@ export default defineComponent({
         }
         else {
           this.is_private = false;
+        }
+        if (is_published == 1) {
+          this.is_published = true;
+        }
+        else {
+          this.is_published = false;
+        }
+        if (is_recommend == 1) {
+          this.is_recommend = true;
+        }
+        else {
+          this.is_recommend = false;
+        }
+        if (is_friendlink == 1) {
+          this.is_friendlink = true;
+        }
+        else {
+          this.is_friendlink = false;
         }
         if (folder_id == -1) {
           this.folder_id = this.folder_list[0].value;
@@ -102,6 +123,9 @@ export default defineComponent({
         this.title = '';
         this.folder_id = this.folder_list[0].value;
         this.is_private = false;
+        this.is_published = false;
+        this.is_recommend = false;
+        this.is_friendlink = false;
       }
     },
     clearQuestion() {
@@ -162,6 +186,24 @@ export default defineComponent({
         }
         else {
           params.append("is_private", 0);
+        }
+        if (this.is_published == true) {
+          params.append("is_published", 1);
+        }
+        else {
+          params.append("is_published", 0);
+        }
+        if (this.is_recommend == true) {
+          params.append("is_recommend", 1);
+        }
+        else {
+          params.append("is_recommend", 0);
+        }
+        if (this.is_friendlink == true) {
+          params.append("is_friendlink", 1);
+        }
+        else {
+          params.append("is_friendlink", 0);
         }
         params.append("teacher_id", $cookies.get('teacher_id'));
         params.append("login", $cookies.get('login'));
@@ -309,7 +351,7 @@ export default defineComponent({
     <h3 style="margin-top:15px;" v-if="$cookies.get('level')!='work'">根目录</h3>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
-      :is_private="bookmarkitem.is_private" :http_code="bookmarkitem.http_code" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
+      :is_private="bookmarkitem.is_private" :is_published="bookmarkitem.is_published" :is_recommend="bookmarkitem.is_recommend" :is_friendlink="bookmarkitem.is_friendlink" :http_code="bookmarkitem.http_code" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
       @editbookmark="fatherMethod"></bookmarkitem>
   </div>
 
@@ -370,6 +412,9 @@ export default defineComponent({
     </p>
     <p>
       <a-checkbox v-model:checked="is_private">私有</a-checkbox>
+      <a-checkbox v-model:checked="is_published">发表</a-checkbox>
+      <a-checkbox v-model:checked="is_recommend">推荐</a-checkbox>
+      <a-checkbox v-model:checked="is_friendlink">友链</a-checkbox>
     </p>
     <p>
       <a-button type="primary" @click="addBookmark(editId)" :loading="iconLoading">提交</a-button>

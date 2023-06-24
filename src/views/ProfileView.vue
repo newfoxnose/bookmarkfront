@@ -59,7 +59,12 @@ export default defineComponent({
       iconLoading,
       testuser
     };
-  }
+  },
+  data() {
+    return {
+      theme_list: ["bs1.css","bs2.css","bs3.css","bs4.css","bs5.css","bs6.css","bs7.css","bs8.css","bs9.css","bs10.css","bs11.css","bs12.css","bs13.css","bs14.css","bs15.css","bs16.css","bs17.css","bs18.css","bs19.css","bs20.css","bs21.css","bs22.css","bs23.css","bs24.css","bs25.css"]
+    }
+  },
 });
 </script>
 <template>
@@ -89,6 +94,13 @@ export default defineComponent({
     </a-form-item>
     <a-form-item label="七牛BUCKET" name="qiniu_bucket" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_bucket" />
+    </a-form-item>
+    <a-form-item label="个人网站主题颜色" name="theme" :rules="[{ required: false }]">
+
+      <a-select style="width: 100%" v-model:value="formState.theme">
+        <a-select-option v-for="item in theme_list" :value="item"> {{ item }}</a-select-option>
+      </a-select>
+
     </a-form-item>
     <a-form-item label="现密码" name="current_pwd" :rules="[{ required:true, message: '现密码不能为空' }]">
       <a-input-password v-model:value="formState.current_pwd" />

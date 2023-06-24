@@ -1,6 +1,6 @@
 <script setup>
 //import bookmarkitem from './bookmarkitem.vue';     //不能再导入组件了，netlify不支持3层，本地可以
-import { EyeInvisibleTwoTone } from '@ant-design/icons-vue';
+import { EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone } from '@ant-design/icons-vue';
 import { onMounted, ref } from "vue";
 const subFolderRefs = ref([]);
 defineProps({
@@ -45,7 +45,7 @@ onMounted(() => {
 
 export default {
   components: {
-    EyeInvisibleTwoTone,
+    EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone
     //bookmarkitem
   },
   emits: ['fatherMethod'],
@@ -76,13 +76,16 @@ export default {
     <h3>{{ folder_name }}</h3>
     <div class="item" v-show="isShow(bookmarkitem.title, bookmarkitem.url)" v-for="bookmarkitem in folder_bookmark" :itemid=bookmarkitem.id>
       <img v-if="editable == 'yes'" :src="bookmarkitem.icon_display" style="width:16px;height:16px;margin-right:3px;"
-        @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private)">
+        @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private,bookmarkitem.is_published,bookmarkitem.is_recommend,bookmarkitem.is_friendlink)">
       <img v-else :src="bookmarkitem.icon_display" style="width:16px;height:16px;"
-        @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private)">
+        @click="fatherMethod('编辑书签', bookmarkitem.id, bookmarkitem.url, bookmarkitem.title, bookmarkitem.folder_id, bookmarkitem.is_private,bookmarkitem.is_published,bookmarkitem.is_recommend,bookmarkitem.is_friendlink)">
       <a :href="bookmarkitem.url" :title="bookmarkitem.title" target="_blank">
         {{ bookmarkitem.short_title }}
       </a>
       <eye-invisible-two-tone v-if="bookmarkitem.is_private == '1'" style="margin-left:3px;" />
+      <appstore-two-tone v-if="bookmarkitem.is_published == '1'" style="margin-left:3px;" />
+      <like-two-tone  v-if="bookmarkitem.is_recommend == '1'" style="margin-left:3px;" />
+    <api-two-tone  v-if="bookmarkitem.is_friendlink == '1'" style="margin-left:3px;" />
       <span class="http_code" v-if="bookmarkitem.http_code != 200 && bookmarkitem.http_code != ''">{{ bookmarkitem.http_code }}</span>
     </div>
   </div>
@@ -105,7 +108,7 @@ export default {
 }
 .item {
   margin-top: 2rem;
-  width: 300px;
+  width: 320px;
   display: inline-block;
 }
 
@@ -113,7 +116,7 @@ export default {
 @media (min-width: 1024px) {
   .item {
     margin-top: 0;
-    padding: 0.4rem 0 1rem 3rem;
+    padding: 0.4rem 0 1rem 2rem;
   }
 }
 </style>
