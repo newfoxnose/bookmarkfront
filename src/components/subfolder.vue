@@ -83,8 +83,8 @@ export default {
         {{ bookmarkitem.short_title }}
       </a>
       <eye-invisible-two-tone v-if="bookmarkitem.is_private == '1'" style="margin-left:3px;" />
-      <appstore-two-tone v-if="bookmarkitem.is_published == '1'" style="margin-left:3px;" />
-      <like-two-tone  v-if="bookmarkitem.is_recommend == '1'" style="margin-left:3px;" />
+      <RouterLink :to="'/editpost/'+bookmarkitem.id" v-if="bookmarkitem.is_published == '1'"><appstore-two-tone style="margin-left:3px;" /></RouterLink>
+       <like-two-tone  v-if="bookmarkitem.is_recommend == '1'" style="margin-left:3px;" />
     <api-two-tone  v-if="bookmarkitem.is_friendlink == '1'" style="margin-left:3px;" />
       <span class="http_code" v-if="bookmarkitem.http_code != 200 && bookmarkitem.http_code != ''">{{ bookmarkitem.http_code }}</span>
     </div>
