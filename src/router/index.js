@@ -71,6 +71,11 @@ const router = createRouter({
       path: '/email',
       name: 'email',
       component: () => import('../components/email.vue')
+    },
+    {
+      path: '/editpost/:id',
+      name: 'editpost',
+      component: () => import('../views/EditpostView.vue')
     }
   ],
 })

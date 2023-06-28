@@ -26,7 +26,7 @@ export default {
       {{ short_title }}
     </a>
     <eye-invisible-two-tone v-if="is_private == '1'" style="margin-left:3px;" />
-    <appstore-two-tone v-if="is_published == '1'" style="margin-left:3px;" />
+    <RouterLink :to="'/editpost/'+id" v-if="is_published == '1'"><appstore-two-tone style="margin-left:3px;" /></RouterLink>
     <like-two-tone  v-if="is_recommend == '1'" style="margin-left:3px;" />
     <api-two-tone  v-if="is_friendlink == '1'" style="margin-left:3px;" />
     <span class="http_code" v-if="http_code != 200 && http_code != ''">{{ http_code }}</span>
