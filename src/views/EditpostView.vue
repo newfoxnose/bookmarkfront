@@ -14,15 +14,12 @@
 
   <br><br>
   <a-form :model="formState">
-  <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
-      <a-input v-model:value="formState.title"/>
+    <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
+      <a-input v-model:value="formState.title" />
     </a-form-item>
   </a-form>
-  <div style="border: 1px solid #ccc">
-    <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
-    <Editor style="height: 500px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig" :mode="mode"
-      @onCreated="handleCreated" />
-  </div>
+
+  <vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-01"></vue-ueditor-wrap>
 </template>
 <style scoped>
 .loadingbar {
@@ -34,22 +31,18 @@
 }
 </style>
 <script>
-import { message } from 'ant-design-vue';
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
 
-import {  onBeforeUnmount, ref, shallowRef, onMounted, getCurrentInstance } from 'vue'
+
+import { message } from 'ant-design-vue';
+
+import { ref,  onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 export default {
-  components: { Editor, Toolbar },
   setup() {
     const formState = ref([])
     const router = useRouter()
-    console.log(router.currentRoute.value.params.id)
     const iconLoading = ref(false);
-    // 编辑器实例，必须用 shallowRef
-    const editorRef = shallowRef()
-    const title = ref('')
+
     // 内容 HTML
     const valueHtml = ref('<p>hello</p>')
 
@@ -60,7 +53,7 @@ export default {
     // ajax 异步获取内容
     onMounted(() => {
       const interval = setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
+        const percent = defaultPercent.value + Math.round(Math.random() * 7 + 2);
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value > 90) {
           clearInterval(interval);
@@ -73,37 +66,15 @@ export default {
       params.append("post_id", router.currentRoute.value.params.id);
       proxy.$http.post('/ajax/get_post_ajax/', params).then(res => {
         console.log(res.data)
-        //valueHtml.value = res.data.data.content
-        const editor = editorRef.value
-        editor.setHtml(res.data.data.content)
+        valueHtml.value = res.data.data.content
         defaultPercent.value = 100;
         loadingdone.value = true
-        formState.value.title=res.data.data.title
+        formState.value.title = res.data.data.title
       });
       setTimeout(() => {
         //valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
       }, 1500)
     })
-    //编辑器配置
-    const toolbarConfig = {
-      excludeKeys: [
-        'emotion', 'uploadImage', 'uploadVideo'
-      ]
-    }
-    const editorConfig = {
-      placeholder: '请输入内容...'
-    }
-
-    // 组件销毁时，也及时销毁编辑器
-    onBeforeUnmount(() => {
-      const editor = editorRef.value
-      if (editor == null) return
-      editor.destroy()
-    })
-
-    const handleCreated = (editor) => {
-      editorRef.value = editor // 记录 editor 实例，重要！
-    }
 
     const save = () => {
       iconLoading.value = true;
@@ -122,18 +93,23 @@ export default {
 
     return {
       formState,
-      editorRef,
-      title,
       valueHtml,
-      mode: 'default', // 或 'simple'
-      toolbarConfig,
-      editorConfig,
-      handleCreated,
       save,
       auto_save_count_down,
       iconLoading,
       defaultPercent,
       loadingdone
+    };
+  },
+  created() {
+    // 更多 UEditor 配置，参考 http://fex.baidu.com/ueditor/#start-config
+    this.editorConfig = {
+      toolbars: [
+        ['source', 'undo', 'redo'],
+        ['bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc']
+      ],
+      UEDITOR_HOME_URL: '/UEditor/', // 访问 UEditor 静态资源的根路径，可参考常见问题1
+      serverUrl: '//ueditor.zhenghaochuan.com/cos', // 服务端接口（这个地址是我为了方便各位体验文件上传功能搭建的临时接口，请勿在生产环境使用！！！）
     };
   },
 }

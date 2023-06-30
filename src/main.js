@@ -13,6 +13,9 @@ import axios from "axios";
 //导入自定义的全局函数
 import func from '@/assets/func'
 
+//导入ueditor
+import VueUeditorWrap from 'vue-ueditor-wrap';
+
 const app = createApp(App);
 
 /* 配置请求的根路径，远程后端 */
@@ -29,6 +32,7 @@ app.config.globalProperties.$cookies = VueCookies; //全局挂载cookies
 app.config.globalProperties.$func = func;//全局挂载自定义全局函数
 
 app.use(router);
+app.use(VueUeditorWrap);  //ueditor
 app.use(Antd); //for ant design
 
 app.mount("#app");
