@@ -44,7 +44,7 @@ export default defineComponent({
           <RouterLink to="/email">发送至邮箱</RouterLink>
         </a-menu-item>
         <a-menu-item>
-          <a :href="$cookies.get('teacher_id')">个人网站</a>
+          <RouterLink to="/domain" target="_blank">个人网站</RouterLink>
         </a-menu-item>
       </a-menu>
     </template>

@@ -77,6 +77,12 @@ const router = createRouter({
       name: 'editpost',
       component: () => import('../views/EditpostView.vue')
     }
+    ,
+    {
+      path: '/domain',
+      name: 'domain',
+      component: () => import('../components/domain.vue')
+    }   
   ],
 })
 
