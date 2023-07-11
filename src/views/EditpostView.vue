@@ -11,8 +11,9 @@
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
   <span style="float:right" v-if="auto_save_count_down < 10">距离自动保存还有<i style="color:red">{{ auto_save_count_down
   }}</i>秒</span>
-
-  <br><br>
+<p>网址：{{ formState.url }}
+  <a-button type="primary" @click="reload_url(editId)" :loading="iconLoading">重新获取网页内容</a-button>
+</p>
   <a-form :model="formState">
     <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
       <a-input v-model:value="formState.title" />
@@ -70,6 +71,7 @@ export default {
         defaultPercent.value = 100;
         loadingdone.value = true
         formState.value.title = res.data.data.title
+        formState.value.url = res.data.data.url
       });
       setTimeout(() => {
         //valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
@@ -90,11 +92,27 @@ export default {
         iconLoading.value = false;
       });
     }
+    
+    const reload_url = () => {
+      iconLoading.value = true;
+      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+      params.append("teacher_id", $cookies.get('teacher_id'));
+      params.append("login", $cookies.get('login'));
+      params.append("level", $cookies.get('level'));
+      params.append("url", formState.value.url);
+      proxy.$http.post('/ajax/url_title/', params).then(res => {
+        message.info("已重新获取");
+        formState.value.title = res.data.data.title
+        valueHtml.value = res.data.data.content
+        iconLoading.value = false;
+      });
+    }
 
     return {
       formState,
       valueHtml,
       save,
+      reload_url,
       auto_save_count_down,
       iconLoading,
       defaultPercent,
