@@ -1,0 +1,116 @@
+<script>
+if ($cookies.get('login') != "yes") {
+  window.location.href = "/login"
+}
+import { message } from 'ant-design-vue';
+import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
+export default defineComponent({
+  setup() {
+    const testuser = ref(false);
+    const iconLoading = ref(false);
+    const { proxy } = getCurrentInstance()
+    const formState = ref([])
+    onMounted(() => {
+      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+      params.append("teacher_id", $cookies.get('teacher_id'));
+      params.append("login", $cookies.get('login'));
+      params.append("level", $cookies.get('level'));
+      proxy.$http.post('/ajax/get_profile_ajax/', params).then(res => {
+        formState.value=res.data.data;
+        if (res.data.data.email=='test@test.com'){
+          testuser.value=true;
+        }
+      });
+    })
+    const onFinish = values => {
+      iconLoading.value = true;
+      //console.log('提交数据Success:', values);
+      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+      params.append("teacher_id", $cookies.get('teacher_id'));
+      params.append("login", $cookies.get('login'));
+      params.append("level", $cookies.get('level'));
+      for (var x in values){
+        if (values[x]==null){
+          values[x]='';
+        }
+        params.append(x, values[x]);
+      }
+      proxy.$http.post('/ajax/update_profile_ajax/', params).then(res => {
+        formState.value=res.data.data;
+        if (res.data.msg!=''){
+          iconLoading.value = false;
+          if (res.data.msg!='修改成功!'){
+            message.error(res.data.msg);
+          }
+          else{
+            message.success(res.data.msg);
+          }
+        }
+      });
+    };
+    const onFinishFailed = errorInfo => {
+      //message.success(`失败.`);
+      console.log('Failed:', errorInfo);
+    };
+    return {
+      formState,
+      onFinish,
+      onFinishFailed,
+      iconLoading,
+      testuser
+    };
+  },
+  data() {
+    return {
+      theme_list: ["bs1.css","bs2.css","bs3.css","bs4.css","bs5.css","bs6.css","bs7.css","bs8.css","bs9.css","bs10.css","bs11.css","bs12.css","bs13.css","bs14.css","bs15.css","bs16.css","bs17.css","bs18.css","bs19.css","bs20.css","bs21.css","bs22.css","bs23.css","bs24.css","bs25.css"]
+    }
+  },
+});
+</script>
+<template>
+  <div style="margin-top:15px;"></div>
+  <a-form :model="formState" name="basic" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }" autocomplete="off"
+    @finish="onFinish" @finishFailed="onFinishFailed">
+    <a-form-item label="昵称" name="name" :rules="[{ required: true, message: '昵称不能为空' }]">
+      <a-input v-model:value="formState.name" />
+    </a-form-item>
+    <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
+      <a-input v-model:value="formState.email" :disabled="testuser"/>
+    </a-form-item>
+    <a-form-item label="域名" name="domain" :rules="[{ required:true }]">
+      <a-input v-model:value="formState.domain" :disabled="testuser" suffix=".gm.ws"/>
+    </a-form-item>
+    <a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
+      <a-input-password v-model:value="formState.pwd"  :disabled="testuser"/>
+    </a-form-item>
+    <a-form-item label="重复新密码（不修改请留空）" name="pwd_repeat" :rules="[{ required:false }]">
+      <a-input-password v-model:value="formState.pwd_repeat"  :disabled="testuser"/>
+    </a-form-item>
+    <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
+      <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/"/>
+    </a-form-item>
+    <a-form-item label="七牛ACCESSKEY" name="qiniu_accesskey" :rules="[{ required: false }]">
+      <a-input v-model:value="formState.qiniu_accesskey" />
+    </a-form-item>
+    <a-form-item label="七牛SECRETKEY" name="qiniu_secretkey" :rules="[{ required: false }]">
+      <a-input v-model:value="formState.qiniu_secretkey" />
+    </a-form-item>
+    <a-form-item label="七牛BUCKET" name="qiniu_bucket" :rules="[{ required: false }]">
+      <a-input v-model:value="formState.qiniu_bucket" />
+    </a-form-item>
+    <a-form-item label="个人网站主题颜色" name="theme" :rules="[{ required: false }]">
+
+      <a-select style="width: 100%" v-model:value="formState.theme">
+        <a-select-option v-for="item in theme_list" :value="item"> {{ item }}</a-select-option>
+      </a-select>
+
+    </a-form-item>
+    <a-form-item label="现密码" name="current_pwd" :rules="[{ required:true, message: '现密码不能为空' }]">
+      <a-input-password v-model:value="formState.current_pwd" />
+    </a-form-item>
+
+    <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
+      <a-button type="primary" html-type="submit" :loading="iconLoading">提交</a-button>
+    </a-form-item>
+  </a-form>
+</template>

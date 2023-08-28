@@ -1,7 +1,3 @@
-<template>
-  <a-result title="重定向中......" sub-title="请稍等.......">
-  </a-result>
-</template>
 <script>
 import { message } from 'ant-design-vue';
 import { defineComponent } from 'vue';
@@ -17,7 +13,7 @@ export default defineComponent({
         if (res.data.msg == "请求成功") {
           var pattern_En = new RegExp("[0-9a-z]");
           if (pattern_En.test(res.data.data.domain)) {
-            window.location.href = "https://" + res.data.data.domain + ".gm.ws"
+            window.location.href = "http://" + res.data.data.domain + ".gm.ws"
           }
           else {
             window.location.href = res.data.data.domain;
