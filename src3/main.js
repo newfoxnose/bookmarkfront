@@ -19,8 +19,8 @@ import VueUeditorWrap from 'vue-ueditor-wrap';
 const app = createApp(App);
 
 /* 配置请求的根路径，远程后端 */
-//axios.defaults.baseURL = "https://bm.gm.ws";
-axios.defaults.baseURL = "http://bookmark.com";
+axios.defaults.baseURL = "https://bm.gm.ws";
+//axios.defaults.baseURL = "http://bookmark.com";
 
 axios.defaults.timeout = 30000;   //axios全局超时时间
 
