@@ -31,7 +31,7 @@ app.config.globalProperties.$cookies = VueCookies; //全局挂载cookies
 
 app.config.globalProperties.$func = func;//全局挂载自定义全局函数
 
-app.config.globalProperties.$remoteDomain = axios.defaults.baseURL
+app.config.globalProperties.$remoteDomain = axios.defaults.baseURL    //全局定义远程域名
 
 app.use(router);
 app.use(VueUeditorWrap);  //ueditor
