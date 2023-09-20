@@ -111,7 +111,10 @@ export default {
         formState.value.title = res.data.data.title
         valueHtml.value = res.data.data.content
         iconLoading.value = false;
-      });
+      }).catch(error => {
+        message.info("超时");
+            console.log(error);
+          });
     }
     return {
       formState,
