@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 //import bookmarkitem from './bookmarkitem.vue';     //不能再导入组件了，netlify不支持3层，本地可以
 import { EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone } from '@ant-design/icons-vue';
 import { onMounted, ref } from "vue";
@@ -40,7 +40,7 @@ defineProps({
 onMounted(() => {
   //console.log(subFolderRefs.value);
 });
-</script >
+</script>
 <script>
 
 export default {

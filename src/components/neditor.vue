@@ -1,21 +1,22 @@
 <template>
- 
-  <div>
+    <div>
         <div :id="this.id"></div>
     </div>
-
 </template>
+
 <script>
 
-import '/public/neditor/dist/neditor.config.js'
-import '/public/neditor/dist/neditor.all.min.js'
-import '/public/neditor/dist/i18n/zh-cn/zh-cn.js'
-//import '/public/neditor/dist/neditor.parse.min.js'
+import '../../public/neditor/neditor.config.js'
+import '../../public/neditor/neditor.all.min.js'
+//import '../../public/neditor/i18n/zh-cn/zh-cn.js'
+import '../../public/neditor/neditor.parse.min.js'
 
-export default {
-  name: 'editor',
-  props: ['id','r_content'],
-  data() {
+
+
+    export default {
+        name: 'editor',
+        props: ['id','r_content'],
+        data() {
             return {
                 ue: '', //ueditor实例
                 content: '', //编辑器内容
@@ -74,5 +75,9 @@ export default {
             }
         }
 
-}
+    }
 </script>
+
+<style>
+
+</style>

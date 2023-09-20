@@ -15,6 +15,8 @@ export default defineComponent({
       .then(res => {
         // obj.success ? obj.success(res) : null
         if (res.data.msg == "请求成功") {
+          window.location.href = "http://bookmark.com/u"+res.data.data.cookie_teacher_id;
+/*
           var pattern_En = new RegExp("[0-9a-z]");
           if (pattern_En.test(res.data.data.domain)) {
             window.location.href = "https://" + res.data.data.domain + ".gm.ws"
@@ -22,6 +24,7 @@ export default defineComponent({
           else {
             window.location.href = res.data.data.domain;
           }
+*/
         }
         else {
           message.info("请求失败");

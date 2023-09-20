@@ -11,18 +11,21 @@
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
   <span style="float:right" v-if="auto_save_count_down < 10">距离自动保存还有<i style="color:red">{{ auto_save_count_down
   }}</i>秒</span>
-<p>网址：
-  <a :href="formState.url" target="_blank">{{ formState.url }}</a>
-  &nbsp;&nbsp;
-  <a-button type="primary" @click="reload_url(editId)" :loading="iconLoading">重新获取网页内容</a-button>
-</p>
+  <p>网址：
+    <a :href="formState.url" target="_blank">{{ formState.url }}</a>
+    &nbsp;&nbsp;
+    <a-button type="primary" @click="reload_url(editId)" :loading="iconLoading">重新获取网页内容</a-button>
+  </p>
   <a-form :model="formState">
     <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
       <a-input v-model:value="formState.title" />
     </a-form-item>
   </a-form>
 
-  <vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-01"></vue-ueditor-wrap>
+  <keep-alive>
+    <editor ref="editor" id="editor" v-bind:r_content="setForm.rich_text">
+    </editor>
+  </keep-alive>
 </template>
 <style scoped>
 .loadingbar {
@@ -34,11 +37,10 @@
 }
 </style>
 <script>
-
-
+import editor from '@/components/neditor.vue'
 import { message } from 'ant-design-vue';
 
-import { ref,  onMounted, getCurrentInstance } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 export default {
   setup() {
@@ -94,7 +96,7 @@ export default {
         iconLoading.value = false;
       });
     }
-    
+
     const reload_url = () => {
       iconLoading.value = true;
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
@@ -121,21 +123,8 @@ export default {
       loadingdone
     };
   },
-  created() {
-    // 更多 UEditor 配置，参考 http://fex.baidu.com/ueditor/#start-config
-    this.editorConfig = {
-      /*
-      toolbars: [
-        ['source', 'undo', 'redo'],
-        ['bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc','simpleupload']
-      ],
-      */
-      //UEDITOR_HOME_URL: '/neditor/',
-      UEDITOR_HOME_URL: '/UEditor/', // 访问 UEditor 静态资源的根路径，可参考常见问题1
-      lang:'zh-cn',
-      //serverUrl: '//bookmark.com/neditor/controller.php?id='+$cookies.get('teacher_id'), // 服务端接口
-      serverUrl: '//bookmark.com/ueditor/controller.php?id='+$cookies.get('teacher_id'), // 服务端接口
-    };
-  },
+  data() {
+    return { rich_text: '', }
+  }
 }
 </script>
