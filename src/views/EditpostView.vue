@@ -109,7 +109,6 @@ export default {
         iconLoading.value = false;
       });
     }
-
     return {
       formState,
       valueHtml,
@@ -120,6 +119,7 @@ export default {
       defaultPercent,
       loadingdone
     };
+    
   },
   created() {
     // 更多 UEditor 配置，参考 http://fex.baidu.com/ueditor/#start-config
@@ -132,9 +132,9 @@ export default {
       */
       UEDITOR_HOME_URL: '/UEditor/', // 访问 UEditor 静态资源的根路径，可参考常见问题1
       lang:'zh-cn',
-      //serverUrl: '//bookmark.com/ueditor/controller.php?id='+$cookies.get('teacher_id'), // 服务端接口
-      serverUrl: '//bm.gm.ws/ueditor/controller.php?id='+$cookies.get('teacher_id'), // 服务端接口
+      serverUrl: this.$remoteDomain+'/ueditor/controller.php?id='+$cookies.get('teacher_id'), // 服务端接口
     };
   },
 }
+
 </script>
