@@ -93,7 +93,8 @@ export default {
         message.info("已保存");
         iconLoading.value = false;
       }).catch(error => {
-        message.info("超时");
+        message.info("无法正常保存");
+        iconLoading.value = false;
             console.log(error);
           });
     }
@@ -112,7 +113,8 @@ export default {
         valueHtml.value = res.data.data.content
         iconLoading.value = false;
       }).catch(error => {
-        message.info("超时");
+        message.info("无法正常获取");
+        iconLoading.value = false;
             console.log(error);
           });
     }
