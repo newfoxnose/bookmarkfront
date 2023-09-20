@@ -141,6 +141,8 @@ export default {
       */
       UEDITOR_HOME_URL: '/UEditor/', // 访问 UEditor 静态资源的根路径，可参考常见问题1
       lang:'zh-cn',
+      // 初始容器高度
+      initialFrameHeight: 360,
       serverUrl: this.$remoteDomain+'/ueditor/controller.php?id='+$cookies.get('teacher_id'), // 服务端接口
     };
   },
