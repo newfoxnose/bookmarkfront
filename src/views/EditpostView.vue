@@ -92,7 +92,10 @@ export default {
       proxy.$http.post('/ajax/save_post_ajax/', params).then(res => {
         message.info("已保存");
         iconLoading.value = false;
-      });
+      }).catch(error => {
+        message.info("超时");
+            console.log(error);
+          });
     }
     
     const reload_url = () => {
