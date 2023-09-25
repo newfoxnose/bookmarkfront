@@ -77,12 +77,28 @@ const router = createRouter({
       name: 'editpost',
       component: () => import('../views/EditpostView.vue')
     }
+    ,{
+      path: '/compose',
+      name: 'compose',
+      component: () => import('../views/ComposeView.vue')
+    }
     ,
     {
       path: '/domain',
       name: 'domain',
       component: () => import('../components/domain.vue')
-    }   
+    }  
+    ,
+    {
+      path: '/blog',
+      name: 'blog',
+      component: () => import('../views/BlogView.vue')
+    }  ,
+    {
+      path: '/editblog/:id',
+      name: 'editblog',
+      component: () => import('../views/EditblogView.vue')
+    }
   ],
 })
 
