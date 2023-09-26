@@ -45,13 +45,14 @@ export default {
 
 .item {
   margin-top: 2rem;
-  width: 320px;
+  width: 50%;
   display: inline-block;
 }
 
 
 @media (min-width: 1024px) {
   .item {
+    width: 33%;
     margin-top: 0;
     padding: 0.4rem 0 1rem 2rem;
   }

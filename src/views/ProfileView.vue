@@ -74,6 +74,9 @@ export default defineComponent({
     <a-form-item label="昵称" name="name" :rules="[{ required: true, message: '昵称不能为空' }]">
       <a-input v-model:value="formState.name" />
     </a-form-item>
+    <a-form-item label="SLOGAN" name="slogan">
+      <a-input v-model:value="formState.slogan" />
+    </a-form-item>
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
       <a-input v-model:value="formState.email" :disabled="testuser"/>
     </a-form-item>
