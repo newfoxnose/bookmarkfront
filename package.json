@@ -12,6 +12,7 @@
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "ant-design-vue": "^3.2.15",
+    "fingerprintjs2": "^2.1.4",
     "jquery": "^3.6.4",
     "js-base64": "^3.7.5",
     "qiniu-js": "^3.4.1",
