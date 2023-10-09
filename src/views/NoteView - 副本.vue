@@ -6,13 +6,16 @@
     }" />
   </div>
 
+
   <h3 style="margin-top:15px;">随手记</h3>
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
   <span style="float:right" v-if="auto_save_count_down < 10">距离自动保存还有<i style="color:red">{{ auto_save_count_down
   }}</i>秒</span>
-
-<vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-01"></vue-ueditor-wrap>
-
+  <div style="border: 1px solid #ccc">
+    <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
+    <Editor style="height: 500px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig" :mode="mode"
+      @onCreated="handleCreated" />
+  </div>
 </template>
 <style scoped>
 .loadingbar {
@@ -25,13 +28,17 @@
 </style>
 <script>
 import { message } from 'ant-design-vue';
+import '@wangeditor/editor/dist/css/style.css' // 引入 css
 
-import { onBeforeUnmount, ref, onMounted, getCurrentInstance } from 'vue'
-
+import { onBeforeUnmount, ref, shallowRef, onMounted, getCurrentInstance } from 'vue'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 export default {
+  components: { Editor, Toolbar },
   setup() {
 
     const iconLoading = ref(false);
+    // 编辑器实例，必须用 shallowRef
+    const editorRef = shallowRef()
 
     // 内容 HTML
     const valueHtml = ref('<p>hello</p>')
@@ -80,6 +87,26 @@ export default {
             }, 1000)
       */
     })
+    //编辑器配置
+    const toolbarConfig = {
+      excludeKeys: [
+        'emotion', 'uploadImage', 'uploadVideo'
+      ]
+    }
+    const editorConfig = {
+      placeholder: '请输入内容...'
+    }
+
+    // 组件销毁时，也及时销毁编辑器
+    onBeforeUnmount(() => {
+      const editor = editorRef.value
+      if (editor == null) return
+      editor.destroy()
+    })
+
+    const handleCreated = (editor) => {
+      editorRef.value = editor // 记录 editor 实例，重要！
+    }
 
     const save = () => {
       iconLoading.value = true;
@@ -95,28 +122,17 @@ export default {
     }
 
     return {
+      editorRef,
       valueHtml,
+      mode: 'default', // 或 'simple'
+      toolbarConfig,
+      editorConfig,
+      handleCreated,
       save,
       auto_save_count_down,
       iconLoading,
       defaultPercent,
       loadingdone
-    };
-  },
-  created() {
-    // 更多 UEditor 配置，参考 http://fex.baidu.com/ueditor/#start-config
-    this.editorConfig = {
-      /*
-      toolbars: [
-        ['source', 'undo', 'redo'],
-        ['bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc','simpleupload']
-      ],
-      */
-      UEDITOR_HOME_URL: '/UEditor/', // 访问 UEditor 静态资源的根路径，可参考常见问题1
-      lang:'zh-cn',
-      // 初始容器高度
-      initialFrameHeight: 360,
-      serverUrl: this.$remoteDomain+'/ueditor/controller.php?id='+$cookies.get('teacher_id'), // 服务端接口
     };
   },
 }
