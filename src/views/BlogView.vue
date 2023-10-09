@@ -13,6 +13,8 @@
       <a :href=" '/editblog/' + item.id " style="margin-left:5px;">
         {{ item.title }}
       </a>
+      <eye-invisible-two-tone v-if="item.is_private == '1'" style="margin-left:3px;" />
+      <like-two-tone  v-if="item.is_recommend == '1'" style="margin-left:3px;" />
       <span style="margin-left:20px;">( {{ item.createtime}})</span>
       <a style="margin-left:20px;" @click="deletefile(item.id)">删除</a>
 
@@ -44,7 +46,8 @@
 </style>
 <script>
 import { message } from 'ant-design-vue';
-import { InboxOutlined } from '@ant-design/icons-vue';
+
+import { InboxOutlined,EyeInvisibleTwoTone,LikeTwoTone } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import * as qiniu from 'qiniu-js';
 import { Base64 } from "js-base64";
@@ -52,7 +55,7 @@ import { Base64 } from "js-base64";
 
 export default {
   components: {
-    InboxOutlined,
+    InboxOutlined,EyeInvisibleTwoTone,LikeTwoTone
   },
   setup() {
     const defaultPercent = ref(10);

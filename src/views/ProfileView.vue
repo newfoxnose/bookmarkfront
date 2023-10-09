@@ -80,8 +80,8 @@ export default defineComponent({
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
       <a-input v-model:value="formState.email" :disabled="testuser"/>
     </a-form-item>
-    <a-form-item label="域名" name="domain" :rules="[{ required:true }]">
-      <a-input v-model:value="formState.domain" :disabled="testuser" suffix=".gm.ws"/>
+    <a-form-item label="域名" name="domain" style="display:none">
+      <a-input v-model:value="formState.domain" :disabled="testuser" suffix="功能未完成"/>
     </a-form-item>
     <a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
       <a-input-password v-model:value="formState.pwd"  :disabled="testuser"/>

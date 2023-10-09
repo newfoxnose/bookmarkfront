@@ -7,7 +7,7 @@
   </div>
   <h3 style="margin-top:15px;">文件</h3>
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
-  <div v-if="fileitems != null">
+  <div v-if="qiniu_token != ''">
     <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" action="https://up-cn-east-2.qiniup.com"
       :data={token:qiniu_token,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
       @drop=" handleDrop ">
@@ -29,7 +29,7 @@
 
       <span class="ext">{{ item.key.split(".").pop() }}</span>
       <a target="_blank" :href=" qiniu_domain + '/' + item.key " style="margin-left:5px;">
-        {{ item.key }}
+        {{ item.key.substring(11) }}
       </a>
       <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime)
         }})</span>
@@ -97,15 +97,22 @@ export default {
       params.append("login", $cookies.get('login'));
       params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
+        console.log(res.data)
+        if (res.data.code=="200"){
+          res.data.data.documents.shift()
         qiniu_token.value = res.data.data.qiniu_token
         qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
+        }
+        else{
+          message.error(res.data.msg);
+        }
         defaultPercent.value = 100;
         loadingdone.value = true
       });
     })
     const handleBeforeUpload = (file) => {
-      file_key.value = file.name;
+      file_key.value = "attachment/"+file.name;
     }
     const handleChange = info => {
       const status = info.file.status;
@@ -120,6 +127,7 @@ export default {
         params.append("login", $cookies.get('login'));
         params.append("level", $cookies.get('level'));
         proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
+          res.data.data.documents.shift()
           qiniu_token.value = res.data.data.qiniu_token
           qiniu_domain.value = res.data.data.qiniu_domain
           fileitems.value = res.data.data.documents
@@ -136,6 +144,7 @@ export default {
       params.append("level", $cookies.get('level'));
       params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
       proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
+        res.data.data.documents.shift()
         qiniu_token.value = res.data.data.qiniu_token
         qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
