@@ -23877,6 +23877,7 @@ UE.plugin.register('autoupload', function (){
                         //获取粘贴板文件列表或者拖放文件列表
                         items = e.type == 'paste' ? getPasteImage(e):getDropImage(e);
                         if(items){
+                            alert("存在远程图片，请耐心等待处理完毕");
                             var len = items.length,
                                 file;
                             while (len--){

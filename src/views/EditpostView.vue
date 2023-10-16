@@ -106,7 +106,7 @@ export default {
       params.append("login", $cookies.get('login'));
       params.append("level", $cookies.get('level'));
       params.append("url", formState.value.url);
-      proxy.$http.post('/ajax/url_title/', params).then(res => {
+      proxy.$http.post('/ajax/url_content/', params).then(res => {
         //console.log(res);
         message.info("已重新获取");
         formState.value.title = res.data.data.title
