@@ -11,13 +11,12 @@ export default defineComponent({
     let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
     params.append("teacher_id", $cookies.get('teacher_id'));
     params.append("level", $cookies.get('level'));
-    const { data: res } = this.$http.post('/ajax/domain_ajax', params)
+    const { data: res } = this.$http.post('/ajax/note_ajax', params)
       .then(res => {
         // obj.success ? obj.success(res) : null
         if (res.data.msg == "请求成功") {
-          console.log(res.data.return_domain);
+          console.log(res.data.data.domain);
           //window.location.href = this.$remoteDomain+"/u"+res.data.data.cookie_teacher_id;
-
         }
         else {
           message.info("请求失败");
