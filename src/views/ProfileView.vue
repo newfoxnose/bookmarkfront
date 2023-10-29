@@ -80,15 +80,10 @@ export default defineComponent({
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
       <a-input v-model:value="formState.email" :disabled="testuser"/>
     </a-form-item>
-    <a-form-item label="域名" name="domain" style="display:none">
-      <a-input v-model:value="formState.domain" :disabled="testuser" suffix="功能未完成"/>
+    <a-form-item label="域名" name="domain">
+      <a-input v-model:value="formState.domain" :disabled="testuser"/>
     </a-form-item>
-    <a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
-      <a-input-password v-model:value="formState.pwd"  :disabled="testuser"/>
-    </a-form-item>
-    <a-form-item label="重复新密码（不修改请留空）" name="pwd_repeat" :rules="[{ required:false }]">
-      <a-input-password v-model:value="formState.pwd_repeat"  :disabled="testuser"/>
-    </a-form-item>
+ 
     <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/"/>
     </a-form-item>
@@ -101,12 +96,16 @@ export default defineComponent({
     <a-form-item label="七牛BUCKET" name="qiniu_bucket" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_bucket" />
     </a-form-item>
-    <a-form-item label="个人网站主题颜色" name="theme" :rules="[{ required: false }]">
-
-      <a-select style="width: 100%" v-model:value="formState.theme">
-        <a-select-option v-for="item in theme_list" :value="item"> {{ item }}</a-select-option>
-      </a-select>
-
+    <a-form-item label="个人网站主题" name="theme" :rules="[{ required: false }]">
+      <a-radio-group v-model:value="formState.theme" size="large" button-style="solid" class="radio-check">
+        <a-radio-button v-for="item in theme_list" :value="item" class="theme_thumbnail"><img :src="'images/'+ item +'.png'" /></a-radio-button>
+      </a-radio-group>
+</a-form-item>
+<a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
+      <a-input-password v-model:value="formState.pwd"  :disabled="testuser"/>
+    </a-form-item>
+    <a-form-item label="重复新密码（不修改请留空）" name="pwd_repeat" :rules="[{ required:false }]">
+      <a-input-password v-model:value="formState.pwd_repeat"  :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="现密码" name="current_pwd" :rules="[{ required:true, message: '现密码不能为空' }]">
       <a-input-password v-model:value="formState.current_pwd" />
@@ -117,3 +116,26 @@ export default defineComponent({
     </a-form-item>
   </a-form>
 </template>
+
+<style scoped>
+.theme_thumbnail{
+  margin:5px;
+  width:130px;
+  height:82px;
+  padding:3px;
+}
+.theme_thumbnail img{
+  width:100%;
+  border-style:solid;
+  border-width:thin;
+  border-color:white;
+  filter: brightness(0.7);
+}
+.ant-radio-button-wrapper-checked {
+  border-color:rgb(81, 19, 214) !important;
+  background-color:rgb(81, 19, 214) !important;
+}
+.ant-radio-button-wrapper-checked img {
+  filter: brightness(1.2);
+}
+</style>

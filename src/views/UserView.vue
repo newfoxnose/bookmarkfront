@@ -412,7 +412,7 @@ export default defineComponent({
     </p>
     <p>
       <a-checkbox v-model:checked="is_private">私有</a-checkbox>
-      <a-checkbox v-model:checked="is_published">发表</a-checkbox>
+      <a-checkbox v-model:checked="is_published">采集</a-checkbox>
       <a-checkbox v-model:checked="is_recommend">推荐</a-checkbox>
       <a-checkbox v-model:checked="is_friendlink">友链</a-checkbox>
     </p>
