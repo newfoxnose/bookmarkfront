@@ -16,8 +16,7 @@ export default defineComponent({
         // obj.success ? obj.success(res) : null
         if (res.data.msg == "请求成功") {
           console.log(res.data.return_domain);
-          //window.location.href = this.$remoteDomain+"/u"+res.data.data.cookie_teacher_id;
-
+          window.location.href =res.data.return_domain;
         }
         else {
           message.info("请求失败");
