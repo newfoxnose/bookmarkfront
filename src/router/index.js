@@ -86,7 +86,12 @@ const router = createRouter({
     {
       path: '/domain',
       name: 'domain',
-      component: () => import('../components/domain.vue')
+      component: () => import('../views/DomainView.vue')
+    } ,
+    {
+      path: '/redirect',
+      name: 'redirect',
+      component: () => import('../components/redirect.vue')
     }  
     ,
     {

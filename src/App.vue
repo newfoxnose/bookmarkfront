@@ -39,6 +39,9 @@ export default defineComponent({
           <RouterLink to="/profile">个人设置</RouterLink>
         </a-menu-item>
         <a-menu-item>
+          <RouterLink to="/domain">个人域名设置</RouterLink>
+        </a-menu-item>
+        <a-menu-item>
           <RouterLink to="/upload">导入</RouterLink>
         </a-menu-item>
         <a-menu-item>
@@ -48,7 +51,7 @@ export default defineComponent({
           <RouterLink to="/email">发送至邮箱</RouterLink>
         </a-menu-item>
         <a-menu-item>
-          <RouterLink to="/domain" target="_blank">个人网站</RouterLink>
+          <RouterLink to="/redirect" target="_blank">个人网站</RouterLink>
         </a-menu-item>
       </a-menu>
     </template>
