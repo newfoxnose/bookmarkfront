@@ -42,13 +42,13 @@ export default defineComponent({
           <RouterLink to="/domain">个人域名设置</RouterLink>
         </a-menu-item>
         <a-menu-item>
-          <RouterLink to="/upload">导入</RouterLink>
+          <RouterLink to="/upload">导入书签</RouterLink>
         </a-menu-item>
         <a-menu-item>
-          <RouterLink to="/export">导出至本地</RouterLink>
+          <RouterLink to="/export">导出书签至本地</RouterLink>
         </a-menu-item>
         <a-menu-item>
-          <RouterLink to="/email">发送至邮箱</RouterLink>
+          <RouterLink to="/email">发送书签至邮箱</RouterLink>
         </a-menu-item>
         <a-menu-item>
           <RouterLink to="/redirect" target="_blank">个人网站</RouterLink>

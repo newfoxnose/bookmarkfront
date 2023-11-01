@@ -59,7 +59,6 @@ export default defineComponent({
       }
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       const { data: res } = this.$http.post('/ajax/import_ajax', params)
         .then(res => {
           console.log(res.data);
@@ -93,13 +92,6 @@ function convertbookmark(file) {
   reader.onload = () => {
     $("#bm").html(reader.result)
     var dl = $("#bm dl").first();
-    /*
-        var onlywork = $("meta[name=onlywork]");
-        if (onlywork.length == 1) {
-          $("#onlywork").val("onlywork");
-        }
-        console.log(onlywork.length);
-    */
     console.log("dt长度为：" + dl.children("dt").length);
     //var dt = dl.children("dt").eq(0);
     //var obj = foo(dt);

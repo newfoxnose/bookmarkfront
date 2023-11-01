@@ -53,7 +53,7 @@ export default {
     const auto_save_count_down = ref(60)
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
-    // ajax 异步获取内容
+    // ajax 异步获取内容4
     onMounted(() => {
       const interval = setInterval(() => {
         const percent = defaultPercent.value + Math.round(Math.random() * 7 + 2);
@@ -65,7 +65,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("post_id", router.currentRoute.value.params.id);
       proxy.$http.post('/ajax/get_post_ajax/', params).then(res => {
         console.log(res.data)
@@ -85,7 +84,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("content", valueHtml.value);
       params.append("title", formState.value.title);
       params.append("post_id", router.currentRoute.value.params.id);
@@ -104,7 +102,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("url", formState.value.url);
       proxy.$http.post('/ajax/url_content/', params).then(res => {
         //console.log(res);

@@ -6,17 +6,7 @@ export default ({
     let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
     params.append("teacher_id", $cookies.get('teacher_id'));
     params.append("login", $cookies.get('login'));
-    params.append("level", $cookies.get('level'));
 
-/*
-    let params = {
-      teacher_id: $cookies.get('teacher_id'),
-      login: $cookies.get('login'),
-      level: $cookies.get('level'),
-    };
-*/
-
-    //const { data: res } = this.$http.get('/ajax/export_ajax', { params: params, responseType: 'blob' })
     const { data: res } = this.$http.post('/ajax/export_ajax', params)
       .then(res => {
         let blob = new Blob([res.data]);
@@ -37,4 +27,7 @@ export default ({
   }
 });
 </script>
-<template></template>
+<template>
+  <a-result title="导出到本地" sub-title="请注意查看下载列表内容">
+  </a-result>
+</template>

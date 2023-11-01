@@ -77,7 +77,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/list_blog_ajax/', params).then(res => {
         fileitems.value = res.data.data.blog
         defaultPercent.value = 100;
@@ -88,7 +87,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("id_b64", proxy.$func.urlsafe_b64encode(Base64.encode(id)));
       proxy.$http.post('/ajax/delete_blog_ajax/', params).then(res => {
         fileitems.value = res.data.data.blog

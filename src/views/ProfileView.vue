@@ -14,7 +14,6 @@ export default defineComponent({
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/get_profile_ajax/', params).then(res => {
         formState.value=res.data.data;
         if (res.data.data.email=='test@test.com'){
@@ -28,7 +27,6 @@ export default defineComponent({
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       for (var x in values){
         if (values[x]==null){
           values[x]='';

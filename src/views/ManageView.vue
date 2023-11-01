@@ -162,7 +162,6 @@ export default defineComponent({
         params.append("father_id", this.father_id);
         params.append("teacher_id", $cookies.get('teacher_id'));
         params.append("login", $cookies.get('login'));
-        params.append("level", $cookies.get('level'));
         let ajax_url = '';
         if (action == "修改") {
           ajax_url = '/ajax/edit_folder_ajax/update_folder';
@@ -202,7 +201,6 @@ export default defineComponent({
         params.append("folder_id", this.new_father_id);
         params.append("teacher_id", $cookies.get('teacher_id'));
         params.append("login", $cookies.get('login'));
-        params.append("level", $cookies.get('level'));
         const { data: res } = this.$http.post('/ajax/new_folder_ajax', params)
           .then(res => {
             console.log(res.data);
@@ -225,14 +223,10 @@ export default defineComponent({
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       const { data: folder_res } = await this.$http.post('/ajax/manage_folder_ajax/', params)
       this.data = folder_res.data.data
       this.defaultPercent = 100;
       this.loadingdone=true;
-      if (folder_res.data.data[0]['name'] == '工作') {
-        this.new_father_id = folder_res.data.data[0]['value'];
-      }
     },
   },
   async mounted() {

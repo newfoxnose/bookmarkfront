@@ -95,7 +95,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
         console.log(res.data)
         if (res.data.code=="200"){
@@ -125,7 +124,6 @@ export default {
         let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
         params.append("teacher_id", $cookies.get('teacher_id'));
         params.append("login", $cookies.get('login'));
-        params.append("level", $cookies.get('level'));
         proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
           res.data.data.documents.shift()
           qiniu_token.value = res.data.data.qiniu_token
@@ -141,7 +139,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
       proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
         res.data.data.documents.shift()

@@ -102,7 +102,6 @@ export default defineComponent({
         if (res.data.code == "200") {
           $cookies.set('teacher_id', res.data.data.teacher_id, "720h")
           $cookies.set('login', res.data.data.login, "720h")
-          $cookies.set('level', res.data.data.level, "720h")
           window.location.href = "/user"
         }
       }).catch(error => {

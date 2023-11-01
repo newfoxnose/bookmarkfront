@@ -66,7 +66,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("blog_id", router.currentRoute.value.params.id);
       proxy.$http.post('/ajax/get_folder_ajax/', params).then(res => {
         folder_list.value = res.data.data.data
@@ -101,7 +100,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("content", valueHtml.value);
       params.append("title", formState.value.title);
       params.append("folder_id", formState.value.folder_id);

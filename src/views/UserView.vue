@@ -148,7 +148,6 @@ export default defineComponent({
           params.append("url", theurl);
           params.append("teacher_id", $cookies.get('teacher_id'));
           params.append("login", $cookies.get('login'));
-          params.append("level", $cookies.get('level'));
           const { data: res } = this.$http.post('/ajax/url_title', params)
             .then(res => {
               console.log(res.data);
@@ -207,7 +206,6 @@ export default defineComponent({
         }
         params.append("teacher_id", $cookies.get('teacher_id'));
         params.append("login", $cookies.get('login'));
-        params.append("level", $cookies.get('level'));
         let ajax_url = '';
         if (id != '' && action == "删除") {
           params.append("id", id);
@@ -268,7 +266,6 @@ export default defineComponent({
           params.append("folder_id", this.folder_id);
           params.append("teacher_id", $cookies.get('teacher_id'));
           params.append("login", $cookies.get('login'));
-          params.append("level", $cookies.get('level'));
           const { data: res } = this.$http.post('/ajax/new_folder_ajax', params)
             .then(res => {
               // obj.success ? obj.success(res) : null
@@ -302,7 +299,6 @@ export default defineComponent({
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       this.$http.post('/ajax/home_stream_ajax/' + folder_index, params).then((res) => {
         if (res.data.data.next_folder_index != -1) {
           this.items.folder[folder_index] = res.data.data.folder[folder_index];
@@ -323,7 +319,6 @@ export default defineComponent({
     let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
     params.append("teacher_id", $cookies.get('teacher_id'));
     params.append("login", $cookies.get('login'));
-    params.append("level", $cookies.get('level'));
     const { data: res } = await this.$http.post('/ajax/home_stream_ajax/', params)
     //console.log(res.data)
     this.items = res.data
@@ -348,7 +343,7 @@ export default defineComponent({
 
 
   <div :folderid="-1">
-    <h3 style="margin-top:15px;" v-if="$cookies.get('level')!='work'">根目录</h3>
+    <h3 style="margin-top:15px;">根目录</h3>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
       :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
       :is_private="bookmarkitem.is_private" :is_published="bookmarkitem.is_published" :is_recommend="bookmarkitem.is_recommend" :is_friendlink="bookmarkitem.is_friendlink" :http_code="bookmarkitem.http_code" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"

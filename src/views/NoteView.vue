@@ -52,7 +52,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       proxy.$http.post('/ajax/note_ajax/', params).then(res => {
         valueHtml.value = res.data.data.note
         defaultPercent.value = 100;
@@ -86,7 +85,6 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
-      params.append("level", $cookies.get('level'));
       params.append("content", valueHtml.value);
       proxy.$http.post('/ajax/save_note_ajax/', params).then(res => {
         message.info("已保存");
