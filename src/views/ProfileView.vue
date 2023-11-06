@@ -80,16 +80,16 @@ export default defineComponent({
       <a-input v-model:value="formState.slogan" />
     </a-form-item>
     <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/"/>
+      <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/" :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="七牛ACCESSKEY" name="qiniu_accesskey" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_accesskey" />
+      <a-input v-model:value="formState.qiniu_accesskey" :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="七牛SECRETKEY" name="qiniu_secretkey" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_secretkey" />
+      <a-input v-model:value="formState.qiniu_secretkey" :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="七牛BUCKET" name="qiniu_bucket" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_bucket" />
+      <a-input v-model:value="formState.qiniu_bucket" :disabled="testuser"/>
     </a-form-item>
     <a-form-item label="个人网站主题" name="theme" :rules="[{ required: false }]">
       <a-radio-group v-model:value="formState.theme" size="large" button-style="solid" class="radio-check">

@@ -7,9 +7,13 @@
   </div>
   <h3 style="margin-top:15px;">文件</h3>
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
+  <!--七牛云的不同节点
+    https://upload-z2.qiniup.com 华南-广东
+  https://up-cn-east-2.qiniup.com 自用
+  -->
   <div v-if="qiniu_token != ''">
-    <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" :action=upload_url
-      :data={teacher_id:aaa,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
+    <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" action="https://upload-z2.qiniup.com"
+      :data={token:qiniu_token,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
       @drop=" handleDrop ">
       <p class="ant-upload-drag-icon">
         <inbox-outlined></inbox-outlined>
@@ -79,11 +83,9 @@ export default {
 
     const { proxy } = getCurrentInstance()
     const qiniu_token = ref('')
-    const aaa=ref($cookies.get('teacher_id'));
     const qiniu_domain = ref('')
     const file_key = ref('')
     const fileitems = ref([])
-    const upload_url = ref(proxy.$remoteDomain+"/ajax/upload_file_ajax")
 
     // 获取token和列表
     onMounted(() => {
@@ -98,7 +100,7 @@ export default {
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
       proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
-        //console.log(res.data)
+        console.log(res.data)
         if (res.data.code=="200"){
           res.data.data.documents.shift()
         qiniu_token.value = res.data.data.qiniu_token
@@ -117,7 +119,7 @@ export default {
     }
     const handleChange = info => {
       const status = info.file.status;
-      //console.log(info.file)
+      //console.log(status)
       if (status !== 'uploading') {
         //console.log(info.file, info.fileList);
       }
@@ -132,6 +134,7 @@ export default {
           qiniu_domain.value = res.data.data.qiniu_domain
           fileitems.value = res.data.data.documents
         });
+
       } else if (status === 'error') {
         message.error(`${info.file.name} 上传失败.`);
       }
@@ -149,8 +152,6 @@ export default {
       });
     };
     return {
-      aaa,
-      upload_url,
       qiniu_token,
       qiniu_domain,
       file_key,
