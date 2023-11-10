@@ -65,7 +65,7 @@ export default defineComponent({
           // obj.success ? obj.success(res) : null
           message.info(res.data.msg);
           if (res.data.data != null) {
-            window.location.href = "/user"
+            //window.location.href = "/user"
           }
         })
         .catch(error => {

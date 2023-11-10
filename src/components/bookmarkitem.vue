@@ -4,11 +4,11 @@ export default {
   components: {
     EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone
   },
-  props: ['title', 'icon', 'id', 'url', 'short_title', 'search', 'editable', 'folder_id', 'is_private', 'http_code', 'is_published', 'is_recommend', 'is_friendlink'],
+  props: ['title','pinyin', 'icon', 'id', 'url', 'short_title', 'search', 'editable', 'folder_id', 'is_private', 'http_code', 'is_published', 'is_recommend', 'is_friendlink'],
   emits: ['editbookmark'],
   methods: {
-    isShow: function (str, url) {
-      if (str.toUpperCase().includes(this.search.toUpperCase()) || url.toUpperCase().includes(this.search.toUpperCase())) {
+    isShow: function (str,pinyin, url) {
+      if (str.toUpperCase().includes(this.search.toUpperCase()) || pinyin.toUpperCase().includes(this.search.toUpperCase()) ||url.toUpperCase().includes(this.search.toUpperCase())) {
         return true
       } else {
         return false
@@ -18,7 +18,7 @@ export default {
 }
 </script>
 <template>
-  <div class="item" v-show="isShow(title, url)" :itemid=id>
+  <div class="item" v-show="isShow(title,pinyin, url)" :itemid=id>
     <img v-if="editable == 'yes'" :src="icon" style="width:16px;height:16px;margin-right:3px;"
       @click="$emit('editbookmark', '编辑书签', id, url, title, folder_id, is_private, is_published,is_recommend,is_friendlink)">
     <img v-else :src="icon" style="width:16px;height:16px;">

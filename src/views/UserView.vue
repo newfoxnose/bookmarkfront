@@ -300,6 +300,8 @@ export default defineComponent({
       params.append("teacher_id", $cookies.get('teacher_id'));
       params.append("login", $cookies.get('login'));
       this.$http.post('/ajax/home_stream_ajax/' + folder_index, params).then((res) => {
+        //console.log(folder_index);
+        //console.log(res.data);
         if (res.data.data.next_folder_index != -1) {
           this.items.folder[folder_index] = res.data.data.folder[folder_index];
           this.home_stream_ajax(res.data.data.next_folder_index);
@@ -345,7 +347,7 @@ export default defineComponent({
   <div :folderid="-1">
     <h3 style="margin-top:15px;">根目录</h3>
     <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
-      :url="bookmarkitem.url" :title="bookmarkitem.title" :short_title="bookmarkitem.short_title"
+      :url="bookmarkitem.url" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" :short_title="bookmarkitem.short_title"
       :is_private="bookmarkitem.is_private" :is_published="bookmarkitem.is_published" :is_recommend="bookmarkitem.is_recommend" :is_friendlink="bookmarkitem.is_friendlink" :http_code="bookmarkitem.http_code" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
       @editbookmark="fatherMethod"></bookmarkitem>
   </div>
