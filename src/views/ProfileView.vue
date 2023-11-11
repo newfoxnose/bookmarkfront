@@ -81,6 +81,7 @@ export default defineComponent({
     </a-form-item>
     <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_domain" suffix="http://开头，结尾不带/" :disabled="testuser"/>
+      <a-typography-paragraph>推荐专门新注册一个七牛账号使用，以免泄密，每月有10G免费空间和10G免费http流量。</a-typography-paragraph>
     </a-form-item>
     <a-form-item label="七牛ACCESSKEY" name="qiniu_accesskey" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_accesskey" :disabled="testuser"/>
