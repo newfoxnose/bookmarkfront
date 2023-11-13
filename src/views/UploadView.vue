@@ -1,4 +1,11 @@
 <template>
+    <div class="loadingbar" v-show="loadingdone == false">
+    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
+      '0%': '#108ee9',
+      '100%': '#87d068',
+    }" />
+  </div>
+
   <h3 style="margin-top:15px;">导入书签</h3>
   <div class="clearfix">
     <a-upload :file-list="fileList" :before-upload="beforeUpload" :customRequest="noUse" :disabled="fileList.length >= 1"  @remove="handleRemove">
@@ -15,6 +22,15 @@
   </div>
   <div id="bm" style="display:none"></div>
 </template>
+<style scoped>
+.loadingbar {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+</style>
 <script>
 import { UploadOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
@@ -26,6 +42,9 @@ export default defineComponent({
   setup() {
     const fileList = ref([]);
     const uploading = ref(false);
+    const defaultPercent = ref(10);
+    const loadingdone = ref(true);
+
     const handleRemove = file => {
       const index = fileList.value.indexOf(file);
       const newFileList = fileList.value.slice();
@@ -36,6 +55,8 @@ export default defineComponent({
       fileList,
       uploading,
       handleRemove,
+      defaultPercent,
+      loadingdone
     };
   },
   data() {
@@ -53,6 +74,14 @@ export default defineComponent({
       //这个函数没什么用，只是为了避免自动调用默认上传接口
     },
     Upload() {
+      this.loadingdone = false;
+      const interval = setInterval(() => {
+        const percent = this.defaultPercent + Math.round(Math.random() * 7 + 2);
+        this.defaultPercent = percent > 95 ? 95 : percent;
+        if (this.defaultPercent > 90) {
+          clearInterval(interval);
+        }
+      }, 100)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       for (var i = 0; i < this.json_string.length; i++) {
         params.append("json_string[]", this.json_string[i]);
@@ -65,7 +94,9 @@ export default defineComponent({
           // obj.success ? obj.success(res) : null
           message.info(res.data.msg);
           if (res.data.data != null) {
-            //window.location.href = "/user"
+            this.defaultPercent = 100;
+            this.loadingdone = true;
+            window.location.href = "/user"
           }
         })
         .catch(error => {
