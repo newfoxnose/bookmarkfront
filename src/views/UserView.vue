@@ -7,9 +7,7 @@ import {
 } from '@ant-design/icons-vue';
 import { defineComponent, ref, reactive } from 'vue';
 import { message } from 'ant-design-vue';
-if ($cookies.get('login') != "yes") {
-  window.location.href = "/login"
-}
+
 
 export default defineComponent({
   components: {
@@ -146,8 +144,8 @@ export default defineComponent({
           message.info('自动获取网页标题中，请稍等');
           let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
           params.append("url", theurl);
-          params.append("teacher_id", $cookies.get('teacher_id'));
-          params.append("login", $cookies.get('login'));
+          params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
           const { data: res } = this.$http.post('/ajax/url_title', params)
             .then(res => {
               console.log(res.data);
@@ -204,8 +202,8 @@ export default defineComponent({
         else {
           params.append("is_friendlink", 0);
         }
-        params.append("teacher_id", $cookies.get('teacher_id'));
-        params.append("login", $cookies.get('login'));
+        params.append("timestamp",new Date().getTime());
+        params.append("token", $cookies.get('token'));
         let ajax_url = '';
         if (id != '' && action == "删除") {
           params.append("id", id);
@@ -264,8 +262,8 @@ export default defineComponent({
           let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
           params.append("new_folder", this.new_folder);
           params.append("folder_id", this.folder_id);
-          params.append("teacher_id", $cookies.get('teacher_id'));
-          params.append("login", $cookies.get('login'));
+          params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
           const { data: res } = this.$http.post('/ajax/new_folder_ajax', params)
             .then(res => {
               // obj.success ? obj.success(res) : null
@@ -297,8 +295,8 @@ export default defineComponent({
     },
     home_stream_ajax(folder_index) {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("timestamp",new Date().getTime());
+      params.append("token", $cookies.get('token'));
       this.$http.post('/ajax/home_stream_ajax/' + folder_index, params).then((res) => {
         //console.log(folder_index);
         //console.log(res.data);
@@ -319,10 +317,9 @@ export default defineComponent({
   },
   async mounted() {
     let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-    params.append("teacher_id", $cookies.get('teacher_id'));
-    params.append("login", $cookies.get('login'));
+    params.append("timestamp",new Date().getTime());
+    params.append("token", $cookies.get('token'));
     const { data: res } = await this.$http.post('/ajax/home_stream_ajax/', params)
-    //console.log(res.data)
     this.items = res.data
     if (res.data.next_folder_index != -1) {
       this.home_stream_ajax(0);

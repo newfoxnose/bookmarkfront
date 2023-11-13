@@ -1,9 +1,8 @@
 <script>
-if ($cookies.get('login') != "yes") {
-  window.location.href = "/login"
-}
+
 import { message } from 'ant-design-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
+import md5 from 'js-md5';
 export default defineComponent({
   setup() {
     const testuser = ref(false);
@@ -12,8 +11,8 @@ export default defineComponent({
     const formState = ref([])
     onMounted(() => {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/get_profile_ajax/', params).then(res => {
         formState.value=res.data.data;
         if (res.data.data.email=='test@test.com'){
@@ -25,14 +24,10 @@ export default defineComponent({
       iconLoading.value = true;
       //console.log('提交数据Success:', values);
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
-      for (var x in values){
-        if (values[x]==null){
-          values[x]='';
-        }
-        params.append(x, values[x]);
-      }
+      params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
+      params.append("current_pwd", md5(values.current_pwd));
+      params.append("domain", values.domain);
       proxy.$http.post('/ajax/update_domain_ajax/', params).then(res => {
         formState.value=res.data.data;
         if (res.data.msg!=''){

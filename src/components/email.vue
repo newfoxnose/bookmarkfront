@@ -4,9 +4,8 @@ export default ({
   mounted() {
 
     let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-    params.append("teacher_id", $cookies.get('teacher_id'));
-    params.append("login", $cookies.get('login'));
-
+    params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
     this.$http.post('/ajax/send_email_ajax/', params).then(res => {
       console.log(res.data.data);
       message.info(res.data.msg);

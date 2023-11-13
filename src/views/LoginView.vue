@@ -21,10 +21,6 @@
       </a-input>
     </a-form-item>
 
-    <a-form-item name="记住" :wrapper-col="{ offset: 8, span: 16 }">
-      <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
-    </a-form-item>
-
     <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
       <a-button type="primary" html-type="submit" :loading="iconLoading">登入</a-button>
     </a-form-item>
@@ -34,14 +30,15 @@
 import { message } from 'ant-design-vue'; 
 import { defineComponent, reactive,ref,getCurrentInstance } from 'vue';
 import Fingerprint2 from 'fingerprintjs2'
+import md5 from 'js-md5';
 
 //要使用jquery，必须修改vite.config.js并把下面两句加上
 import jQuery from "jquery";
 Object.assign(window, { $: jQuery, jQuery });
 //jquery结束
 
-if ($cookies.get('login')=="yes"){
-  window.location.href ="/user"
+if ($cookies.get('token') != null&&$cookies.get('token') != '') {
+  window.location.href = "/user"
 }
 export default defineComponent({
   setup() {
@@ -50,11 +47,9 @@ export default defineComponent({
     const { proxy } = getCurrentInstance()
     const formState = reactive({     //熟悉下这里的数据写法
       email: '',
-      password: '',
-      remember: true,
+      password: ''
     });
     const onFinish = values => {
-      //getList(values)
       console.log('Success:', values);
     };
     const onFinishFailed = errorInfo => {
@@ -86,17 +81,17 @@ export default defineComponent({
       iconLoading.value = true;
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("email", values.email);
-      params.append("password", values.password);
+      params.append("password", md5(values.password));
       params.append("captcha", values.captcha);
       params.append("hashkey", murmur.value);
+      params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/login_ajax/', params).then(res => {
         console.log(res.data)
         iconLoading.value = false;
         message.info(res.data.msg);
         // obj.success ? obj.success(res) : null
         if (res.data.code == "200") {
-            $cookies.set('teacher_id',res.data.data.teacher_id,"720h")  
-            $cookies.set('login',res.data.data.login,"720h")  
+          $cookies.set('token',res.data.data.token,"720h")  
             window.location.href ="/user"
           }
       }).catch(error => {
@@ -114,30 +109,6 @@ export default defineComponent({
       iconLoading,
       onFinishFailed,
     };
-  },
-  methods: {
-    getList(values) {
-      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("email", values.email);
-      params.append("password", values.password);
-      const { data: res } = this.$http.post('/ajax/login_ajax', params)
-        .then(res => {
-          // obj.success ? obj.success(res) : null
-          if (res.data.msg == "登入成功") {
-            $cookies.set('teacher_id',res.data.data.teacher_id,"720h")  
-            $cookies.set('login',res.data.data.login,"720h")  
-            window.location.href ="/user"
-          }
-          else{
-            message.info("登入失败");
-          }
-          //console.log(res.data);
-        })
-        .catch(error => {
-          // obj.error ? obj.error(error) : null;
-          console.log(error);
-        })
-    },
   },
 
 });

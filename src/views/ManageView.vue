@@ -1,7 +1,5 @@
 <script>
-if ($cookies.get('login') != "yes") {
-  window.location.href = "/login"
-}
+
 import {
   HomeOutlined
 } from '@ant-design/icons-vue';
@@ -160,8 +158,8 @@ export default defineComponent({
         params.append("folder_id", this.folder_id);
         params.append("folder_name", this.folder_name);
         params.append("father_id", this.father_id);
-        params.append("teacher_id", $cookies.get('teacher_id'));
-        params.append("login", $cookies.get('login'));
+        params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
         let ajax_url = '';
         if (action == "修改") {
           ajax_url = '/ajax/edit_folder_ajax/update_folder';
@@ -199,8 +197,8 @@ export default defineComponent({
         let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
         params.append("new_folder", this.new_folder_name);
         params.append("folder_id", this.new_father_id);
-        params.append("teacher_id", $cookies.get('teacher_id'));
-        params.append("login", $cookies.get('login'));
+        params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
         const { data: res } = this.$http.post('/ajax/new_folder_ajax', params)
           .then(res => {
             console.log(res.data);
@@ -221,8 +219,8 @@ export default defineComponent({
     },
     async load_data() {     //async和await需要一起出现
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
       const { data: folder_res } = await this.$http.post('/ajax/manage_folder_ajax/', params)
       this.data = folder_res.data.data
       this.defaultPercent = 100;

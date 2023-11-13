@@ -36,13 +36,13 @@ import { SettingOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { defineComponent, reactive, getCurrentInstance, ref } from 'vue';
 import Fingerprint2 from 'fingerprintjs2'
-
+import md5 from 'js-md5';
 //要使用jquery，必须修改vite.config.js并把下面两句加上
 import jQuery from "jquery";
 Object.assign(window, { $: jQuery, jQuery });
 //jquery结束
 
-if ($cookies.get('login') == "yes") {
+if ($cookies.get('token') != null&&$cookies.get('token') != '') {
   window.location.href = "/user"
 }
 export default defineComponent({
@@ -90,8 +90,8 @@ export default defineComponent({
       iconLoading.value = true;
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("email", values.email);
-      params.append("password", values.password);
-      params.append("repeat_password", values.repeat_password);
+      params.append("password", md5(values.password));
+      params.append("repeat_password", md5(values.repeat_password));
       params.append("captcha", values.captcha);
       params.append("hashkey", murmur.value);
       proxy.$http.post('/ajax/reg_ajax/', params).then(res => {
@@ -100,8 +100,7 @@ export default defineComponent({
         message.info(res.data.msg);
         // obj.success ? obj.success(res) : null
         if (res.data.code == "200") {
-          $cookies.set('teacher_id', res.data.data.teacher_id, "720h")
-          $cookies.set('login', res.data.data.login, "720h")
+          $cookies.set('token', res.data.data.token, "720h")
           window.location.href = "/user"
         }
       }).catch(error => {

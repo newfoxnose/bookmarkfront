@@ -9,7 +9,7 @@
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
   <div v-if="qiniu_token != ''">
     <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" :action=upload_url
-      :data={teacher_id:aaa,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
+      :data={token:aaa,timestamp:bbb,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
       @drop=" handleDrop ">
       <p class="ant-upload-drag-icon">
         <inbox-outlined></inbox-outlined>
@@ -79,7 +79,8 @@ export default {
 
     const { proxy } = getCurrentInstance()
     const qiniu_token = ref('')
-    const aaa=ref($cookies.get('teacher_id'));
+    const aaa=ref($cookies.get('token'));
+    const bbb=ref();
     const qiniu_domain = ref('')
     const file_key = ref('')
     const fileitems = ref([])
@@ -95,8 +96,8 @@ export default {
         }
       }, 100)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+      params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
         //console.log(res.data)
         if (res.data.code=="200"){
@@ -113,6 +114,7 @@ export default {
       });
     })
     const handleBeforeUpload = (file) => {
+      bbb.value=new Date().getTime();
       file_key.value = "attachment/"+file.name;
     }
     const handleChange = info => {
@@ -124,8 +126,8 @@ export default {
       if (status === 'done') {
         message.success(`${info.file.name} 上传成功.`);
         let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-        params.append("teacher_id", $cookies.get('teacher_id'));
-        params.append("login", $cookies.get('login'));
+        params.append("token", $cookies.get('token'));
+        params.append("timestamp",new Date().getTime());
         proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
           res.data.data.documents.shift()
           qiniu_token.value = res.data.data.qiniu_token
@@ -138,8 +140,8 @@ export default {
     };
     const deletefile = (file) => {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+      params.append("timestamp",new Date().getTime());
       params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
       proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
         res.data.data.documents.shift()
@@ -150,6 +152,7 @@ export default {
     };
     return {
       aaa,
+      bbb,
       upload_url,
       qiniu_token,
       qiniu_domain,

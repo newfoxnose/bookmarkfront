@@ -57,8 +57,8 @@ export default defineComponent({
       for (var i = 0; i < this.json_string.length; i++) {
         params.append("json_string[]", this.json_string[i]);
       }
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
       const { data: res } = this.$http.post('/ajax/import_ajax', params)
         .then(res => {
           console.log(res.data);

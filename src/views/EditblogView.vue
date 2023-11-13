@@ -64,8 +64,8 @@ export default {
         }
       }, 100)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
       params.append("blog_id", router.currentRoute.value.params.id);
       proxy.$http.post('/ajax/get_folder_ajax/', params).then(res => {
         folder_list.value = res.data.data.data
@@ -98,8 +98,8 @@ export default {
     const save = () => {
       iconLoading.value = true;
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
       params.append("content", valueHtml.value);
       params.append("title", formState.value.title);
       params.append("folder_id", formState.value.folder_id);
@@ -156,7 +156,7 @@ export default {
       lang: 'zh-cn',
       // 初始容器高度
       initialFrameHeight: 360,
-      serverUrl: this.$remoteDomain + '/ueditor/controller.php?id=' + $cookies.get('teacher_id'), // 服务端接口
+      serverUrl: this.$remoteDomain+'/ueditor/controller.php?token='+$cookies.get('token')+'&timestamp='+(new Date().getTime()), // 服务端接口
     };
   },
 }

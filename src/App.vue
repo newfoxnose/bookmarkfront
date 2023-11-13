@@ -17,7 +17,7 @@ export default defineComponent({
 
       <div class="wrapper">
         <nav>
-          <span v-if="$cookies.get('login') == 'yes'">
+          <span v-if="$cookies.get('token') != null&&$cookies.get('token') != ''">
             <RouterLink to="/user">书签</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>

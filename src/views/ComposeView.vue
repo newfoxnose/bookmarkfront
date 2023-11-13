@@ -49,8 +49,8 @@ export default defineComponent({
 
     onMounted(() => {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("teacher_id", $cookies.get('teacher_id'));
-      params.append("login", $cookies.get('login'));
+      params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/get_folder_ajax/', params).then(res => {
         folder_list.value = res.data.data.data
         formState.value.folder_id = res.data.data.data[0].value
@@ -65,8 +65,8 @@ export default defineComponent({
       }
       else {
         let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-        params.append("teacher_id", $cookies.get('teacher_id'));
-        params.append("login", $cookies.get('login'));
+        params.append("token", $cookies.get('token'));
+        params.append("timestamp",new Date().getTime());
         params.append("content", valueHtml.value);
         params.append("title", formState.value.title);
         params.append("folder_id", formState.value.folder_id);
@@ -126,7 +126,7 @@ export default defineComponent({
       lang: 'zh-cn',
       // 初始容器高度
       initialFrameHeight: 360,
-      serverUrl: this.$remoteDomain + '/ueditor/controller.php?id=' + $cookies.get('teacher_id'), // 服务端接口
+      serverUrl: this.$remoteDomain+'/ueditor/controller.php?token='+$cookies.get('token')+'&timestamp='+(new Date().getTime()), // 服务端接口
     };
   }
 })
