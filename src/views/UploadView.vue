@@ -76,12 +76,12 @@ export default defineComponent({
     Upload() {
       this.loadingdone = false;
       const interval = setInterval(() => {
-        const percent = this.defaultPercent + Math.round(Math.random() * 7 + 2);
+        const percent = this.defaultPercent + Math.round(Math.random() * 3 + 1);
         this.defaultPercent = percent > 95 ? 95 : percent;
         if (this.defaultPercent > 90) {
           clearInterval(interval);
         }
-      }, 100)
+      }, 200)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       for (var i = 0; i < this.json_string.length; i++) {
         params.append("json_string[]", this.json_string[i]);

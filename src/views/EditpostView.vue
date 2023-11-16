@@ -20,7 +20,7 @@
       <a-input v-model:value="formState.title" />
     </a-form-item>
   </a-form>
-
+<p>注：http协议的图片无法在编辑器里显示，不代表没有正常上传</p>
   <vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-01"></vue-ueditor-wrap>
 </template>
 <style scoped>
