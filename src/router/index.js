@@ -92,7 +92,12 @@ const router = createRouter({
       path: '/redirect',
       name: 'redirect',
       component: () => import('../components/redirect.vue')
-    }  
+    }  ,
+    {
+      path: '/clear',
+      name: 'clear',
+      component: () => import('../components/clear.vue')
+    } 
     ,
     {
       path: '/blog',

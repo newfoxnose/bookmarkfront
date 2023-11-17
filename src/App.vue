@@ -42,6 +42,9 @@ export default defineComponent({
           <RouterLink to="/domain">个人域名设置</RouterLink>
         </a-menu-item>
         <a-menu-item>
+          <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
+        </a-menu-item>
+        <a-menu-item>
           <RouterLink to="/upload">导入书签</RouterLink>
         </a-menu-item>
         <a-menu-item>
