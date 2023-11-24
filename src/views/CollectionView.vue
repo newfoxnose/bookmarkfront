@@ -297,7 +297,7 @@ export default defineComponent({
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("timestamp",new Date().getTime());
       params.append("token", $cookies.get('token'));
-      this.$http.post('/ajax/home_stream_ajax/0/' + folder_index, params).then((res) => {
+      this.$http.post('/ajax/home_stream_ajax/1/' + folder_index, params).then((res) => {
         //console.log(folder_index);
         //console.log(res.data);
         if (res.data.data.next_folder_index != -1) {
@@ -319,7 +319,7 @@ export default defineComponent({
     let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
     params.append("timestamp",new Date().getTime());
     params.append("token", $cookies.get('token'));
-    const { data: res } = await this.$http.post('/ajax/home_stream_ajax/0/', params)
+    const { data: res } = await this.$http.post('/ajax/home_stream_ajax/1/', params)
     this.items = res.data
     if (res.data.next_folder_index != -1) {
       this.home_stream_ajax(0);

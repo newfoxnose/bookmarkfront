@@ -108,6 +108,11 @@ const router = createRouter({
       path: '/editblog/:id',
       name: 'editblog',
       component: () => import('../views/EditblogView.vue')
+    } ,
+    {
+      path: '/collection',
+      name: 'collection',
+      component: () => import('../views/CollectionView.vue')
     }
   ],
 })

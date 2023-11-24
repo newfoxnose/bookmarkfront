@@ -19,6 +19,7 @@ export default defineComponent({
         <nav>
           <span v-if="$cookies.get('token') != null&&$cookies.get('token') != ''">
             <RouterLink to="/user">书签</RouterLink>
+            <RouterLink to="/collection">采集</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
             <RouterLink to="/compose">写作</RouterLink>
