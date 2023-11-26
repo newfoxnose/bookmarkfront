@@ -13,12 +13,17 @@
       <br>演示账号密码：testtest
     </a-form-item>
 
+
     <a-form-item label="验证码" name="captcha" :rules="[{ required: true, message: '请输入验证码' }]">
       <a-input v-model:value="formState.captcha">
         <template #addonAfter>
           <div><img id="captchaimg" @click="reload_captcha"></div>
         </template>
       </a-input>
+    </a-form-item>
+
+    <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+      <a-checkbox v-model:checked="checked">仅在此设备登入</a-checkbox>
     </a-form-item>
 
     <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
@@ -49,6 +54,7 @@ export default defineComponent({
       email: '',
       password: ''
     });
+    const checked = ref(false);
     const onFinish = values => {
       console.log('Success:', values);
     };
@@ -83,10 +89,11 @@ export default defineComponent({
       params.append("email", values.email);
       params.append("password", md5(values.password));
       params.append("captcha", values.captcha);
+      params.append("exclusive_login", checked.value);
       params.append("hashkey", murmur.value);
       params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/login_ajax/', params).then(res => {
-        console.log(res.data)
+        //console.log(res.data)
         iconLoading.value = false;
         message.info(res.data.msg);
         // obj.success ? obj.success(res) : null
@@ -108,6 +115,7 @@ export default defineComponent({
       onFinish,
       iconLoading,
       onFinishFailed,
+      checked,
     };
   },
 

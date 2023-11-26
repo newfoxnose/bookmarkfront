@@ -83,14 +83,8 @@ export default defineComponent({
         title: 'lv',
         dataIndex: 'lv'
       }, {
-        title: '书签',
+        title: '书签/采集/博文数量',
         dataIndex: 'amount'
-      }, {
-        title: '采集',
-        dataIndex: 'collection_amount'
-      }, {
-        title: '博文',
-        dataIndex: 'blog_amount'
       }, {
         title: '操作'
       }],
