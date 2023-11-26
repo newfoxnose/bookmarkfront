@@ -11,7 +11,7 @@ export default ({
       .then(res => {
         console.log(res.data);
         // obj.success ? obj.success(res) : null
-        message.info("导出成功");
+        message.info("清理完成");
       })
       .catch(error => {
         // obj.error ? obj.error(error) : null;
