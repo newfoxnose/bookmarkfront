@@ -71,7 +71,7 @@ export default {
         folder_list.value = res.data.data.data
       })
       proxy.$http.post('/ajax/get_blog_ajax/', params).then(res => {
-        console.log(res.data.data.blog)
+        //console.log(res.data.data.blog)
         valueHtml.value = res.data.data.blog.content
         defaultPercent.value = 100;
         loadingdone.value = true
@@ -117,15 +117,9 @@ export default {
         params.append("is_recommend", 0);
       }
       proxy.$http.post('/ajax/save_blog_ajax/', params).then(res => {
-        console.log(res.data)
-        if (res.data.msg == "更新成功") {
-          message.info("已保存");
-          iconLoading.value = false;
-        }
-        else {
-          message.info("出错了，请重试");
-          iconLoading.value = false;
-        }
+        //console.log(res.data)
+        message.info(res.data.msg);
+        iconLoading.value = false;
       }).catch(error => {
         message.info("无法正常保存");
         iconLoading.value = false;

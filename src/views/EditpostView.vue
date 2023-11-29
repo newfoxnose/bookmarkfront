@@ -87,7 +87,8 @@ export default {
       params.append("title", formState.value.title);
       params.append("post_id", router.currentRoute.value.params.id);
       proxy.$http.post('/ajax/save_post_ajax/', params).then(res => {
-        message.info("已保存");
+        message.info(res.data.msg);
+        console.log(res.data);
         iconLoading.value = false;
       }).catch(error => {
         message.info("无法正常保存");

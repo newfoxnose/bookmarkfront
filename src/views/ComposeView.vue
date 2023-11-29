@@ -83,12 +83,16 @@ export default defineComponent({
           params.append("is_recommend", 0);
         }
         proxy.$http.post('/ajax/save_blog_ajax/', params).then(res => {
-          console.log(res.data.msg);
-          if (res.data.msg == "新建成功") {
+          //console.log(res.data.msg);
+          if (res.data.msg == "新建成功") {    //这条提示如果改的话要和后端一起改
             visible.value = true;
             //message.info("已保存，即将跳转到列表页面",10);
             iconLoading.value = false;
             //window.location.href = "/blog";
+          }
+          else{
+            message.info(res.data.msg);
+            iconLoading.value = false;
           }
         }).catch(error => {
           message.info("无法正常保存");

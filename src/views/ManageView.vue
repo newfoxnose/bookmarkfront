@@ -136,7 +136,7 @@ export default defineComponent({
         temp_lv = this.data[i]['lv']
       }
       this.showDrawer()
-      console.log(this.data)
+      //console.log(this.data)
     },
     deleteFolder(folder_id) {
       this.show_prompt()
@@ -152,7 +152,7 @@ export default defineComponent({
       this.folder_id = folder_id
     },
     submitModify(action) {
-      console.log("folder_id:" + this.folder_id)
+      //console.log("folder_id:" + this.folder_id)
       if (action == "修改" && (this.folder_id == '' || this.folder_name == '' || this.father_id == '')) {
         message.info("请填写必要项目");
       }
@@ -181,7 +181,7 @@ export default defineComponent({
         }
         const { data: res } = this.$http.post(ajax_url, params)
           .then(res => {
-            console.log(res.data);
+            //console.log(res.data);
             // obj.success ? obj.success(res) : null
             message.info(res.data.msg);
             if (res.data.data == true) {
@@ -204,10 +204,10 @@ export default defineComponent({
         params.append("new_folder", this.new_folder_name);
         params.append("folder_id", this.new_father_id);
         params.append("token", $cookies.get('token'));
-          params.append("timestamp",new Date().getTime());
+        params.append("timestamp",new Date().getTime());
         const { data: res } = this.$http.post('/ajax/new_folder_ajax', params)
           .then(res => {
-            console.log(res.data);
+            //console.log(res.data);
             // obj.success ? obj.success(res) : null
             message.info(res.data.msg);
             if (res.data.inserted_id != null) {
