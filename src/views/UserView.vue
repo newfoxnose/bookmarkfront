@@ -325,6 +325,9 @@ export default defineComponent({
       this.home_stream_ajax(0);
     }
     const { data: folder_res } = await this.$http.post('/ajax/get_folder_ajax/', params)
+    if (folder_res.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
     //console.log(folder_res.data)
     this.folder_list = folder_res.data.data
     this.folder_id = folder_res.data.data[0].value;

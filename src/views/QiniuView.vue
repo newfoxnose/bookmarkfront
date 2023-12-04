@@ -100,6 +100,9 @@ export default {
       params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
         //console.log(res.data)
+        if (res.data.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
         if (res.data.code=="200"){
           res.data.data.documents.shift()
         qiniu_token.value = res.data.data.qiniu_token

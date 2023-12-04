@@ -228,6 +228,9 @@ export default defineComponent({
       params.append("token", $cookies.get('token'));
           params.append("timestamp",new Date().getTime());
       const { data: folder_res } = await this.$http.post('/ajax/manage_folder_ajax/', params)
+      if (folder_res.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
       this.data = folder_res.data.data
       this.defaultPercent = 100;
       this.loadingdone=true;

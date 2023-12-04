@@ -9,7 +9,11 @@ export default ({
 
     const { data: res } = this.$http.post('/ajax/export_ajax', params)
       .then(res => {
-        let blob = new Blob([res.data]);
+        if (res.data.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
+    else{
+      let blob = new Blob([res.data]);
         let url = window.URL.createObjectURL(blob); // 创建 url 并指向 blob
         let a = document.createElement('a');
         a.href = url;
@@ -19,6 +23,7 @@ export default ({
         window.URL.revokeObjectURL(url); // 释放该 url
         // obj.success ? obj.success(res) : null
         message.info("导出成功");
+    }
       })
       .catch(error => {
         // obj.error ? obj.error(error) : null;

@@ -78,6 +78,9 @@ export default {
       params.append("token", $cookies.get('token'));
           params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/list_blog_ajax/', params).then(res => {
+        if (res.data.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
         fileitems.value = res.data.data.blog
         defaultPercent.value = 100;
         loadingdone.value = true

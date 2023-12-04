@@ -14,6 +14,9 @@ export default defineComponent({
       params.append("token", $cookies.get('token'));
           params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/get_profile_ajax/', params).then(res => {
+        if (res.data.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
         formState.value=res.data.data;
         if (res.data.data.email=='test@test.com'){
           testuser.value=true;

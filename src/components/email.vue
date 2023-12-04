@@ -8,6 +8,9 @@ export default ({
           params.append("timestamp",new Date().getTime());
     this.$http.post('/ajax/send_email_ajax/', params).then(res => {
       console.log(res.data.data);
+      if (res.data.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
       message.info(res.data.msg);
     }).catch(error => {
       // obj.error ? obj.error(error) : null;

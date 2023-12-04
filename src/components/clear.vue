@@ -10,6 +10,9 @@ export default ({
     const { data: res } = this.$http.post('/ajax/qiniu_clear_ajax', params)
       .then(res => {
         console.log(res.data);
+        if (res.data.code=='401'){      //不在登陆状态
+      window.location.href ="/login";
+    }
         // obj.success ? obj.success(res) : null
         message.info("清理完成");
       })
