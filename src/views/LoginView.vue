@@ -42,9 +42,6 @@ import jQuery from "jquery";
 Object.assign(window, { $: jQuery, jQuery });
 //jquery结束
 
-if ($cookies.get('token') != null&&$cookies.get('token') != '') {
-  window.location.href = "/user"
-}
 export default defineComponent({
   setup() {
     const iconLoading = ref(false);
