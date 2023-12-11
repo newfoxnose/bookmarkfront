@@ -4,7 +4,6 @@ import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import md5 from 'js-md5';
 export default defineComponent({
   setup() {
-    const testuser = ref(false);
     const iconLoading = ref(false);
     const { proxy } = getCurrentInstance()
     const formState = ref([])
@@ -17,9 +16,6 @@ export default defineComponent({
       window.location.href ="/login";
     }
         formState.value=res.data.data;
-        if (res.data.data.email=='test@test.com'){
-          testuser.value=true;
-        }
       });
     })
     const onFinish = values => {
@@ -60,8 +56,7 @@ export default defineComponent({
       formState,
       onFinish,
       onFinishFailed,
-      iconLoading,
-      testuser
+      iconLoading
     };
   },
   data() {
@@ -80,23 +75,23 @@ export default defineComponent({
     </a-form-item>
 
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
-      <a-input v-model:value="formState.email" :disabled="testuser"/>
+      <a-input v-model:value="formState.email" />
     </a-form-item>
     <a-form-item label="SLOGAN" name="slogan">
       <a-input v-model:value="formState.slogan" />
     </a-form-item>
     <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/" :disabled="testuser"/>
+      <a-input v-model:value="formState.qiniu_domain" suffix="开头带协议，结尾不带/" />
       <a-typography-paragraph>推荐专门新注册一个七牛账号使用，以免泄密，有10G免费空间和每月10G免费http流量。</a-typography-paragraph>
     </a-form-item>
     <a-form-item label="七牛ACCESSKEY" name="qiniu_accesskey" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_accesskey" :disabled="testuser"/>
+      <a-input v-model:value="formState.qiniu_accesskey" />
     </a-form-item>
     <a-form-item label="七牛SECRETKEY" name="qiniu_secretkey" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_secretkey" :disabled="testuser"/>
+      <a-input v-model:value="formState.qiniu_secretkey" />
     </a-form-item>
     <a-form-item label="七牛BUCKET" name="qiniu_bucket" :rules="[{ required: false }]">
-      <a-input v-model:value="formState.qiniu_bucket" :disabled="testuser"/>
+      <a-input v-model:value="formState.qiniu_bucket" />
     </a-form-item>
     <a-form-item label="个人网站主题" name="theme" :rules="[{ required: false }]">
       <a-radio-group v-model:value="formState.theme" size="large" button-style="solid" class="radio-check">
@@ -104,10 +99,10 @@ export default defineComponent({
       </a-radio-group>
 </a-form-item>
 <a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
-      <a-input-password v-model:value="formState.pwd"  :disabled="testuser"/>
+      <a-input-password v-model:value="formState.pwd"  />
     </a-form-item>
     <a-form-item label="重复新密码（不修改请留空）" name="pwd_repeat" :rules="[{ required:false }]">
-      <a-input-password v-model:value="formState.pwd_repeat"  :disabled="testuser"/>
+      <a-input-password v-model:value="formState.pwd_repeat"  />
     </a-form-item>
     <a-form-item label="现密码" name="current_pwd" :rules="[{ required:true, message: '现密码不能为空' }]">
       <a-input-password v-model:value="formState.current_pwd" />

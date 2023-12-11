@@ -5,12 +5,10 @@
 
     <a-form-item label="邮箱" name="email" :rules="[{ type: 'email', required: true, message: '请输入有效邮箱地址' }]">
       <a-input v-model:value="formState.email" />
-      <br>演示账号：test@test.com
     </a-form-item>
 
     <a-form-item label="密码" name="password" :rules="[{ required: true, message: '请输入密码' }]">
       <a-input-password v-model:value="formState.password" />
-      <br>演示账号密码：testtest
     </a-form-item>
 
 
