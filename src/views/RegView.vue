@@ -43,7 +43,7 @@ Object.assign(window, { $: jQuery, jQuery });
 //jquery结束
 
 if ($cookies.get('token') != null&&$cookies.get('token') != '') {
-  window.location.href = "/user"
+  window.location.href = "/"
 }
 export default defineComponent({
   components: {
@@ -101,7 +101,7 @@ export default defineComponent({
         // obj.success ? obj.success(res) : null
         if (res.data.code == "200") {
           $cookies.set('token', res.data.data.token, "720h")
-          window.location.href = "/user"
+          window.location.href = "/"
         }
       }).catch(error => {
         iconLoading.value = false;

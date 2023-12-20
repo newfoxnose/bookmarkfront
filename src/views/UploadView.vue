@@ -126,7 +126,7 @@ export default defineComponent({
           if (res.data.data != null) {
             this.defaultPercent = 100;
             this.loadingdone = true;
-            window.location.href = "/user";
+            window.location.href = "/";
           }
         })
         .catch((error) => {

@@ -18,7 +18,7 @@ export default defineComponent({
       <div class="wrapper">
         <nav>
           <span v-if="$cookies.get('token') != null&&$cookies.get('token') != ''">
-            <RouterLink to="/user">书签</RouterLink>
+            <RouterLink to="/">书签</RouterLink>
             <RouterLink to="/collection">采集</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
@@ -63,7 +63,6 @@ export default defineComponent({
             <RouterLink to="/logout">退出</RouterLink>
           </span>
           <span v-else>
-            <RouterLink to="/">首页</RouterLink>
             <RouterLink to="/login">登入</RouterLink>
             <RouterLink to="/reg">注册</RouterLink>
           </span>
