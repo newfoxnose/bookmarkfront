@@ -108,7 +108,22 @@ const router = createRouter({
       path: '/collection',
       name: 'collection',
       component: () => import('../views/CollectionView.vue')
-    }
+    },
+    {
+      path: '/gallery',
+      name: 'gallery',
+      component: () => import('../views/GalleryView.vue')
+    },
+    {
+      path: '/editimg/:id',
+      name: 'editimg',
+      component: () => import('../views/EditimgView.vue')
+    } ,
+    {
+      path: '/newimg',
+      name: 'newimg',
+      component: () => import('../views/NewimgView.vue')
+    } 
   ],
 })
 

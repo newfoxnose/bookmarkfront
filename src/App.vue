@@ -20,6 +20,7 @@ export default defineComponent({
           <span v-if="$cookies.get('token') != null&&$cookies.get('token') != ''">
             <RouterLink to="/">书签</RouterLink>
             <RouterLink to="/collection">采集</RouterLink>
+            <RouterLink to="/gallery">图库</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
             <RouterLink to="/compose">写作</RouterLink>
@@ -30,6 +31,9 @@ export default defineComponent({
     </a>
     <template #overlay>
       <a-menu>
+        <a-menu-item>
+          <RouterLink to="/newimg">新图片</RouterLink>
+        </a-menu-item>
         <a-menu-item>
           <RouterLink to="/blog">文章</RouterLink>
         </a-menu-item>
