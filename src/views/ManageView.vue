@@ -86,11 +86,14 @@ export default defineComponent({
         title: '书签',
         dataIndex: 'amount'
       }, {
-        title: '采集',
+        title: '文摘',
         dataIndex: 'collection_amount'
       }, {
-        title: '博文',
+        title: '博客',
         dataIndex: 'blog_amount'
+      }, {
+        title: '图贴',
+        dataIndex: 'img_amount'
       }, {
         title: '操作'
       }],
