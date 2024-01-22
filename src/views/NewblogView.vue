@@ -1,5 +1,5 @@
 <template>
-  <h3 style="margin-top:15px;">写作</h3>
+  <h3 style="margin-top:15px;">写博客</h3>
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
   <a-form :model="formState">
     <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
@@ -11,15 +11,14 @@
       </a-select>
     </p>
     <p>
-      <a-checkbox v-model:checked="formState.is_private">私有</a-checkbox>
       <a-checkbox v-model:checked="formState.is_recommend">推荐</a-checkbox>
     </p>
   </a-form>
   <vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-01"></vue-ueditor-wrap>
 
   <div>
-    <a-modal v-model:visible="visible" title="新建文章成功" @ok="handleOk" ok-text="确认" cancel-text="取消">
-      <p>跳转到文章列表页请点击“确定”</p>
+    <a-modal v-model:visible="visible" title="新建博客成功" @ok="handleOk" ok-text="确认" cancel-text="取消">
+      <p>跳转到博客列表页请点击“确定”</p>
       <p>再写一篇请点击“取消”</p>
     </a-modal>
   </div>
@@ -48,6 +47,7 @@ export default defineComponent({
     const { proxy } = getCurrentInstance()
 
     onMounted(() => {
+      
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get('token'));
           params.append("timestamp",new Date().getTime());
@@ -61,6 +61,7 @@ export default defineComponent({
     })
 
     const save = () => {
+      console.log(router.currentRoute.value.params);
       iconLoading.value = true;
       if (proxy.$func.getVarType(formState.value.title) == "undefined" || formState.value.title == '') {
         message.info("标题不能为空");
@@ -73,12 +74,7 @@ export default defineComponent({
         params.append("content", valueHtml.value);
         params.append("title", formState.value.title);
         params.append("folder_id", formState.value.folder_id);
-        if (formState.value.is_private == true) {
-          params.append("is_private", 1);
-        }
-        else {
-          params.append("is_private", 0);
-        }
+        params.append("is_private", 0);   //博客都为公开
         if (formState.value.is_recommend == true) {
           params.append("is_recommend", 1);
         }

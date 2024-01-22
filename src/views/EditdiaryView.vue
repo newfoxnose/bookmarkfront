@@ -7,7 +7,7 @@
   </div>
 
 
-  <h3 style="margin-top:15px;">编辑博客</h3>
+  <h3 style="margin-top:15px;">编辑日记</h3>
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
   <a-form :model="formState">
     <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
@@ -19,7 +19,7 @@
       </a-select>
     </p>
     <p>
-      <a-checkbox v-model:checked="formState.is_recommend">推荐</a-checkbox>
+      <a-checkbox v-model:checked="formState.is_recommend">置顶</a-checkbox>
     </p>
   </a-form>
 
@@ -106,7 +106,7 @@ export default {
       params.append("title", formState.value.title);
       params.append("folder_id", formState.value.folder_id);
       params.append("post_id", router.currentRoute.value.params.id);
-      params.append("is_private", 0);   //博客都为公开
+      params.append("is_private", 1);   //日记都为私密
       if (formState.value.is_recommend == true) {
         params.append("is_recommend", 1);
       }

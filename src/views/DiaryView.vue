@@ -5,12 +5,12 @@
       '100%': '#87d068',
     }" />
   </div>
-  <h3 style="margin-top:15px;">博客</h3>
+  <h3 style="margin-top:15px;">日记</h3>
   <div>
     <div v-for=" item  in  fileitems " style="margin-bottom:5px;">
 
       <span class="ext">{{ item.id }}</span>
-      <a :href=" '/editblog/' + item.id " style="margin-left:5px;">
+      <a :href=" '/editdiary/' + item.id " style="margin-left:5px;">
         {{ item.title }}
       </a>
       <eye-invisible-two-tone v-if="item.is_private == '1'" style="margin-left:3px;" />
@@ -77,7 +77,7 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get('token'));
           params.append("timestamp",new Date().getTime());
-          params.append("is_private",0);
+          params.append("is_private",1);
       proxy.$http.post('/ajax/list_blog_ajax/', params).then(res => {
         if (res.data.code=='401'){      //不在登陆状态
       window.location.href ="/login";
@@ -92,7 +92,7 @@ export default {
       params.append("token", $cookies.get('token'));
           params.append("timestamp",new Date().getTime());
       params.append("id_b64", proxy.$func.urlsafe_b64encode(Base64.encode(id)));
-      params.append("is_private", 0);   //博客都为公开
+      params.append("is_private", 1);   //日记都为私密
       proxy.$http.post('/ajax/delete_blog_ajax/', params).then(res => {
         fileitems.value = res.data.data.blog
       });
