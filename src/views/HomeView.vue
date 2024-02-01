@@ -1,13 +1,14 @@
 <script>
-
-import bookmarkitem from '../components/bookmarkitem.vue'
-import subfolder from '../components/subfolder.vue'
+import bookmarkitem from "../components/bookmarkitem.vue";
+import subfolder from "../components/subfolder.vue";
 import {
-  CloseOutlined, SearchOutlined, StarOutlined, PlusOutlined
-} from '@ant-design/icons-vue';
-import { defineComponent, ref, reactive } from 'vue';
-import { message } from 'ant-design-vue';
-
+  CloseOutlined,
+  SearchOutlined,
+  StarOutlined,
+  PlusOutlined,
+} from "@ant-design/icons-vue";
+import { defineComponent, ref, reactive, getCurrentInstance,onMounted } from "vue";
+import { message, Modal } from "ant-design-vue";
 
 export default defineComponent({
   components: {
@@ -16,7 +17,7 @@ export default defineComponent({
     CloseOutlined,
     StarOutlined,
     SearchOutlined,
-    PlusOutlined
+    PlusOutlined,
   },
   setup() {
     const iconLoading = ref(false);
@@ -38,6 +39,177 @@ export default defineComponent({
     const finishloading = () => {
       defaultPercent.value = 100;
     };
+
+    const showconfirmdelete = (editId) => {
+      Modal.confirm({
+        title: "确认删除该项目吗？",
+        content:
+          "点击OK删除且无法找回, 点击cancel取消",
+        onOk() {
+          addBookmark(editId, "删除");
+        },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onCancel() {},
+      });
+    };
+
+    const url = ref(String);
+    const title = ref(String);
+    const folder_id = ref(String);
+    const items = ref([]);
+    const folder_list = ref([]);
+    const is_private = ref(false);
+    const is_published = ref(false);
+    const is_recommend = ref(false);
+    const is_friendlink = ref(false);
+    const loadingdone = ref(false);
+    const { proxy } = getCurrentInstance();
+
+    onMounted(() => {
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+
+      proxy.$http
+        .post("/ajax/get_folder_ajax/", params)
+        .then((folder_res) => {
+          if (folder_res.data.code == "401") {
+            //不在登陆状态
+            window.location.href = "/login";
+          }
+          folder_list.value = folder_res.data.data.data;
+          folder_id.value = folder_res.data.data.data[0].value;
+        });
+
+      proxy.$http.post("/ajax/home_stream_ajax/0/", params).then((res) => {
+        console.log(res.data)
+        items.value = res.data.data;
+        if (res.data.data.next_folder_index != -1) {
+          home_stream_ajax(0);
+        }
+      });
+    });
+
+    const home_stream_ajax = (folder_index) => {
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("timestamp", new Date().getTime());
+      params.append("token", $cookies.get("token"));
+      proxy.$http
+        .post("/ajax/home_stream_ajax/0/" + folder_index, params)
+        .then((res) => {
+          //console.log(folder_index);
+          //console.log(res.data);
+          if (res.data.data.next_folder_index != -1) {
+            items.value.folder[folder_index] =
+              res.data.data.folder[folder_index];
+            home_stream_ajax(res.data.data.next_folder_index);
+            increaseloading();
+          } else {
+            finishloading();
+            loadingdone.value = true;
+            proxy.$http.post("/ajax/update_http_code/", params).then((res) => {
+              console.log(res.data);
+            });
+          }
+        });
+    }
+
+    const addBookmark = (id, action) => {
+      if (url.value != "" && title.value != "" && folder_id.value != "") {
+        iconLoading.value = true;
+        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+        params.append("url", url.value);
+        params.append("title", title.value);
+        params.append("folder_id", folder_id.value);
+        if (is_private.value == true) {
+          params.append("is_private", 1);
+        }
+        else {
+          params.append("is_private", 0);
+        }
+        if (is_published.value == true) {
+          params.append("is_published", 1);
+        }
+        else {
+          params.append("is_published", 0);
+        }
+        if (is_recommend.value == true) {
+          params.append("is_recommend", 1);
+        }
+        else {
+          params.append("is_recommend", 0);
+        }
+        if (is_friendlink.value == true) {
+          params.append("is_friendlink", 1);
+        }
+        else {
+          params.append("is_friendlink", 0);
+        }
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get("token"));
+        let ajax_url = "";
+        if (id != "" && action == "删除") {
+          params.append("id", id);
+          ajax_url = "/ajax/delete_bookmark_ajax";
+        } else if (id != "") {
+          params.append("id", id);
+          ajax_url = "/ajax/edit_bookmark_ajax";
+        } else {
+          ajax_url = "/ajax/add_bookmark_ajax";
+        }
+        const { data: res } = proxy.$http
+          .post(ajax_url, params)
+          .then((res) => {
+            iconLoading.value = false;
+            //console.log(res.data);
+            // obj.success ? obj.success(res) : null
+            message.info(res.data.msg);
+            if (res.data.data != null) {
+              let temp_item = res.data.data;
+              let folder_path = res.data.data.folder_path;
+              if (id != "" && action == "删除") {
+                console.log("start to delete item");
+                items.value = proxy.$func.insert_item(
+                  items.value,
+                  folder_path,
+                  temp_item,
+                  "delete"
+                );
+                //document.querySelector("[itemid='" + id + "']").remove();
+              } else if (id != "") {
+                let old_folder_path = res.data.data.old_folder_path;
+                items.value = proxy.$func.insert_item(
+                  items.value,
+                  old_folder_path,
+                  temp_item,
+                  "delete"
+                ); //删除旧的
+                items.value = proxy.$func.insert_item(
+                  items.value,
+                  folder_path,
+                  temp_item
+                ); //插入新的
+              } else {
+                items.value = proxy.$func.insert_item(
+                  items.value,
+                  folder_path,
+                  temp_item
+                );
+              }
+              onClose();
+            }
+          })
+          .catch((error) => {
+            //obj.error ? obj.error(error) : null;
+            //console.log(error);
+            message.info("出错了，请刷新");
+            onClose();
+          });
+      } else {
+        message.info("请填写必要项目");
+      }
+    };
+
     return {
       visible,
       showDrawer,
@@ -46,79 +218,85 @@ export default defineComponent({
       defaultPercent,
       increaseloading,
       finishloading,
-      iconLoading
+      iconLoading,
+      showconfirmdelete,
+      addBookmark,
+      url,
+      title,
+      folder_id,
+      items,
+      is_private,
+      is_published,
+      is_recommend,
+      is_friendlink,
+      folder_list,
+      loadingdone
     };
   },
   data() {
     return {
-      items: {},
-      question: '',
-      search: '',
-      editable: 'yes',
-      title: '',
-      url: '',
-      folder_id: '',
-      folder_list: {},
+      question: "",
+      search: "",
+      editable: "yes",
       clicked: false,
-      editId: '',
-      new_folder: '',
-      new_folder_clicked: false,
-      is_private: false,
-      is_published: false,
-      is_recommend: false,
-      is_friendlink: false,
-      loadingdone:false
-    }
+      editId: "",
+      new_folder: "",
+      new_folder_clicked: false
+    };
   },
   watch: {
     // 每当 question 改变时，这个函数就会执行
     question(newQuestion, oldQuestion) {
-      this.search = newQuestion
-    }
+      this.search = newQuestion;
+    },
   },
   methods: {
-    fatherMethod(drawerTitle, id, url, title, folder_id, is_private, is_published,is_recommend,is_friendlink) {
-      if (drawerTitle == '编辑书签') {
+    fatherMethod(
+      drawerTitle,
+      id,
+      url,
+      title,
+      folder_id,
+      is_private,
+      is_published,
+      is_recommend,
+      is_friendlink
+    ) {
+      if (drawerTitle == "编辑书签") {
         this.showDrawer(drawerTitle);
         this.editId = id;
         this.url = url;
         this.title = title;
         if (is_private == 1) {
           this.is_private = true;
-        }
-        else {
+        } else {
           this.is_private = false;
         }
         if (is_published == 1) {
           this.is_published = true;
-        }
-        else {
+        } else {
           this.is_published = false;
         }
         if (is_recommend == 1) {
           this.is_recommend = true;
-        }
-        else {
+        } else {
           this.is_recommend = false;
         }
         if (is_friendlink == 1) {
           this.is_friendlink = true;
-        }
-        else {
+        } else {
           this.is_friendlink = false;
         }
         if (folder_id == -1) {
           this.folder_id = this.folder_list[0].value;
-        }
-        else {
+        } else {
           this.folder_id = folder_id;
         }
-      }
-      else {
+      } else {
         this.showDrawer("新建书签");
-        this.editId = '';
-        this.url = '';
-        this.title = '';
+        this.editId = "";
+        this.url = "";
+        this.title = "";
         this.folder_id = this.folder_list[0].value;
         this.is_private = false;
         this.is_published = false;
@@ -127,147 +305,67 @@ export default defineComponent({
       }
     },
     clearQuestion() {
-      this.question = ''
-      this.search = ''
+      this.question = "";
+      this.search = "";
     },
     getUrl() {
       let theurl = this.url.toLowerCase();
-      if (theurl == '') {
-        message.info('网址不能为空');
-      }
-      else if (theurl.substring(0, 7) != "http://" && theurl.substring(0, 8) != "https://") {
-        message.info('网址必须以http://或https://开头');
-      }
-      else {
+      if (theurl == "") {
+        message.info("网址不能为空");
+      } else if (
+        theurl.substring(0, 7) != "http://" &&
+        theurl.substring(0, 8) != "https://"
+      ) {
+        message.info("网址必须以http://或https://开头");
+      } else {
         if (this.clicked == false) {
           this.clicked = true;
-          message.info('自动获取网页标题中，请稍等');
-          let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+          message.info("自动获取网页标题中，请稍等");
+          let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
           params.append("url", theurl);
-          params.append("token", $cookies.get('token'));
-          params.append("timestamp",new Date().getTime());
-          const { data: res } = this.$http.post('/ajax/url_title', params)
-            .then(res => {
+          params.append("token", $cookies.get("token"));
+          params.append("timestamp", new Date().getTime());
+          const { data: res } = this.$http
+            .post("/ajax/url_title", params)
+            .then((res) => {
               console.log(res.data);
               // obj.success ? obj.success(res) : null
               if (res.data.msg == "请求成功") {
                 message.info("成功获取网页标题");
-                this.title = res.data.data.title
-              }
-              else {
+                this.title = res.data.data.title;
+              } else {
                 message.info("未获取到网页标题，但仍可以直接添加网址");
-                this.title = res.data.data.title
+                this.title = res.data.data.title;
               }
               this.clicked = false;
             })
-            .catch(error => {
+            .catch((error) => {
               // obj.error ? obj.error(error) : null;
               console.log(error);
               this.clicked = false;
-            })
-        }
-        else {
+            });
+        } else {
           message.info("正在请求数据，请勿重复点击");
         }
       }
     },
-    addBookmark(id, action) {
-      if (this.url != '' && this.title != '' && this.folder_id != '') {
-        this.iconLoading = true;
-        let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-        params.append("url", this.url);
-        params.append("title", this.title);
-        params.append("folder_id", this.folder_id);
-        if (this.is_private == true) {
-          params.append("is_private", 1);
-        }
-        else {
-          params.append("is_private", 0);
-        }
-        if (this.is_published == true) {
-          params.append("is_published", 1);
-        }
-        else {
-          params.append("is_published", 0);
-        }
-        if (this.is_recommend == true) {
-          params.append("is_recommend", 1);
-        }
-        else {
-          params.append("is_recommend", 0);
-        }
-        if (this.is_friendlink == true) {
-          params.append("is_friendlink", 1);
-        }
-        else {
-          params.append("is_friendlink", 0);
-        }
-        params.append("timestamp",new Date().getTime());
-        params.append("token", $cookies.get('token'));
-        let ajax_url = '';
-        if (id != '' && action == "删除") {
-          params.append("id", id);
-          ajax_url = '/ajax/delete_bookmark_ajax';
-        }
-        else if (id != '') {
-          params.append("id", id);
-          ajax_url = '/ajax/edit_bookmark_ajax';
-        }
-        else {
-          ajax_url = '/ajax/add_bookmark_ajax';
-        }
-        const { data: res } = this.$http.post(ajax_url, params)
-          .then(res => {
-            this.iconLoading = false;
-            //console.log(res.data);
-            // obj.success ? obj.success(res) : null
-            message.info(res.data.msg);
-            if (res.data.data != null) {
-              let temp_item = res.data.data;
-              let folder_path = res.data.data.folder_path;
-              if (id != '' && action == "删除") {
-                this.items = this.$func.insert_item(this.items, folder_path, temp_item, "delete");
-                //document.querySelector("[itemid='" + id + "']").remove();
-              }
-              else if (id != '') {
-                let old_folder_path = res.data.data.old_folder_path;
-                this.items = this.$func.insert_item(this.items, old_folder_path, temp_item, "delete");   //删除旧的
-                this.items = this.$func.insert_item(this.items, folder_path, temp_item);                //插入新的
-              }
-              else {
-                this.items = this.$func.insert_item(this.items, folder_path, temp_item);
-              }
-              this.onClose();
-            }
-          })
-          .catch(error => {
-            //obj.error ? obj.error(error) : null;
-            //console.log(error);
-            message.info("出错了，请刷新");            
-            this.onClose();
-          })
-      }
-      else {
-        message.info("请填写必要项目");
-      }
-    },
     newFolder() {
-      if (this.new_folder == '') {
-        message.info('新目录名称不能为空');
-      }
-      else {
+      if (this.new_folder == "") {
+        message.info("新目录名称不能为空");
+      } else {
         if (this.new_folder_clicked == false) {
           this.new_folder_clicked = true;
-          message.info('创建新目录中，请稍等');
-          let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+          message.info("创建新目录中，请稍等");
+          let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
           params.append("new_folder", this.new_folder);
           params.append("folder_id", this.folder_id);
-          params.append("token", $cookies.get('token'));
-          params.append("timestamp",new Date().getTime());
-          const { data: res } = this.$http.post('/ajax/new_folder_ajax', params)
-            .then(res => {
+          params.append("token", $cookies.get("token"));
+          params.append("timestamp", new Date().getTime());
+          const { data: res } = this.$http
+            .post("/ajax/new_folder_ajax", params)
+            .then((res) => {
               // obj.success ? obj.success(res) : null
-              console.log(res.data)
+              console.log(res.data);
               if (res.data.msg == "新建目录成功") {
                 message.info("新建目录成功");
                 this.folder_list = res.data.select_folder;
@@ -275,98 +373,85 @@ export default defineComponent({
                 let temp_folder = res.data.data;
                 let folder_path = temp_folder.folder_path;
                 folder_path.pop();
-                this.items = this.$func.insert_item(this.items, folder_path, temp_folder, "newfolder");
-              }
-              else {
+                items.value = this.$func.insert_item(
+                  items.value,
+                  folder_path,
+                  temp_folder,
+                  "newfolder"
+                );
+              } else {
                 message.info(res.data.msg);
               }
               this.new_folder_clicked = false;
             })
-            .catch(error => {
+            .catch((error) => {
               // obj.error ? obj.error(error) : null;
               console.log(error);
               this.new_folder_clicked = false;
-            })
-        }
-        else {
+            });
+        } else {
           message.info("正在请求数据，请勿重复点击");
         }
       }
     },
-    home_stream_ajax(folder_index) {
-      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("timestamp",new Date().getTime());
-      params.append("token", $cookies.get('token'));
-      this.$http.post('/ajax/home_stream_ajax/0/' + folder_index, params).then((res) => {
-        //console.log(folder_index);
-        //console.log(res.data);
-        if (res.data.data.next_folder_index != -1) {
-          this.items.folder[folder_index] = res.data.data.folder[folder_index];
-          this.home_stream_ajax(res.data.data.next_folder_index);
-          this.increaseloading()
-        }
-        else {
-          this.finishloading()
-          this.loadingdone=true
-          this.$http.post('/ajax/update_http_code/', params).then((res) => {
-            console.log(res.data);
-          })
-        }
-      })
-    }
-  },
-  async mounted() {
-    let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-    params.append("timestamp",new Date().getTime());
-    params.append("token", $cookies.get('token'));
-    const { data: res } = await this.$http.post('/ajax/home_stream_ajax/0/', params)
-    this.items = res.data
-    if (res.data.next_folder_index != -1) {
-      this.home_stream_ajax(0);
-    }
-    const { data: folder_res } = await this.$http.post('/ajax/get_folder_ajax/', params)
-    if (folder_res.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
-    }
-    //console.log(folder_res.data)
-    this.folder_list = folder_res.data.data
-    this.folder_id = folder_res.data.data[0].value;
-
   },
 });
 </script>
  
 <template>
-    <div class="loadingbar" v-show="loadingdone==false">
-    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
+  <div class="loadingbar" v-show="loadingdone == false">
+    <a-progress
+      type="circle"
+      :percent="defaultPercent"
+      status="active"
+      :show-info="false"
+      :stroke-color="{
         '0%': '#108ee9',
         '100%': '#87d068',
-      }"/>
+      }"
+    />
   </div>
 
-
   <div :folderid="-1">
-    <h3 style="margin-top:15px;">根目录</h3>
-    <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id" :folder_id="bookmarkitem.folder_id"
-      :url="bookmarkitem.url" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" :short_title="bookmarkitem.short_title"
-      :is_private="bookmarkitem.is_private" :is_published="bookmarkitem.is_published" :is_recommend="bookmarkitem.is_recommend" :is_friendlink="bookmarkitem.is_friendlink" :http_code="bookmarkitem.http_code" :icon="bookmarkitem.icon_display" :search="search" :editable="editable"
-      @editbookmark="fatherMethod"></bookmarkitem>
+    <h3 style="margin-top: 15px">根目录</h3>
+    <bookmarkitem
+      v-for="bookmarkitem in items.root_bookmarks"
+      :id="bookmarkitem.id"
+      :folder_id="bookmarkitem.folder_id"
+      :url="bookmarkitem.url"
+      :title="bookmarkitem.title"
+      :pinyin="bookmarkitem.pinyin"
+      :short_title="bookmarkitem.short_title"
+      :is_private="bookmarkitem.is_private"
+      :is_published="bookmarkitem.is_published"
+      :is_recommend="bookmarkitem.is_recommend"
+      :is_friendlink="bookmarkitem.is_friendlink"
+      :http_code="bookmarkitem.http_code"
+      :icon="bookmarkitem.icon_display"
+      :search="search"
+      :editable="editable"
+      @editbookmark="fatherMethod"
+    ></bookmarkitem>
   </div>
 
   <div v-for="item in items.folder">
-    <subfolder :folder_name="item.folder_name" :folder_id="item.id" :folder_bookmark="item.bookmarks"
-      :subfolder="item.subfolder" :search="search" :editable="editable" :fatherMethod="fatherMethod"
-      :display_offset="item.display_offset">
+    <subfolder
+      :folder_name="item.folder_name"
+      :folder_id="item.id"
+      :folder_bookmark="item.bookmarks"
+      :subfolder="item.subfolder"
+      :search="search"
+      :editable="editable"
+      :fatherMethod="fatherMethod"
+      :display_offset="item.display_offset"
+    >
     </subfolder>
   </div>
 
-  <div style="margin-bottom:20px;">
-    &nbsp;
-  </div>
+  <div style="margin-bottom: 20px">&nbsp;</div>
 
   <div class="search-div">
     <div class="search">
-
       <a-input v-model:value="question">
         <template #addonBefore>
           <star-outlined @click="fatherMethod('新建书签')" />
@@ -375,13 +460,24 @@ export default defineComponent({
           <close-outlined @click="clearQuestion" />
         </template>
       </a-input>
-
     </div>
   </div>
 
-  <a-drawer :width="500" :title="updatedDrawerTitle" placement="bottom" :visible="visible" @close="onClose">
+  <a-drawer
+    :width="500"
+    :title="updatedDrawerTitle"
+    placement="bottom"
+    :visible="visible"
+    @close="onClose"
+  >
     <template #extra v-if="updatedDrawerTitle == '编辑书签'">
-      <a-button type="primary" danger @click="addBookmark(editId, '删除')" :loading="iconLoading">删除</a-button>
+      <a-button
+        type="primary"
+        danger
+        @click="showconfirmdelete(editId)"
+        :loading="iconLoading"
+        >删除</a-button
+      >
     </template>
 
     <p>
@@ -396,8 +492,18 @@ export default defineComponent({
       <a-input v-model:value="title" placeholder="标题" />
     </p>
     <p>
-      <a-select style="width: 100%" v-model:value="folder_id" v-if="folder_list">
-        <a-select-option v-for="item in folder_list" :value="item.value" :lv="item.lv"> {{ item.name }}</a-select-option>
+      <a-select
+        style="width: 100%"
+        v-model:value="folder_id"
+        v-if="folder_list"
+      >
+        <a-select-option
+          v-for="item in folder_list"
+          :value="item.value"
+          :lv="item.lv"
+        >
+          {{ item.name }}</a-select-option
+        >
       </a-select>
     </p>
     <p>
@@ -415,7 +521,12 @@ export default defineComponent({
       <a-checkbox v-model:checked="is_friendlink">友链</a-checkbox>
     </p>
     <p>
-      <a-button type="primary" @click="addBookmark(editId)" :loading="iconLoading">提交</a-button>
+      <a-button
+        type="primary"
+        @click="addBookmark(editId)"
+        :loading="iconLoading"
+        >提交</a-button
+      >
       &nbsp;
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </p>
@@ -455,7 +566,7 @@ export default defineComponent({
   }
 
   .folder-name:before {
-    content: ' ';
+    content: " ";
     border-left: 1px solid var(--color-border);
     position: absolute;
     left: 0;
@@ -464,7 +575,7 @@ export default defineComponent({
   }
 
   .folder-name:after {
-    content: ' ';
+    content: " ";
     border-left: 1px solid var(--color-border);
     position: absolute;
     left: 0;
@@ -480,7 +591,6 @@ export default defineComponent({
     display: none;
   }
 }
-
 
 .search-div {
   display: flex;
@@ -505,13 +615,11 @@ export default defineComponent({
   border-width: 2px;
 }
 
-
 .loadingbar {
-  position:fixed;
-  top:50%;
-left:50%;
-transform: translate(-50%,-50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 10;
 }
-
 </style>
