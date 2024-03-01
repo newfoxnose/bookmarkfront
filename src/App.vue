@@ -1,7 +1,7 @@
 <script>
-import { RouterLink, RouterView } from 'vue-router'
-import { defineComponent } from 'vue';
-import { DownOutlined } from '@ant-design/icons-vue';
+import { RouterLink, RouterView } from "vue-router";
+import { defineComponent } from "vue";
+import { DownOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
   components: {
@@ -17,62 +17,104 @@ export default defineComponent({
 
       <div class="wrapper">
         <nav>
-          <span v-if="$cookies.get('token') != null&&$cookies.get('token') != ''">
+          <span
+            v-if="$cookies.get('token') != null && $cookies.get('token') != ''"
+          >
             <RouterLink to="/">书签</RouterLink>
-            <RouterLink to="/collection">文摘</RouterLink>
-            <RouterLink to="/gallery">图库</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
             <RouterLink to="/chat">ChatGPT</RouterLink>
-            <a-dropdown style="display:inline !important">
-    <a class="ant-dropdown-link" @click.prevent >
-      更多
-      <DownOutlined />
-    </a>
-    <template #overlay>
-      <a-menu>
-        <a-menu-item>
-          <RouterLink to="/newblog">写博客</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/newdiary">写日记</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/newimg">新图片</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/blog">博客</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/diary">日记</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/manage">管理目录</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/profile">个人设置</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/domain">个人域名设置</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/upload">导入书签</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/export">导出书签至本地</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/email">发送书签至邮箱</RouterLink>
-        </a-menu-item>
-        <a-menu-item>
-          <RouterLink to="/redirect" target="_blank">个人网站</RouterLink>
-        </a-menu-item>
-      </a-menu>
-    </template>
-  </a-dropdown>
+
+            <a-dropdown style="display: inline !important">
+              <a class="ant-dropdown-link" @click.prevent>
+                博客
+                <DownOutlined />
+              </a>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item>
+                    <RouterLink to="/newblog">写博客</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/blog">博客列表</RouterLink>
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+
+            <a-dropdown style="display: inline !important">
+              <a class="ant-dropdown-link" @click.prevent>
+                日记
+                <DownOutlined />
+              </a>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item>
+                    <RouterLink to="/newdiary">写日记</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/diary">日记列表</RouterLink>
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+
+            <a-dropdown style="display: inline !important">
+              <a class="ant-dropdown-link" @click.prevent>
+                图片
+                <DownOutlined />
+              </a>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item>
+                    <RouterLink to="/newimg">新图片</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/gallery">图库</RouterLink>
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+
+            <a-dropdown style="display: inline !important">
+              <a class="ant-dropdown-link" @click.prevent>
+                更多
+                <DownOutlined />
+              </a>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item>
+                    <RouterLink to="/collection">文摘</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/manage">管理目录</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/profile">个人设置</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/domain">个人域名设置</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/upload">导入书签</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/export">导出书签至本地</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/email">发送书签至邮箱</RouterLink>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/redirect" target="_blank"
+                      >个人网站</RouterLink
+                    >
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
             <RouterLink to="/logout">退出</RouterLink>
           </span>
           <span v-else>
