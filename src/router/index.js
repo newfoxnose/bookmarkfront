@@ -136,6 +136,10 @@ const router = createRouter({
       path: "/newimg",
       name: "newimg",
       component: () => import("../views/NewimgView.vue"),
+    },{
+      path: "/chat",
+      name: "chat",
+      component: () => import("../views/ChatView.vue"),
     },
   ],
 });

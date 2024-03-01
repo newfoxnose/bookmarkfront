@@ -23,8 +23,7 @@ export default defineComponent({
             <RouterLink to="/gallery">图库</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
-            <RouterLink to="/newblog">写博客</RouterLink>
-            <RouterLink to="/newdiary">写日记</RouterLink>
+            <RouterLink to="/chat">ChatGPT</RouterLink>
             <a-dropdown style="display:inline !important">
     <a class="ant-dropdown-link" @click.prevent >
       更多
@@ -32,6 +31,12 @@ export default defineComponent({
     </a>
     <template #overlay>
       <a-menu>
+        <a-menu-item>
+          <RouterLink to="/newblog">写博客</RouterLink>
+        </a-menu-item>
+        <a-menu-item>
+          <RouterLink to="/newdiary">写日记</RouterLink>
+        </a-menu-item>
         <a-menu-item>
           <RouterLink to="/newimg">新图片</RouterLink>
         </a-menu-item>
