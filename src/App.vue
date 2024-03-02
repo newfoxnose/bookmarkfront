@@ -112,10 +112,12 @@ export default defineComponent({
                       >个人网站</RouterLink
                     >
                   </a-menu-item>
+                  <a-menu-item>
+                    <RouterLink to="/logout">退出</RouterLink>
+                  </a-menu-item>
                 </a-menu>
               </template>
             </a-dropdown>
-            <RouterLink to="/logout">退出</RouterLink>
           </span>
           <span v-else>
             <RouterLink to="/login">登入</RouterLink>
