@@ -128,9 +128,17 @@ export default defineComponent({
     </header>
   </div>
   <RouterView />
+  <div class="footer">
+      Copyright 2023-2024
+    </div>
 </template>
 
 <style scoped>
+.footer{
+  padding:30px;
+  text-align: center;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
@@ -188,5 +196,6 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
+
 }
 </style>
