@@ -24,7 +24,7 @@ export default defineComponent({
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
             <RouterLink to="/chat">ChatGPT</RouterLink>
-
+            <RouterLink to="/feed">RSS</RouterLink>
             <a-dropdown style="display: inline !important">
               <a class="ant-dropdown-link" @click.prevent>
                 博客

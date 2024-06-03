@@ -140,6 +140,14 @@ const router = createRouter({
       path: "/chat",
       name: "chat",
       component: () => import("../views/ChatView.vue"),
+    },{
+      path: "/feed",
+      name: "feed",
+      component: () => import("../views/FeedView.vue"),
+    },{
+      path: "/rss/:id",
+      name: "rss",
+      component: () => import("../views/RSSView.vue"),
     },
   ],
 });
