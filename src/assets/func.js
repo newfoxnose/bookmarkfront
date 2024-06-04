@@ -25,6 +25,10 @@ export default {
     string = string.replace(/\=/g, "");
     return string;
   },
+  isValidUrl(url) {
+    const regex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    return regex.test(url);
+  },
   timeFormat(timeStamp) {
     timeStamp = String(timeStamp).slice(0, 13);
     timeStamp = Number(timeStamp);

@@ -9,12 +9,17 @@
 
   <a-form :model="formState" name="add" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }" autocomplete="off"
     @finish="onFinish" @finishFailed="onFinishFailed">
+    <a-form-item label="地址" name="feed_url" :rules="[{ required:true, message: '地址不能为空' }]">
+      <a-input v-model:value="formState.feed_url">
+      <template #addonAfter>
+          <search-outlined @click="getUrl" v-if="!iconLoading" />
+          <a-spin size="small" v-if="iconLoading" />
+        </template>
+      </a-input>
+    </a-form-item>
     <a-form-item label="名称" name="feed_name" :rules="[{ required:true, message: '名称不能为空' }]">
       <a-input v-model:value="formState.feed_name"  />
     </a-form-item> 
-    <a-form-item label="地址" name="feed_url" :rules="[{ required:true, message: '地址不能为空' }]">
-      <a-input v-model:value="formState.feed_url" />
-    </a-form-item>
     <a-form-item label="私有" name="is_private">
       <a-checkbox v-model:checked="formState.is_private"></a-checkbox>
     </a-form-item>
@@ -34,7 +39,6 @@
       </span>
     </div>
   </div>
-
   
   <a-drawer :model="drawer" :width="500" title="编辑RSS源" placement="bottom" :visible="visible" @close="onClose">
     <template #extra >
@@ -75,12 +79,12 @@
 <script>
 import { message } from 'ant-design-vue';
 
-import { FormOutlined } from '@ant-design/icons-vue';
+import { FormOutlined,SearchOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 
 export default {
   components: {
-    FormOutlined
+    FormOutlined,SearchOutlined
   },
   setup() {
     const defaultPercent = ref(10);
@@ -113,7 +117,36 @@ export default {
       iconLoading.value = false;
       visible.value = false;
     };
-
+    const getUrl = () => {
+      if (proxy.$func.isValidUrl(formState.value.feed_url)==true){
+        iconLoading.value = true;
+      message.info('自动获取网页标题中，请稍等');
+          let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+          params.append("url", formState.value.feed_url);
+          params.append("token", $cookies.get('token'));
+          params.append("timestamp",new Date().getTime());
+          const { data: res } = proxy.$http.post('/ajax/url_title', params)
+            .then(res => {
+              console.log(res.data);
+              // obj.success ? obj.success(res) : null
+              if (res.data.msg == "请求成功") {
+                message.info("成功获取源名称");
+                formState.value.feed_name = res.data.data.title
+              }
+              else {
+                message.info("未获取到源名称，请手动输入");
+              }
+            })
+            .catch(error => {
+              // obj.error ? obj.error(error) : null;
+              console.log(error);
+            })
+      iconLoading.value = false;
+      }
+      else{
+        message.info('网址无效');
+      }
+    };
     onMounted(() => {
       const interval=setInterval(() => {
         const percent = defaultPercent.value + Math.round(Math.random()*7+2);
@@ -192,6 +225,7 @@ export default {
       loadingdone,
       iconLoading,
       formState,
+      getUrl,
       onFinish,
       onFinishFailed
     };

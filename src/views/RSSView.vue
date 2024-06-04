@@ -15,11 +15,28 @@
   <h3 style="margin-top: 15px">{{ title }}</h3>
   <div>
     <div v-for=" item in feedItems" style="margin-bottom:5px;">
-      <a :href=" item.link " style="margin-left:5px;"  class="ext" target="_blank">
+      <span class="green" style="margin-left:5px;cursor: pointer;"  @click="showDrawer(item.title,item.description)">
         {{ item.title }}
+      </span>
+      <a :href=" item.link " style="margin-left:5px;" target="_blank">
+        <link-outlined />
       </a>
+      <!--
       <div v-if="JSON.stringify(item.description)!== '{}'" v-html="item.description"></div>
+      -->
     </div>
+
+    <a-drawer
+    :width="500"
+    :title="articletitle"
+    placement="left"
+    :visible="visible"
+    @close="onClose"
+  >
+    <div v-html="articlecontent"></div>
+  </a-drawer>
+
+
   </div>
 
 </template>
@@ -35,8 +52,12 @@
 <script>
 import { message } from "ant-design-vue";
 import { onMounted, getCurrentInstance, ref } from "vue";
+import { LinkOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router'
 export default {
+  components: {
+    LinkOutlined
+  },
   setup() {
     const iconLoading = ref(false);
     const router = useRouter()
@@ -45,6 +66,17 @@ export default {
     const loadingdone = ref(false);
     const title = ref('');
     const feedItems = ref([]);
+    const visible = ref(false);
+    const articletitle = ref('');
+    const articlecontent = ref('');
+    const showDrawer = (title,content) => {
+      visible.value = true;
+      articletitle.value=title
+      articlecontent.value=content
+    };
+    const onClose = () => {
+      visible.value = false;
+    };
 
     onMounted(() => {
       console.log("mounted");
@@ -67,8 +99,8 @@ export default {
         }
         defaultPercent.value = 100;
         loadingdone.value = true;
-        title.value = res.data.data.xml_json.channel.title;
-        feedItems.value = res.data.data.xml_json.channel.item;
+        title.value = res.data.data.title;
+        feedItems.value = res.data.data.xml_json;
       });
     });
 
@@ -78,6 +110,11 @@ export default {
       iconLoading,
       defaultPercent,
       loadingdone,
+      visible,
+      showDrawer,
+      onClose,
+      articletitle,
+      articlecontent
     };
   },
 };
