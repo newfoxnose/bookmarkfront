@@ -27,16 +27,36 @@
   <div>
     <div v-for=" item  in  fileitems " style="margin-bottom:5px;">
 
-      <span class="ext">{{ item.key.split(".").pop() }}</span>
-      <a target="_blank" :href=" qiniu_domain + '/' + item.key " style="margin-left:5px;">
+      <span class="ext">{{ lcase_ext= item.key.split('.').pop().toLowerCase() }}</span>
+      <a-image v-if="['jpg','jpeg','png','gif','bmp','webp'].indexOf(lcase_ext) !== -1" :href=" qiniu_domain + '/' + item.key " style="max-height:50px;margin-left:5px;"
+    :src=" qiniu_domain + '/' + item.key "
+  />
+      <a v-else target="_blank" :href=" qiniu_domain + '/' + item.key " style="margin-left:5px;">
         {{ item.key.substring(11) }}
       </a>
       <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime)
         }})</span>
+        <a v-if="['xls','xlsx','doc','docx','ppt','pptx'].indexOf(lcase_ext) !== -1" target="_blank" :href="'https://view.officeapps.live.com/op/view.aspx?src='+ encodeURIComponent(qiniu_domain + '/' + item.key) " style="margin-left:5px;">
+       在线查看
+      </a>
+      <a v-else-if="['txt'].indexOf(lcase_ext) !== -1" target="_blank" @click="readtext(item.key.substring(11),qiniu_domain + '/' + item.key) " style="margin-left:5px;">
+       在线查看
+      </a>
       <a style="margin-left:20px;" @click="deletefile(item.key)">删除</a>
 
     </div>
   </div>
+  
+
+  <a-drawer
+    :width="500"
+    :title="articletitle"
+    placement="left"
+    :visible="visible"
+    @close="onClose"
+  >
+    <div v-html="articlecontent"></div>
+  </a-drawer>
 </template>
 <style scoped>
 .ext {
@@ -86,6 +106,21 @@ export default {
     const fileitems = ref([])
     const upload_url = ref(proxy.$remoteDomain+"/ajax/upload_file_ajax")
 
+    const visible = ref(false);
+    const articletitle = ref('');
+    const articlecontent = ref('');
+
+    const readtext = (filename,filepath) => {
+      proxy.$http.get(filepath).then(res => {
+        console.log(res)
+        visible.value = true;
+      articletitle.value=filename
+      articlecontent.value='<pre>'+res.data+'</pre>'
+        });
+    }
+    const onClose = () => {
+      visible.value = false;
+    };
     // 获取token和列表
     onMounted(() => {
       const interval=setInterval(() => {
@@ -169,7 +204,12 @@ export default {
         console.log(e);
       },
       defaultPercent,
-      loadingdone
+      loadingdone,
+      readtext,
+      visible,
+      onClose,
+      articletitle,
+      articlecontent
     };
   },
 }

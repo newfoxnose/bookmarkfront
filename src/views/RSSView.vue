@@ -15,7 +15,7 @@
   <h3 style="margin-top: 15px">{{ title }}</h3>
   <div>
     <div v-for=" item in feedItems" style="margin-bottom:5px;">
-      <span class="green" style="margin-left:5px;cursor: pointer;"  @click="showDrawer(item.title,item.description)">
+      <span class="green" style="margin-left:5px;cursor: pointer;"  @click="showDrawer(item.title,item.link,item.description)">
         {{ item.title }}
       </span>
       <a :href=" item.link " style="margin-left:5px;" target="_blank">
@@ -69,10 +69,10 @@ export default {
     const visible = ref(false);
     const articletitle = ref('');
     const articlecontent = ref('');
-    const showDrawer = (title,content) => {
+    const showDrawer = (title,url,content) => {
       visible.value = true;
       articletitle.value=title
-      articlecontent.value=content
+      articlecontent.value=content+'<p><a href="'+url+'" target=_blank>'+url+'</a></p>'
     };
     const onClose = () => {
       visible.value = false;
