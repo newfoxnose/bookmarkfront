@@ -84,7 +84,7 @@ export default defineComponent({
               <template #overlay>
                 <a-menu>
                   <a-menu-item>
-                    <RouterLink to="/collection">文摘</RouterLink>
+                    <RouterLink to="/collection">采集</RouterLink>
                   </a-menu-item>
                   <a-menu-item>
                     <RouterLink to="/manage">管理目录</RouterLink>

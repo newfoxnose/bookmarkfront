@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons-vue";
 import { defineComponent, ref, reactive, getCurrentInstance,onMounted } from "vue";
 import { message, Modal } from "ant-design-vue";
-import html2canvas from "html2canvas";
+
 export default defineComponent({
   components: {
     bookmarkitem,
@@ -23,14 +23,9 @@ export default defineComponent({
     const iconLoading = ref(false);
     const visible = ref(false);
     const updatedDrawerTitle = ref(String);
-
-    const screenshot = ref(null);
-
-
     const showDrawer = (drawerTitle) => {
       visible.value = true;
       updatedDrawerTitle.value = drawerTitle;
-      urlshot_items.value=null
     };
     const onClose = () => {
       iconLoading.value = false;
@@ -68,79 +63,7 @@ export default defineComponent({
     const is_recommend = ref(false);
     const is_friendlink = ref(false);
     const loadingdone = ref(false);
-    const urlshot_items=ref([]);
     const { proxy } = getCurrentInstance();
-
-    async function takeUrlshot(id,url) {
-      console.log(id)
-      console.log(url)
-      try {
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        //params.append("url", formState.value.feed_url);
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("url", url);
-        const { data: res } = proxy.$http
-          .post("/ajax/fetch_pure_ajax", params)
-          .then((res) => {
-            console.log(res.data);
-            // obj.success ? obj.success(res) : null
-            if (res.data.data != "") {
-              //console.log(res.data.data);
-              message.info("成功获取网页内容");
-              takeScreenshot(id,res.data.data);
-            } else {
-              message.info("未获取到网页内容");
-            }
-          })
-          .catch((error) => {
-            // obj.error ? obj.error(error) : null;
-            console.log(error);
-          });
-        iconLoading.value = false;
-      } catch (error) {
-        console.error("生成快照失败:", error);
-      }
-    }
-    
-    async function takeScreenshot(id,content) {
-      try {
-        let tempNode = document.createElement("div");
-        //tempNode.innerHTML ='<div><h1>哈哈哈</h1></div>';
-        tempNode.innerHTML = content;
-        document.body.after(tempNode); //这句一定要有
-
-        //const node = document.documentElement;
-        const canvas = await html2canvas(tempNode, {
-          scale: 1,
-          useCORS: true, // 如果图片跨域，设置为true
-        });
-        screenshot.value = canvas.toDataURL("image/png");
-        tempNode.innerHTML = "";
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("base64", screenshot.value);
-        params.append("id", id);
-        proxy.$http
-          .post("/ajax/upload_base64file_ajax/", params, {
-            headers: {
-              //"Content-Type": "multipart/form-data",    //因为是base64上传，所以不使用multipart
-            },
-          })
-          .then((res) => {
-            //console.log(res.data);
-            if (res.data.code == "401") {
-              //不在登陆状态
-              window.location.href = "/login";
-            }
-            defaultPercent.value = 100;
-            loadingdone.value = true;
-          });
-      } catch (error) {
-        console.error("生成截图失败:", error);
-      }
-    }
 
     onMounted(() => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
@@ -307,11 +230,7 @@ export default defineComponent({
       is_recommend,
       is_friendlink,
       folder_list,
-      loadingdone,
-      takeUrlshot,
-      takeScreenshot,
-      screenshot,
-      urlshot_items
+      loadingdone
     };
   },
   data() {
@@ -373,20 +292,6 @@ export default defineComponent({
         } else {
           this.folder_id = folder_id;
         }
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get("token"));
-      params.append("timestamp", new Date().getTime());
-      params.append("id", id);
-      this.$http
-        .post("/ajax/list_urlshot_ajax/", params)
-        .then((res) => {
-          console.log(res.data.data)
-          if (res.data.code == "401") {
-            //不在登陆状态
-            window.location.href = "/login";
-          }
-          this.urlshot_items=res.data.data.urlshot;
-        });
       } else {
         this.showDrawer("新建书签");
         this.editId = "";
@@ -568,24 +473,20 @@ export default defineComponent({
     <template #extra v-if="updatedDrawerTitle == '编辑书签'">
       <a-button
         type="primary"
+        @click="showconfirmdelete(editId)"
+        :loading="iconLoading"
+        >生成快照</a-button
+      >
+      &nbsp;&nbsp;
+      <a-button
+        type="primary"
         danger
         @click="showconfirmdelete(editId)"
         :loading="iconLoading"
         >删除</a-button
       >
     </template>
-    <p style="display:none">
-      <span v-if="urlshot_items">已有快照：</span>
-      <span v-for="item in urlshot_items">
-        <a :href="item.key" target="_blank">{{ item.date }}</a>
-      </span>
-      <a-button
-        type="primary"
-        @click="takeUrlshot(editId,url)"
-        :loading="iconLoading"
-        >生成快照</a-button
-      >
-    </p>
+
     <p>
       <a-input v-model:value="url" placeholder="网址">
         <template #addonAfter>
@@ -611,9 +512,9 @@ export default defineComponent({
           {{ item.name }}</a-select-option
         >
       </a-select>
-      </p>
-      <p>
-      <a-input v-model:value="new_folder" placeholder="在当前位置创建新目录" style="width: 100%">
+    </p>
+    <p>
+      <a-input v-model:value="new_folder" placeholder="新目录">
         <template #addonAfter>
           <plus-outlined @click="newFolder" v-if="!new_folder_clicked" />
           <a-spin size="small" v-if="new_folder_clicked" />

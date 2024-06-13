@@ -13,13 +13,13 @@
   </div>
 
   <h3 style="margin-top: 15px">随手记</h3>
-  <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
+  <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>（或者使用快捷键Ctrl+S）
   <span style="float: right" v-if="auto_save_count_down < 10"
     >距离自动保存还有<i style="color: red">{{ auto_save_count_down }}</i
     >秒</span
   >
 
-  <div style="border: 1px solid #ccc">
+  <div style="border: 1px solid #ccc;margin-top:5px;">
     <Toolbar
       style="border-bottom: 1px solid #ccc"
       :editor="editorRef"
@@ -53,6 +53,7 @@ import {
   onBeforeUnmount,
   ref,
   onMounted,
+  onUnmounted,
   getCurrentInstance,
   shallowRef,
 } from "vue";
@@ -66,8 +67,8 @@ export default {
 
     // 内容 HTML
     const valueHtml = ref("<p>hello</p>");
-    const toolbarConfig = {excludeKeys:['uploadImage','uploadVideo']};
-    const editorConfig = { placeholder: "请输入内容..."};
+    const toolbarConfig = { excludeKeys: ["uploadImage", "uploadVideo"] };
+    const editorConfig = { placeholder: "请输入内容..." };
 
     const iconLoading = ref(false);
 
@@ -89,9 +90,10 @@ export default {
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
       proxy.$http.post("/ajax/note_ajax/", params).then((res) => {
-        if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
-    }
+        if (res.data.code == "401") {
+          //不在登陆状态
+          window.location.href = "/login";
+        }
         valueHtml.value = res.data.data.note;
         defaultPercent.value = 100;
         loadingdone.value = true;
@@ -117,19 +119,27 @@ export default {
               }
             }, 1000)
       */
+      window.addEventListener("keydown", handleEvent); //监听按键事件
     });
 
-    // 组件销毁时，也及时销毁编辑器
     onBeforeUnmount(() => {
       const editor = editorRef.value;
       if (editor == null) return;
-      editor.destroy();
+      editor.destroy(); // 组件销毁时，也及时销毁编辑器
     });
-
+    onUnmounted(() => {
+      window.removeEventListener("keydown", handleEvent);
+    });
     const handleCreated = (editor) => {
       editorRef.value = editor; // 记录 editor 实例，重要！
     };
-
+    const handleEvent = (event) => {
+        if (event.ctrlKey && (event.key === 's' || event.keyCode === 83)) {
+          event.preventDefault();
+          event.returnValue = false;
+          save();
+        }
+    };
     const save = () => {
       iconLoading.value = true;
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
@@ -148,7 +158,7 @@ export default {
       toolbarConfig,
       editorConfig,
       handleCreated,
-
+      handleEvent,
       valueHtml,
       save,
       auto_save_count_down,
