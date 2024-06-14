@@ -13,14 +13,14 @@ export default defineComponent({
 <template>
   <div>
     <header>
-      <img alt="Vue logo" class="logo" src="@/assets/logo.png" width="100" />
+      <img alt="Vue logo" class="logo" src="@/assets/logo.png" height="60" />
 
       <div class="wrapper">
         <nav>
           <span
             v-if="$cookies.get('token') != null && $cookies.get('token') != ''"
           >
-            <RouterLink to="/">书签</RouterLink>
+            <RouterLink to="/home">书签</RouterLink>
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
             <RouterLink to="/chat">ChatGPT</RouterLink>

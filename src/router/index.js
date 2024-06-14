@@ -1,13 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
+      name: "index",
+      component: () => import("../views/IndexView.vue"),
+    },
+    {
+      path: "/home",
       name: "home",
-      component: HomeView,
+      component: () => import("../views/HomeView.vue"),
     },
     {
       path: "/login",
@@ -80,7 +84,6 @@ const router = createRouter({
       path: "/newdiary",
       name: "newdiary",
       component: () => import("../views/NewdiaryView.vue"),
-      //meta: { "composetype": "diary" }   //这是另一种传参方法，备用
     },
     {
       path: "/domain",

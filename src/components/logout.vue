@@ -13,7 +13,7 @@ export default ({
         console.log(res.data);
       });
       $cookies.set("token", "", "-720h");
-      window.location.href = "/login";
+      window.location.href = "/";
     })
   }
 });
