@@ -14,7 +14,7 @@ import {
   getCurrentInstance,
 } from "vue";
 import { message } from "ant-design-vue";
-//import ScrollReveal from "scrollReveal";
+import ScrollReveal from "scrollreveal";
 
 export default defineComponent({
   components: {
@@ -47,7 +47,7 @@ export default defineComponent({
           window.location.href = "/home";
         }
       });
-/*
+
       ScrollReveal().reveal(".introrow", {
         reset: true,
         distance: "50px",
@@ -60,9 +60,6 @@ export default defineComponent({
         },
         scale: 0.6,
       });
-      */
-
-
     });
 
     return {
