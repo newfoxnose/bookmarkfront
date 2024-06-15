@@ -27,13 +27,13 @@ export default defineComponent({
         opacity: 0.5,
         origin: "left", // 动画出现的位置
         rotate: {
-          x: 20,
-          y: 0,
-          z: 20,
+          x: 10,
+          y: 10,
+          z: 10,
         }, //旋转角度
-        scale: 0.8, // 缩放比例
+        scale: 0.9, // 缩放比例
         viewOffset: {
-          top: 100,
+          top: 10,
         },
       });
 
@@ -47,6 +47,8 @@ export default defineComponent({
           window.location.href = "/home";
         }
       });
+
+      window.resizeTo(window.innerWidth, window.innerHeight);
     });
 
     return {};
