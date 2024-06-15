@@ -14,7 +14,7 @@ import {
   getCurrentInstance,
 } from "vue";
 import { message } from "ant-design-vue";
-import ScrollReveal from "scrollreveal";
+import ScrollReveal from "scrollreveal";      //如果使用import ScrollReveal from "scrollReveal"就会无法部署到netlify，说明netlify对大小写敏感，而本机windows系统则不敏感
 
 export default defineComponent({
   components: {
