@@ -18,3 +18,11 @@ export default defineConfig({
     },
   },
 });
+
+module.exports = {
+  build: {
+    rollupOptions: {
+      external: ['scrollReveal']
+    }
+  }
+}
