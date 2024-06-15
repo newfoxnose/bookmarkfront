@@ -1,9 +1,5 @@
 <script>
 import {
-  CloseOutlined,
-  SearchOutlined,
-  StarOutlined,
-  PlusOutlined,
   LinkOutlined,
 } from "@ant-design/icons-vue";
 import {
@@ -18,36 +14,12 @@ import ScrollReveal from "scrollreveal";      //如果使用import ScrollReveal 
 
 export default defineComponent({
   components: {
-    CloseOutlined,
-    StarOutlined,
-    SearchOutlined,
-    PlusOutlined,
     LinkOutlined,
   },
   setup() {
-    const iconLoading = ref(false);
-    const defaultPercent = ref(5);
     const { proxy } = getCurrentInstance();
-    const increaseloading = () => {
-      const percent = defaultPercent.value + 10;
-      defaultPercent.value = percent > 95 ? 95 : percent;
-    };
-    const finishloading = () => {
-      defaultPercent.value = 100;
-    };
 
     onMounted(() => {
-      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get("token"));
-      params.append("timestamp", new Date().getTime());
-
-      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
-        if (folder_res.data.code == "200") {
-          //在登陆状态就跳转到home页
-          window.location.href = "/home";
-        }
-      });
-
       ScrollReveal().reveal(".introrow", {
         reset: true,
         distance: "50px",
@@ -60,31 +32,26 @@ export default defineComponent({
         },
         scale: 0.6,
       });
+      
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+
+      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
+        if (folder_res.data.code == "200") {
+          //在登陆状态就跳转到home页
+          window.location.href = "/home";
+        }
+      });
     });
 
     return {
-      defaultPercent,
-      increaseloading,
-      finishloading,
-      iconLoading,
     };
   },
 });
 </script>
  
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress
-      type="circle"
-      :percent="defaultPercent"
-      status="active"
-      :show-info="false"
-      :stroke-color="{
-        '0%': '#108ee9',
-        '100%': '#87d068',
-      }"
-    />
-  </div>
 
   <a-carousel class="carousel-banner" autoplay>
     <div><h3>全面的书签管理功能</h3></div>
@@ -240,13 +207,6 @@ export default defineComponent({
 </template>
 
 <style scoped>
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
 .carousel-banner :deep(.slick-slide) {
   margin-top:20px;
   text-align: center;
