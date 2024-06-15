@@ -14,7 +14,7 @@ import {
   getCurrentInstance,
 } from "vue";
 import { message } from "ant-design-vue";
-import ScrollReveal from "scrollReveal";
+//import ScrollReveal from "scrollReveal";
 
 export default defineComponent({
   components: {
