@@ -1,7 +1,5 @@
 <script>
-import {
-  LinkOutlined,
-} from "@ant-design/icons-vue";
+import { LinkOutlined } from "@ant-design/icons-vue";
 import {
   defineComponent,
   ref,
@@ -10,7 +8,7 @@ import {
   getCurrentInstance,
 } from "vue";
 import { message } from "ant-design-vue";
-import ScrollReveal from "scrollreveal";      //如果使用import ScrollReveal from "scrollReveal"就会无法部署到netlify，说明netlify对大小写敏感，而本机windows系统则不敏感
+import ScrollReveal from "scrollreveal"; //如果使用import ScrollReveal from "scrollReveal"就会无法部署到netlify，说明netlify对大小写敏感，而本机windows系统则不敏感
 
 export default defineComponent({
   components: {
@@ -22,17 +20,18 @@ export default defineComponent({
     onMounted(() => {
       ScrollReveal().reveal(".introrow", {
         reset: true,
-        distance: "50px",
+        distance: "30px",
         origin: "left",
-        interval: 80,
+        interval: 50,
         opacity: 0.1,
         rotate: {
           x: 20,
           z: 20,
         },
-        scale: 0.6,
+        scale: 0.8,
+        easing: 'ease-in'
       });
-      
+
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
@@ -45,14 +44,12 @@ export default defineComponent({
       });
     });
 
-    return {
-    };
+    return {};
   },
 });
 </script>
  
 <template>
-
   <a-carousel class="carousel-banner" autoplay>
     <div><h3>全面的书签管理功能</h3></div>
     <div><h3>接入七牛云作为网盘</h3></div>
@@ -63,15 +60,28 @@ export default defineComponent({
   <a-row class="introrow">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
-        <div><a-image src="images/screenshot/ss1-1.png" style="border-radius: 10px;border: 2px solid #ccc;" /></div>
-        <div><a-image src="images/screenshot/ss1-2.png" style="border-radius: 10px;border: 2px solid #ccc;"/></div>
+        <div>
+          <a-image
+            src="images/screenshot/ss1-1.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
+        <div>
+          <a-image
+            src="images/screenshot/ss1-2.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
       </a-carousel>
     </a-col>
     <a-col :sm="24" :md="12" class="screenshotintroparent">
       <div class="screenshotintrochild">
         <a-typography-title :level="3">功能齐全的书签站</a-typography-title>
         <a-typography-paragraph>
-          在线添加、编辑、删除书签，支持根据汉字、拼音、网址关键字快速搜索书签。<a-typography-text mark>自动定期检查死链</a-typography-text>。支持保存网页快照。
+          在线添加、编辑、删除书签，支持根据汉字、拼音、网址关键字快速搜索书签。<a-typography-text
+            mark
+            >自动定期检查死链</a-typography-text
+          >。支持保存网页快照。
         </a-typography-paragraph>
         <a-typography-paragraph>
           支持各种浏览器收藏夹备份文件的
@@ -98,7 +108,12 @@ export default defineComponent({
     </a-col>
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
-        <div><a-image src="images/screenshot/ss2-1.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
+        <div>
+          <a-image
+            src="images/screenshot/ss2-1.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
       </a-carousel>
     </a-col>
   </a-row>
@@ -106,7 +121,12 @@ export default defineComponent({
   <a-row class="introrow">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
-        <div><a-image src="images/screenshot/ss3-1.png"   style="border-radius: 10px;border: 2px solid #ccc;" /></div>
+        <div>
+          <a-image
+            src="images/screenshot/ss3-1.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
       </a-carousel>
     </a-col>
     <a-col :sm="24" :md="12" class="screenshotintroparent">
@@ -135,7 +155,12 @@ export default defineComponent({
     </a-col>
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
-        <div><a-image src="images/screenshot/ss4-1.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
+        <div>
+          <a-image
+            src="images/screenshot/ss4-1.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
       </a-carousel>
     </a-col>
   </a-row>
@@ -143,9 +168,24 @@ export default defineComponent({
   <a-row class="introrow">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
-        <div><a-image src="images/screenshot/ss5-1.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
-        <div><a-image src="images/screenshot/ss5-2.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
-        <div><a-image src="images/screenshot/ss5-3.png" style="border-radius: 10px;border: 2px solid #ccc;" /></div>
+        <div>
+          <a-image
+            src="images/screenshot/ss5-1.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
+        <div>
+          <a-image
+            src="images/screenshot/ss5-2.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
+        <div>
+          <a-image
+            src="images/screenshot/ss5-3.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
       </a-carousel>
     </a-col>
     <a-col :sm="24" :md="12" class="screenshotintroparent">
@@ -160,7 +200,6 @@ export default defineComponent({
     </a-col>
   </a-row>
 
-
   <a-row class="introrow">
     <a-col :sm="24" :md="12" class="screenshotintroparent">
       <div class="screenshotintrochild">
@@ -172,20 +211,49 @@ export default defineComponent({
     </a-col>
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
-        <div><a-image src="images/screenshot/ss6-1.png" style="border-radius: 10px;border: 2px solid #ccc;" /></div>
-        <div><a-image src="images/screenshot/ss6-2.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
+        <div>
+          <a-image
+            src="images/screenshot/ss6-1.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
+        <div>
+          <a-image
+            src="images/screenshot/ss6-2.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
       </a-carousel>
     </a-col>
   </a-row>
 
-  
   <a-row class="introrow">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
-        <div><a-image src="images/screenshot/ss7-1.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
-        <div><a-image src="images/screenshot/ss7-2.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
-        <div><a-image src="images/screenshot/ss7-3.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
-        <div><a-image src="images/screenshot/ss7-4.png"  style="border-radius: 10px;border: 2px solid #ccc;"/></div>
+        <div>
+          <a-image
+            src="images/screenshot/ss7-1.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
+        <div>
+          <a-image
+            src="images/screenshot/ss7-2.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
+        <div>
+          <a-image
+            src="images/screenshot/ss7-3.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
+        <div>
+          <a-image
+            src="images/screenshot/ss7-4.png"
+            style="border-radius: 10px; border: 2px solid #ccc"
+          />
+        </div>
       </a-carousel>
     </a-col>
     <a-col :sm="24" :md="12" class="screenshotintroparent">
@@ -195,20 +263,18 @@ export default defineComponent({
           状态为公开的博客、书签、图片等内容会被自动整合到一个个人网站，并自动发布。
         </a-typography-paragraph>
         <a-typography-paragraph>
-          可<a-typography-text mark
-            >自定义域名</a-typography-text
+          可<a-typography-text mark>自定义域名</a-typography-text
           >，或使用免费域名，提供25种配色方案。
         </a-typography-paragraph>
       </div>
     </a-col>
   </a-row>
-
   <div style="margin-bottom: 20px">&nbsp;</div>
 </template>
 
 <style scoped>
 .carousel-banner :deep(.slick-slide) {
-  margin-top:20px;
+  margin-top: 20px;
   text-align: center;
   height: 200px;
   line-height: 200px;
@@ -218,11 +284,12 @@ export default defineComponent({
 
 .carousel-banner :deep(.slick-slide h3) {
   color: #fff;
-  font-size:16px;
+  font-size: 16px;
 }
 
 .introrow {
-  margin-top: 30px;
+  margin-top: 20px;
+  margin-bottom:20px;
 }
 
 .screenshotintroparent {
@@ -233,11 +300,10 @@ export default defineComponent({
   padding: 20px;
 }
 
-.screenshotintrochild h3{
-  padding-bottom:3px;
+.screenshotintrochild h3 {
+  padding-bottom: 3px;
   border-bottom-style: solid;
   border-bottom-width: medium;
-  border-bottom-color:cadetblue;
+  border-bottom-color: cadetblue;
 }
-
 </style>
