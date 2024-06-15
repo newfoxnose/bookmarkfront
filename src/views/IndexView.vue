@@ -20,16 +20,21 @@ export default defineComponent({
     onMounted(() => {
       ScrollReveal().reveal(".introrow", {
         reset: true,
-        distance: "30px",
-        origin: "left",
+        distance: "10px", // 滚动的距离，单位可以用%，rem等
+        duration: 300, // 动画的时长
+        easing: "ease-in",
         interval: 50,
-        opacity: 0.1,
+        opacity: 0.5,
+        origin: "left", // 动画出现的位置
         rotate: {
           x: 20,
+          y: 0,
           z: 20,
+        }, //旋转角度
+        scale: 0.8, // 缩放比例
+        viewOffset: {
+          top: 100,
         },
-        scale: 0.8,
-        easing: 'ease-in'
       });
 
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
@@ -289,7 +294,7 @@ export default defineComponent({
 
 .introrow {
   margin-top: 20px;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 }
 
 .screenshotintroparent {
