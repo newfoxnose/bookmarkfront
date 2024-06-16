@@ -130,6 +130,8 @@ export default defineComponent({
   <RouterView />
   <div class="footer">
       Copyright 2023-2024
+      <span style="margin-left:5px;margin-right:5px;">|</span>
+      <a href="https://support.qq.com/product/657110" target="_blank">留言反馈</a>
     </div>
 </template>
 

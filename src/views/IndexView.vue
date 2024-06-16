@@ -32,9 +32,6 @@ export default defineComponent({
           z: 10,
         }, //旋转角度
         scale: 0.9, // 缩放比例
-        viewOffset: {
-          top: 10,
-        },
       });
 
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
