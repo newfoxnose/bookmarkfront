@@ -31,10 +31,10 @@ export default defineComponent({
           reset: true,
           distance: "10px", // 滚动的距离，单位可以用%，rem等
           duration: 300, // 动画的时长
-          easing: "ease-in-out",
+          easing: "ease-out",
           interval: 0,
           opacity: 0.5,
-          origin: "top", // 动画出现的位置
+          origin: "left", // 动画出现的位置
           rotate: {
             x: 10,
             y: 5,
