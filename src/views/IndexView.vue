@@ -31,9 +31,6 @@ export default defineComponent({
         // 动画开始的位置，'bottom', 'left', 'top', 'right'
         origin: 'bottom',
         // 回滚的时候是否再次触发动画
-        reset: false,
-        // 延时执行方式（always（一直延时执行），once（只延时执行一次），onload（只在加载时延时执行））
-        // // useDelay: 'onload',
         // 在移动端是否使用动画
         mobile: true,
         // 滚动的距离，单位可以用%，rem等
