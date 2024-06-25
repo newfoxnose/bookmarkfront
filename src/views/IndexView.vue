@@ -44,7 +44,7 @@ export default defineComponent({
         });
       });
 
-      window.resizeTo(window.innerWidth, window.innerHeight);
+      //window.resizeTo(window.innerWidth, window.innerHeight);
     });
 
     return {};
