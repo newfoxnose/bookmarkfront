@@ -18,6 +18,17 @@ export default defineComponent({
     const { proxy } = getCurrentInstance();
 
     onMounted(() => {
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+
+      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
+        if (folder_res.data.code == "200") {
+          //在登陆状态就跳转到home页
+          window.location.href = "/home";
+        }
+      });
+
       ScrollReveal().reveal(".introrow", {
         reset: true,
         distance: "10px", // 滚动的距离，单位可以用%，rem等
@@ -33,18 +44,6 @@ export default defineComponent({
         }, //旋转角度
         scale: 0.9, // 缩放比例
       });
-
-      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get("token"));
-      params.append("timestamp", new Date().getTime());
-
-      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
-        if (folder_res.data.code == "200") {
-          //在登陆状态就跳转到home页
-          window.location.href = "/home";
-        }
-      });
-
       window.resizeTo(window.innerWidth, window.innerHeight);
     });
 
