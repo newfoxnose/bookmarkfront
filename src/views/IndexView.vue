@@ -27,23 +27,23 @@ export default defineComponent({
           //在登陆状态就跳转到home页
           window.location.href = "/home";
         }
+        ScrollReveal().reveal(".introrow", {
+          reset: true,
+          distance: "10px", // 滚动的距离，单位可以用%，rem等
+          duration: 300, // 动画的时长
+          easing: "ease-in-out",
+          interval: 0,
+          opacity: 0.5,
+          origin: "top", // 动画出现的位置
+          rotate: {
+            x: 10,
+            y: 5,
+            z: 10,
+          }, //旋转角度
+          scale: 0.9, // 缩放比例
+        });
       });
 
-      ScrollReveal().reveal(".introrow", {
-        reset: true,
-        distance: "10px", // 滚动的距离，单位可以用%，rem等
-        duration: 300, // 动画的时长
-        easing: "ease-in-out",
-        interval: 0,
-        opacity: 0.5,
-        origin: "top", // 动画出现的位置
-        rotate: {
-          x: 10,
-          y: 5,
-          z: 10,
-        }, //旋转角度
-        scale: 0.9, // 缩放比例
-      });
       window.resizeTo(window.innerWidth, window.innerHeight);
     });
 
