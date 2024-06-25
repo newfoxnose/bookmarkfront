@@ -8,7 +8,7 @@ import {
   getCurrentInstance,
 } from "vue";
 import { message } from "ant-design-vue";
-import ScrollReveal from "scrollreveal"; //如果使用import ScrollReveal from "scrollReveal"就会无法部署到netlify，说明netlify对大小写敏感，而本机windows系统则不敏感
+import scrollReveal from "scrollreveal"; //如果使用import ScrollReveal from "scrollReveal"就会无法部署到netlify，说明netlify对大小写敏感，而本机windows系统则不敏感
 
 export default defineComponent({
   components: {
@@ -16,8 +16,28 @@ export default defineComponent({
   },
   setup() {
     const { proxy } = getCurrentInstance();
-
+    const data = reactive({
+      // 3.在reactive()中声明scrollReveal组件
+      scrollReveal: scrollReveal()
+    })
+    const retScroll = () => {
+      // reveal()的类名可以为id (#reveal-top) 也可以为class(.reveal-top) 名称随意 并且也支持并集class写法 注意必须设置类否则无法使用
+      data.scrollReveal.reveal('.introrow', {
+        reset: true,
+        distance: "50px",
+        origin: "left",
+        interval: 80,
+        opacity: 0.1,
+        rotate: {
+          x: 20,
+          z: 20,
+        },
+        scale: 0.6,
+      })
+    }
     onMounted(() => {
+      retScroll()
+
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
@@ -27,24 +47,9 @@ export default defineComponent({
           //在登陆状态就跳转到home页
           window.location.href = "/home";
         }
-        ScrollReveal().reveal(".introrow", {
-          reset: true,
-          distance: "10px", // 滚动的距离，单位可以用%，rem等
-          duration: 300, // 动画的时长
-          easing: "ease-out",
-          interval: 0,
-          opacity: 0.5,
-          origin: "left", // 动画出现的位置
-          rotate: {
-            x: 10,
-            y: 5,
-            z: 10,
-          }, //旋转角度
-          scale: 0.9, // 缩放比例
-        });
       });
 
-      //window.resizeTo(window.innerWidth, window.innerHeight);
+      window.resizeTo(window.innerWidth, window.innerHeight);
     });
 
     return {};
@@ -272,7 +277,7 @@ export default defineComponent({
       </div>
     </a-col>
   </a-row>
-  <div style="margin-bottom: 100px">&nbsp;</div>
+  <div style="margin-bottom: 20px">&nbsp;</div>
 </template>
 
 <style scoped>
