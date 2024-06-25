@@ -272,7 +272,7 @@ export default defineComponent({
       </div>
     </a-col>
   </a-row>
-  <div style="margin-bottom: 20px">&nbsp;</div>
+  <div style="margin-bottom: 100px">&nbsp;</div>
 </template>
 
 <style scoped>
