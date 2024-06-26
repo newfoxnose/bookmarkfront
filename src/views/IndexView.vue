@@ -8,48 +8,22 @@ import {
   getCurrentInstance,
 } from "vue";
 import { message } from "ant-design-vue";
-import scrollReveal from "scrollreveal"; //如果使用import ScrollReveal from "scrollReveal"就会无法部署到netlify，说明netlify对大小写敏感，而本机windows系统则不敏感
 
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+ 
+/* aos动画初始化 */
+AOS.init({
+    duration: 1000,
+    easing:"ease-in-out-back"
+});
 export default defineComponent({
   components: {
     LinkOutlined,
   },
   setup() {
     const { proxy } = getCurrentInstance();
-    const data = reactive({
-      // 3.在reactive()中声明scrollReveal组件
-      scrollReveal: scrollReveal()
-    })
-    const retScroll = () => {
-      // reveal()的类名可以为id (#reveal-top) 也可以为class(.reveal-top) 名称随意 并且也支持并集class写法 注意必须设置类否则无法使用
-      data.scrollReveal.reveal('.introrow', {
-        reset: true,
-        // 动画的时长
-        duration: 600,
-        // 延迟时间
-        delay: 500,
-        // 动画开始的位置，'bottom', 'left', 'top', 'right'
-        origin: 'bottom',
-        // 回滚的时候是否再次触发动画
-        // 在移动端是否使用动画
-        mobile: true,
-        // 滚动的距离，单位可以用%，rem等
-        distance: '10px',
-        // 其他可用的动画效果
-        opacity: 0.001,
-        // 执行速度 线性函数啥的
-        easing: 'cubic-bezier(0.5, 0, 0, 1)',
-        // 执行方式（缩放）
-        scale: 0.9,
-        // 使用执行之前的回调函数
-        beforeReveal: function (ele) {
-          console.log(1);
-        }
-      })
-    }
     onMounted(() => {
-      retScroll()
-
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
@@ -60,10 +34,7 @@ export default defineComponent({
           window.location.href = "/home";
         }
       });
-
-      window.resizeTo(window.innerWidth, window.innerHeight);
     });
-
     return {};
   },
 });
@@ -77,7 +48,7 @@ export default defineComponent({
     <div><h3>整合AI对话功能</h3></div>
   </a-carousel>
 
-  <a-row class="introrow">
+  <a-row class="introrow" data-aos="flip-up" data-aos-once="false">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
         <div>
@@ -112,7 +83,7 @@ export default defineComponent({
     </a-col>
   </a-row>
 
-  <a-row class="introrow">
+  <a-row class="introrow" data-aos="flip-up" data-aos-once="false">
     <a-col :sm="24" :md="12" class="screenshotintroparent">
       <div class="screenshotintrochild">
         <a-typography-title :level="3">随手记</a-typography-title>
@@ -138,7 +109,7 @@ export default defineComponent({
     </a-col>
   </a-row>
 
-  <a-row class="introrow">
+  <a-row class="introrow" data-aos="flip-up" data-aos-once="false">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
         <div>
@@ -164,7 +135,7 @@ export default defineComponent({
     </a-col>
   </a-row>
 
-  <a-row class="introrow">
+  <a-row class="introrow" data-aos="flip-up" data-aos-once="false">
     <a-col :sm="24" :md="12" class="screenshotintroparent">
       <div class="screenshotintrochild">
         <a-typography-title :level="3">在线AI对话</a-typography-title>
@@ -185,7 +156,7 @@ export default defineComponent({
     </a-col>
   </a-row>
 
-  <a-row class="introrow">
+  <a-row class="introrow" data-aos="flip-up" data-aos-once="false">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
         <div>
@@ -220,7 +191,7 @@ export default defineComponent({
     </a-col>
   </a-row>
 
-  <a-row class="introrow">
+  <a-row class="introrow" data-aos="flip-up" data-aos-once="false">
     <a-col :sm="24" :md="12" class="screenshotintroparent">
       <div class="screenshotintrochild">
         <a-typography-title :level="3">博客</a-typography-title>
@@ -247,7 +218,7 @@ export default defineComponent({
     </a-col>
   </a-row>
 
-  <a-row class="introrow">
+  <a-row class="introrow" data-aos="flip-up" data-aos-once="false">
     <a-col :sm="24" :md="12">
       <a-carousel autoplay effect="fade">
         <div>
@@ -291,8 +262,8 @@ export default defineComponent({
   </a-row>
   <div style="margin-bottom: 20px">&nbsp;</div>
 </template>
-
 <style scoped>
+
 .carousel-banner :deep(.slick-slide) {
   margin-top: 20px;
   text-align: center;
