@@ -24,24 +24,8 @@ export default defineComponent({
             <RouterLink to="/note">随手记</RouterLink>
             <RouterLink to="/qiniu">文件</RouterLink>
             <RouterLink to="/chat">ChatGPT</RouterLink>
+            <RouterLink to="/blog">笔记</RouterLink>
             <RouterLink to="/feed">RSS</RouterLink>
-            <a-dropdown style="display: inline !important">
-              <a class="ant-dropdown-link" @click.prevent>
-                笔记
-                <DownOutlined />
-              </a>
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item>
-                    <RouterLink to="/newblog">写笔记</RouterLink>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <RouterLink to="/blog">笔记列表</RouterLink>
-                  </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
-
 
             <a-dropdown style="display: inline !important">
               <a class="ant-dropdown-link" @click.prevent>
@@ -89,8 +73,6 @@ export default defineComponent({
   <RouterView />
   <div class="footer">
       Copyright 2023-2024
-      <span style="margin-left:5px;margin-right:5px;">|</span>
-      <a href="https://support.qq.com/product/657110" target="_blank">留言反馈</a>
     </div>
 </template>
 
