@@ -1,5 +1,5 @@
 <template>
-  <h3 style="margin-top:15px;">写博客</h3>
+  <h3 style="margin-top:15px;">写笔记</h3>
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
   <a-form :model="formState">
     <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
@@ -11,14 +11,15 @@
       </a-select>
     </p>
     <p>
-      <a-checkbox v-model:checked="formState.is_recommend">推荐</a-checkbox>
+      <a-checkbox v-model:checked="formState.is_recommend">置顶</a-checkbox>
+      <a-checkbox v-model:checked="formState.is_private">不公开</a-checkbox>
     </p>
   </a-form>
   <vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-01"></vue-ueditor-wrap>
 
   <div>
-    <a-modal v-model:visible="visible" title="新建博客成功" @ok="handleOk" ok-text="确认" cancel-text="取消">
-      <p>跳转到博客列表页请点击“确定”</p>
+    <a-modal v-model:visible="visible" title="新建笔记成功" @ok="handleOk" ok-text="确认" cancel-text="取消">
+      <p>跳转到笔记列表页请点击“确定”</p>
       <p>再写一篇请点击“取消”</p>
     </a-modal>
   </div>
@@ -53,7 +54,7 @@ export default defineComponent({
           params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/get_folder_ajax/', params).then(res => {
         if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
         folder_list.value = res.data.data.data
         formState.value.folder_id = res.data.data.data[0].value
@@ -74,7 +75,12 @@ export default defineComponent({
         params.append("content", valueHtml.value);
         params.append("title", formState.value.title);
         params.append("folder_id", formState.value.folder_id);
-        params.append("is_private", 0);   //博客都为公开
+        if (formState.value.is_private == true) {
+          params.append("is_private", 1);
+        }
+        else {
+          params.append("is_private", 0);
+        }
         if (formState.value.is_recommend == true) {
           params.append("is_recommend", 1);
         }

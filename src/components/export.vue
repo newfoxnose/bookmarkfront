@@ -10,7 +10,7 @@ export default ({
     const { data: res } = this.$http.post('/ajax/export_ajax', params)
       .then(res => {
         if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
     else{
       let blob = new Blob([res.data]);

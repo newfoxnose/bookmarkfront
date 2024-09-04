@@ -95,7 +95,7 @@ export default {
       proxy.$http.post("/ajax/rss_ajax/", params).then((res) => {
         if (res.data.code == "401") {
           //不在登陆状态
-          window.location.href = "/login";
+          window.location.href = "/";
         }
         defaultPercent.value = 100;
         loadingdone.value = true;

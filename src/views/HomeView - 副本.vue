@@ -75,7 +75,7 @@ export default defineComponent({
         .then((folder_res) => {
           if (folder_res.data.code == "401") {
             //不在登陆状态
-            window.location.href = "/login";
+            window.location.href = "/";
           }
           folder_list.value = folder_res.data.data.data;
           folder_id.value = folder_res.data.data.data[0].value;

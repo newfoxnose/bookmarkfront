@@ -7,7 +7,7 @@
   </div>
 
 
-  <h3 style="margin-top:15px;">编辑博客</h3>
+  <h3 style="margin-top:15px;">编辑笔记</h3>
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>
   <a-form :model="formState">
     <a-form-item label="标题" name="title" :rules="[{ required: true, message: '标题不能为空' }]">
@@ -68,7 +68,7 @@ export default {
       params.append("blog_id", router.currentRoute.value.params.id);
       proxy.$http.post('/ajax/get_folder_ajax/', params).then(res => {
         if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
         folder_list.value = res.data.data.data
       })

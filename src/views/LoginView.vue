@@ -31,7 +31,7 @@
 </template>
 <script>
 import { message } from 'ant-design-vue'; 
-import { defineComponent, reactive,ref,getCurrentInstance } from 'vue';
+import { defineComponent, reactive,ref,getCurrentInstance,onMounted } from 'vue';
 import Fingerprint2 from 'fingerprintjs2'
 import md5 from 'js-md5';
 
@@ -102,6 +102,19 @@ export default defineComponent({
         console.log(error);
       });
     }
+    onMounted(() => {
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+
+      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
+        console.log(folder_res);
+        if (folder_res.data.code == "200") {
+          //在登陆状态就跳转到home页
+          window.location.href = "/home";
+        }
+      });
+    });
     return {
       login,
       murmur,

@@ -89,7 +89,7 @@ export default defineComponent({
         title: '文摘',
         dataIndex: 'collection_amount'
       }, {
-        title: '博客',
+        title: '笔记',
         dataIndex: 'blog_amount'
       }, {
         title: '图贴',
@@ -232,7 +232,7 @@ export default defineComponent({
           params.append("timestamp",new Date().getTime());
       const { data: folder_res } = await this.$http.post('/ajax/manage_folder_ajax/', params)
       if (folder_res.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
       this.data = folder_res.data.data
       this.defaultPercent = 100;

@@ -9,7 +9,7 @@ export default ({
     this.$http.post('/ajax/send_email_ajax/', params).then(res => {
       console.log(res.data.data);
       if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
       message.info(res.data.msg);
     }).catch(error => {

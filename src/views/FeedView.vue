@@ -161,7 +161,7 @@ export default {
           params.append("is_private",0);
       proxy.$http.post('/ajax/list_feed_ajax/', params).then(res => {
         if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
         fileitems.value = res.data.data.feed
         defaultPercent.value = 100;

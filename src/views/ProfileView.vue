@@ -13,7 +13,7 @@ export default defineComponent({
           params.append("timestamp",new Date().getTime());
       proxy.$http.post('/ajax/get_profile_ajax/', params).then(res => {
         if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
         formState.value=res.data.data;
       });

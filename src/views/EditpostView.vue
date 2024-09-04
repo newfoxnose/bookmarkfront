@@ -67,7 +67,7 @@ export default {
       params.append("post_id", router.currentRoute.value.params.id);
       proxy.$http.post('/ajax/get_post_ajax/', params).then(res => {
         if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
         console.log(res.data)
         valueHtml.value = res.data.data.content

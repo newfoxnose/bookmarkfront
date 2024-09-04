@@ -132,7 +132,7 @@ export default defineComponent({
             //console.log(res.data);
             if (res.data.code == "401") {
               //不在登陆状态
-              window.location.href = "/login";
+              window.location.href = "/";
             }
             defaultPercent.value = 100;
             loadingdone.value = true;
@@ -383,7 +383,7 @@ export default defineComponent({
           console.log(res.data.data)
           if (res.data.code == "401") {
             //不在登陆状态
-            window.location.href = "/login";
+            window.location.href = "/";
           }
           this.urlshot_items=res.data.data.urlshot;
         });

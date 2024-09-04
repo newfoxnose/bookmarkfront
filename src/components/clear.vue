@@ -11,7 +11,7 @@ export default ({
       .then(res => {
         console.log(res.data);
         if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/login";
+      window.location.href ="/";
     }
         // obj.success ? obj.success(res) : null
         message.info("清理完成");

@@ -4,17 +4,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
-      name: "index",
-      component: () => import("../views/IndexView.vue"),
-    },
-    {
       path: "/home",
       name: "home",
       component: () => import("../views/HomeView.vue"),
     },
     {
-      path: "/login",
+      path: "/",
       name: "login",
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
@@ -81,11 +76,6 @@ const router = createRouter({
       //meta: { "composetype": "diary" }   //这是另一种传参方法，备用
     },
     {
-      path: "/newdiary",
-      name: "newdiary",
-      component: () => import("../views/NewdiaryView.vue"),
-    },
-    {
       path: "/domain",
       name: "domain",
       component: () => import("../views/DomainView.vue"),
@@ -106,11 +96,6 @@ const router = createRouter({
       component: () => import("../views/BlogView.vue"),
     },
     {
-      path: "/diary",
-      name: "diary",
-      component: () => import("../views/DiaryView.vue"),
-    },
-    {
       path: "/editblog/:id",
       name: "editblog",
       component: () => import("../views/EditblogView.vue"),
@@ -124,21 +109,6 @@ const router = createRouter({
       path: "/collection",
       name: "collection",
       component: () => import("../views/CollectionView.vue"),
-    },
-    {
-      path: "/gallery",
-      name: "gallery",
-      component: () => import("../views/GalleryView.vue"),
-    },
-    {
-      path: "/editimg/:id",
-      name: "editimg",
-      component: () => import("../views/EditimgView.vue"),
-    },
-    {
-      path: "/newimg",
-      name: "newimg",
-      component: () => import("../views/NewimgView.vue"),
     },{
       path: "/chat",
       name: "chat",

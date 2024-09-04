@@ -27,54 +27,21 @@ export default defineComponent({
             <RouterLink to="/feed">RSS</RouterLink>
             <a-dropdown style="display: inline !important">
               <a class="ant-dropdown-link" @click.prevent>
-                博客
+                笔记
                 <DownOutlined />
               </a>
               <template #overlay>
                 <a-menu>
                   <a-menu-item>
-                    <RouterLink to="/newblog">写博客</RouterLink>
+                    <RouterLink to="/newblog">写笔记</RouterLink>
                   </a-menu-item>
                   <a-menu-item>
-                    <RouterLink to="/blog">博客列表</RouterLink>
+                    <RouterLink to="/blog">笔记列表</RouterLink>
                   </a-menu-item>
                 </a-menu>
               </template>
             </a-dropdown>
 
-            <a-dropdown style="display: inline !important">
-              <a class="ant-dropdown-link" @click.prevent>
-                日记
-                <DownOutlined />
-              </a>
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item>
-                    <RouterLink to="/newdiary">写日记</RouterLink>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <RouterLink to="/diary">日记列表</RouterLink>
-                  </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
-
-            <a-dropdown style="display: inline !important">
-              <a class="ant-dropdown-link" @click.prevent>
-                图片
-                <DownOutlined />
-              </a>
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item>
-                    <RouterLink to="/newimg">新图片</RouterLink>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <RouterLink to="/gallery">图库</RouterLink>
-                  </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
 
             <a-dropdown style="display: inline !important">
               <a class="ant-dropdown-link" @click.prevent>
@@ -93,9 +60,6 @@ export default defineComponent({
                     <RouterLink to="/profile">个人设置</RouterLink>
                   </a-menu-item>
                   <a-menu-item>
-                    <RouterLink to="/domain">个人域名设置</RouterLink>
-                  </a-menu-item>
-                  <a-menu-item>
                     <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
                   </a-menu-item>
                   <a-menu-item>
@@ -108,11 +72,6 @@ export default defineComponent({
                     <RouterLink to="/email">发送书签至邮箱</RouterLink>
                   </a-menu-item>
                   <a-menu-item>
-                    <RouterLink to="/redirect" target="_blank"
-                      >个人网站</RouterLink
-                    >
-                  </a-menu-item>
-                  <a-menu-item>
                     <RouterLink to="/logout">退出</RouterLink>
                   </a-menu-item>
                 </a-menu>
@@ -120,7 +79,7 @@ export default defineComponent({
             </a-dropdown>
           </span>
           <span v-else>
-            <RouterLink to="/login">登入</RouterLink>
+            <RouterLink to="/">登入</RouterLink>
             <RouterLink to="/reg">注册</RouterLink>
           </span>
         </nav>

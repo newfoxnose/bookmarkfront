@@ -92,7 +92,7 @@ export default {
       proxy.$http.post("/ajax/note_ajax/", params).then((res) => {
         if (res.data.code == "401") {
           //不在登陆状态
-          window.location.href = "/login";
+          window.location.href = "/";
         }
         valueHtml.value = res.data.data.note;
         defaultPercent.value = 100;
