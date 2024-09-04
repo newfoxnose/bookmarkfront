@@ -1,6 +1,8 @@
 <template>
   <div style="margin-top:15px;"></div>
-  <a-form :model="formState" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
+  <a-result v-if="logged==0" title="检查是否已登入......" sub-title="请稍等.......">
+  </a-result>
+  <a-form v-if="logged==1" :model="formState" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
     @finish="login" @finishFailed="onFinishFailed">
 
     <a-form-item label="邮箱" name="email" :rules="[{ type: 'email', required: true, message: '请输入有效邮箱地址' }]">
@@ -42,6 +44,7 @@ Object.assign(window, { $: jQuery, jQuery });
 
 export default defineComponent({
   setup() {
+    const logged = ref(0);
     const iconLoading = ref(false);
     const murmur = ref('')
     const { proxy } = getCurrentInstance()
@@ -93,8 +96,12 @@ export default defineComponent({
         message.info(res.data.msg);
         // obj.success ? obj.success(res) : null
         if (res.data.code == "200") {
-          $cookies.set('token',res.data.data.token,"720h")  
+          $cookies.set('token',res.data.data.token,"720h") 
+          logged.value = 2; 
             window.location.href ="/home"
+          }
+          else{
+            logged.value = 1;
           }
       }).catch(error => {
         iconLoading.value = false;
@@ -111,7 +118,11 @@ export default defineComponent({
         console.log(folder_res);
         if (folder_res.data.code == "200") {
           //在登陆状态就跳转到home页
+          logged.value = 2; 
           window.location.href = "/home";
+        }
+        else{
+          logged.value = 1; 
         }
       });
     });
@@ -124,6 +135,7 @@ export default defineComponent({
       iconLoading,
       onFinishFailed,
       checked,
+      logged,
     };
   },
 
