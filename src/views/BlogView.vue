@@ -11,14 +11,16 @@
       }"
     />
   </div>
-  <p style="margin-top:15px;">
-    <a-button type="primary" @click="showDrawer('新建笔记', 0)"><form-outlined />新建笔记</a-button
-      ></p>
+  <p style="margin-top: 15px">
+    <a-button type="primary" @click="showDrawer('新建笔记', 0)"
+      ><form-outlined />新建笔记</a-button
+    >
+  </p>
   <div>
     <a-image-preview-group>
       <div v-for="item in fileitems" style="margin-bottom: 5px">
         <span class="ext">{{ item.id }}</span>
-        <a @click="showDrawer('笔记', item.id)" style="margin-left: 5px">
+        <a @click="showDrawer(item.title, item.id)" style="margin-left: 5px">
           {{ item.title == "" ? "无标题" : item.title }}
         </a>
         <eye-invisible-two-tone
@@ -30,7 +32,9 @@
           style="margin-left: 3px"
         />
         <span style="margin-left: 20px">( {{ item.createtime }})</span>
-        <a style="margin-left: 20px" @click="showconfirmdelete(item.id, currentpage)"
+        <a
+          style="margin-left: 20px"
+          @click="showconfirmdelete(item.id, currentpage)"
           >删除</a
         >
         <br /><a-image
@@ -62,39 +66,46 @@
   >
     <template #extra>
       <a-button type="primary" @click="save()" :loading="iconLoading"
-        >保存</a-button>
+        >保存</a-button
+      >
       &nbsp;
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </template>
 
     <a-form :model="formState">
-      <a-form-item
-        label="标题"
-        name="title"
-        :rules="[{ required: true, message: '标题不能为空' }]"
-      >
-        <a-input v-model:value="formState.title" />
-      </a-form-item>
-
       <a-row>
-        <a-col :span="12">
+        <a-col :span="8">
           <p>
-            <a-select
-              style="width: 100%"
-              v-model:value="formState.folder_id"
-              v-if="folder_list"
+            <a-form-item
+              label="标题"
+              name="title"
+              :rules="[{ required: true, message: '标题不能为空' }]"
             >
-              <a-select-option
-                v-for="item in folder_list"
-                :value="item.value"
-                :lv="item.lv"
+              <a-input v-model:value="formState.title" />
+            </a-form-item></p
+        ></a-col>
+        <a-col :span="8">
+          <p style="padding-left: 20px">
+            <a-form-item
+              label="目录" :rules="[{ required: true, message: '目录不能为空' }]"
+            >
+              <a-select
+                style="width: 100%"
+                v-model:value="formState.folder_id"
+                v-if="folder_list"
               >
-                {{ item.name }}</a-select-option
-              >
-            </a-select>
+                <a-select-option
+                  v-for="item in folder_list"
+                  :value="item.value"
+                  :lv="item.lv"
+                >
+                  {{ item.name }}</a-select-option
+                >
+              </a-select>
+            </a-form-item>
           </p></a-col
         >
-        <a-col :span="12">
+        <a-col :span="8">
           <p style="padding-left: 20px">
             <a-checkbox v-model:checked="formState.is_recommend"
               >置顶</a-checkbox
@@ -143,7 +154,8 @@ import {
   InboxOutlined,
   EyeInvisibleTwoTone,
   LikeTwoTone,
-  StarOutlined,FormOutlined,
+  StarOutlined,
+  FormOutlined,
 } from "@ant-design/icons-vue";
 import { onMounted, getCurrentInstance, defineComponent, ref } from "vue";
 import * as qiniu from "qiniu-js";
@@ -154,7 +166,8 @@ export default {
     InboxOutlined,
     EyeInvisibleTwoTone,
     LikeTwoTone,
-    StarOutlined,FormOutlined,
+    StarOutlined,
+    FormOutlined,
   },
   setup() {
     const formState = ref([]);
@@ -221,8 +234,7 @@ export default {
     const showconfirmdelete = (editId, currentpage) => {
       Modal.confirm({
         title: "确认删除该项目吗？",
-        content:
-          "点击OK删除且无法找回, 点击cancel取消",
+        content: "点击OK删除且无法找回, 点击cancel取消",
         onOk() {
           deletepost(editId, currentpage);
         },
@@ -306,7 +318,7 @@ export default {
         params.append("content", valueHtml.value);
         params.append("title", formState.value.title);
         params.append("folder_id", formState.value.folder_id);
-        if (blog_id.value!=0){
+        if (blog_id.value != 0) {
           params.append("post_id", blog_id.value);
         }
         if (formState.value.is_private == true) {
@@ -325,7 +337,7 @@ export default {
             //console.log(res.data.msg);
             if (res.data.msg == "新建成功") {
               //这条提示如果改的话要和后端一起改
-              message.info("新建笔记成功");     //看不到效果
+              message.info("新建笔记成功"); //看不到效果
               iconLoading.value = false;
               handlepagechange(1);
             } else {
