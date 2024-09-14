@@ -1,32 +1,53 @@
 
-#app {
-  max-width: 1024px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+.logo {
+    height: 32px;
+    margin: 10px;
+    padding:5px;
+    text-align: center;
   }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    /*place-items: center;可以使body所有元素垂直居中*/
+  
+  .content-dark-theme {
+    background: #001529;
+    border-style:solid;
+    border-width:10px;
+    border-color:#001529;
+    padding:10px;
+    color:rgba(255, 255, 255, 0.65);
   }
-
-  #app {
-    width:100%;
-    grid-template-columns: 1fr 1fr;
+  .content-light-theme {
+    background: #fff;
+    border-style:solid;
+    border-width:10px;
+    border-color:rgb(240 242 245);
+    padding:10px;
+    color:#000;
   }
-}
+  
+  
+  
+  .footer-dark-theme {
+    background: #001529;
+    text-align: center;
+    color:rgba(255, 255, 255, 0.65);
+  }
+  .footer-light-theme {
+    background: #fff;
+    text-align: center;
+  }
+  
+.content-dark-theme h3{
+    color:rgba(255, 255, 255, 0.65) !important;
+  }
+  
+  .content-light-theme h3{
+    color:#000 !important;
+  }
+  
+  .content-dark-theme label{
+    color:rgba(255, 255, 255, 0.65) !important;
+  }
+  
+  .content-light-theme label{
+    color:#000 !important;
+  }
+  

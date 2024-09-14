@@ -12,7 +12,7 @@
     />
   </div>
 
-  <h3 style="margin-top: 15px">导入书签</h3>
+  <h3>导入书签</h3>
   <div class="clearfix">
     <a-upload
       :file-list="fileList"

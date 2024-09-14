@@ -11,7 +11,7 @@
       }"
     />
   </div>
-  <h3 style="margin-top: 15px">RSS订阅源</h3>
+  <h3>RSS订阅源</h3>
 
   <div>
     <button @click="takeUrlshot">生成截图</button>

@@ -508,7 +508,7 @@ export default defineComponent({
   </div>
 
   <div :folderid="-1">
-    <h3 style="margin-top: 15px">根目录</h3>
+    <h3>根目录</h3>
     <bookmarkitem
       v-for="bookmarkitem in items.root_bookmarks"
       :id="bookmarkitem.id"
@@ -640,6 +640,8 @@ export default defineComponent({
 </template>
 
 <style scoped>
+
+
 .folder-name {
   margin-top: 2rem;
   display: flex;

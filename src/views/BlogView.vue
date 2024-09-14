@@ -76,19 +76,11 @@
       <a-row>
         <a-col :span="8">
           <p>
-            <a-form-item
-              label="标题"
-              name="title"
-              :rules="[{ required: true, message: '标题不能为空' }]"
-            >
-              <a-input v-model:value="formState.title" />
-            </a-form-item></p
+              <a-input v-model:value="formState.title" placeholder="请输入标题" />
+        </p
         ></a-col>
         <a-col :span="8">
           <p style="padding-left: 20px">
-            <a-form-item
-              label="目录" :rules="[{ required: true, message: '目录不能为空' }]"
-            >
               <a-select
                 style="width: 100%"
                 v-model:value="formState.folder_id"
@@ -102,16 +94,15 @@
                   {{ item.name }}</a-select-option
                 >
               </a-select>
-            </a-form-item>
           </p></a-col
         >
         <a-col :span="8">
-          <p style="padding-left: 20px">
+          <p style="padding-left: 20px;white-space: nowrap;">
             <a-checkbox v-model:checked="formState.is_recommend"
               >置顶</a-checkbox
             >
             <a-checkbox v-model:checked="formState.is_private"
-              >不公开</a-checkbox
+              >私密</a-checkbox
             >
           </p></a-col
         >

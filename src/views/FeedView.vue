@@ -5,7 +5,7 @@
       '100%': '#87d068',
     }" />
  </div>
-  <h3 style="margin-top:15px;">RSS订阅源</h3>
+  <h3>RSS订阅源</h3>
 
   <a-form :model="formState" name="add" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }" autocomplete="off"
     @finish="onFinish" @finishFailed="onFinishFailed">
@@ -67,6 +67,7 @@
   </a-drawer>
 </template>
 <style scoped>
+
 
 .loadingbar {
   position: fixed;

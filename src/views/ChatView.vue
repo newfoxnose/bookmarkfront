@@ -1,8 +1,8 @@
 <template>
-  <h3 style="margin-top: 15px">ChatGPT</h3>
+  <h3>ChatGPT</h3>
 <p id="chat_url" style="display:none">{{ chat_url }}</p>
   <ul id="content" class="content"></ul>
-
+<br>
   <a-input-search id="msg_input"
     enter-button="发送"
     @search="sendquestion"
@@ -10,6 +10,13 @@
 
 </template>
 <style scoped>
+  .content-dark-theme ul{
+    background: #002140;
+  }
+  .content-light-theme ul{
+    background: #fff;
+  }
+  
 
 .content {
   list-style: none;
@@ -123,7 +130,7 @@ function sendquestion() {
         } else {
           $("#content")
             .append(
-              '<li class="msgContent left" style="width: auto;  height: auto;  word-break: break-all;  margin: 5px;  padding: 5px;  border-radius: 5px;  font-size: 16px;float: left;  text-align: left;  max-width: 90%;  background-color: lightgrey;">' +
+              '<li class="msgContent left" style="width: auto;  height: auto;  word-break: break-all;  margin: 5px;  padding: 5px;  border-radius: 5px;  font-size: 16px;float: left;  text-align: left;  max-width: 90%;  background-color: grey;">' +
                 result_json.choices[0].message.content.replace(/\n/gi, "<br>") +
                 "<li>"
             )
