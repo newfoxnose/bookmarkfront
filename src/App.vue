@@ -18,7 +18,7 @@ export default defineComponent({
     };
   },
   setup() {
-    const logourl = ref('images/logo-white.png');
+    const logourl = ref('../images/logo-white.png');
     const contenttheme = ref('content-dark-theme');
     const footertheme = ref('footer-dark-theme');
     const state = reactive({
@@ -29,12 +29,12 @@ export default defineComponent({
     const changeTheme = checked => {
       state.theme = checked ? 'dark' : 'light';
       if (state.theme=='dark'){
-        logourl.value="images/logo-white.png"
+        logourl.value="../images/logo-white.png"
         contenttheme.value="content-dark-theme"
         footertheme.value="footer-dark-theme"
       }
       else{
-        logourl.value="images/logo.png"
+        logourl.value="../images/logo.png"
         contenttheme.value="content-light-theme"
         footertheme.value="footer-light-theme"
       }
