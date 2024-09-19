@@ -332,7 +332,7 @@ export default defineComponent({
       </a-form-item>
       <a-form-item label="父目录" name="xxx">
         <a-select style="width: 100%" v-model:value="father_id" v-if="folder_data">
-          <a-select-option v-for="item in folder_data" :value="item.value" :lv="item.lv" :disabled="item.disabled"> {{
+          <a-select-option v-for="item in folder_data" :value="item.value" :lv="item.lv" :disabled="item.disabled" :class="drawerclass"> {{
             item.label
           }}</a-select-option>
         </a-select>
@@ -350,7 +350,7 @@ export default defineComponent({
     <a-form name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off">
       <a-form-item label="本目录内书签移动到：">
         <a-select style="width: 100%" v-model:value="father_id" v-if="data">
-          <a-select-option v-for="item in data" :value="item.value" :lv="item.lv">
+          <a-select-option v-for="item in data" :value="item.value" :lv="item.lv" :class="drawerclass">
             {{ item.label }}
           </a-select-option>
         </a-select>

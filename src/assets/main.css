@@ -62,7 +62,10 @@
     color:#000;
   }
 
-
+  .drawer-dark-theme .ant-drawer-content-wrapper *{
+    background: #001529;
+    color:rgba(255, 255, 255, 0.65);
+  }
 
 
    .content-dark-theme {
@@ -101,6 +104,54 @@
     border-color: var(--ad-border-color) !important;
   }
 
-  .content-dark-theme #w-e-textarea-1 {
-    background-color: #cccccc !important;
+  .content-dark-theme  {
+    --w-e-textarea-bg-color: #cccccc;   /*wanteditor深色模式*/
+  }
+
+
+
+    
+  .drawer-dark-theme .ant-select-selector {
+    background-color: #001529 !important;
+  }
+  .drawer-light-theme .ant-select-selector {
+    background-color: transparent;
+  }
+  
+.drawer-dark-theme .ant-select-dropdown  {
+    background-color: #001529 !important;
+    padding:0;
+  }
+ .drawer-light-theme .ant-select-dropdown {
+    background-color: transparent;
+  }
+
+  .drawer-dark-theme.ant-select-item  {
+    background-color: #001529 !important;
+    color: var(--ad-text-color) !important;
+  }
+ .drawer-light-theme.ant-select-item  {
+    background-color: transparent;
+  }
+
+  .drawer-dark-theme.ant-select-item  .ant-select-item-option-content{
+    color: #fff !important;
+  }
+
+
+  .drawer-dark-theme.ant-select-item-option-selected  {
+    background-color: #eee !important;
+    color: #fff !important;
+  }
+ .drawer-light-theme.ant-select-item-option-selected  {
+    background-color: transparent;
+  }
+
+
+  .drawer-dark-theme.ant-select-item-option-active  {
+    background-color: #ddd !important;
+    color: #000 !important;
+  }
+ .drawer-light-theme.ant-select-item-option-active  {
+    background-color: #eee;
   }

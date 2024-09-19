@@ -615,6 +615,7 @@ export default defineComponent({
           v-for="item in folder_list"
           :value="item.value"
           :lv="item.lv"
+          :class="drawerclass"
         >
           {{ item.name }}</a-select-option
         >
