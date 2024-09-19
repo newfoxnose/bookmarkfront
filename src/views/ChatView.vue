@@ -49,6 +49,8 @@ import {
 
 export default {
   setup() {
+    $cookies.set('selectedkey','4',"720h") 
+    $cookies.set('openkey','') 
     const { proxy } = getCurrentInstance();
     const chat_url = ref(proxy.$remoteDomain+"/ajax/chat_ajax")
     // ajax 异步获取内容

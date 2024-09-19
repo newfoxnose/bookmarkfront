@@ -57,6 +57,8 @@ export default defineComponent({
     UploadOutlined,
   },
   setup() {
+    $cookies.set('selectedkey','11',"720h") 
+    $cookies.set('openkey','sub1',"720h") 
     const fileList = ref([]);
     const uploading = ref(false);
     const defaultPercent = ref(10);

@@ -51,3 +51,56 @@
     color:#000 !important;
   }
   
+
+
+  .drawer-dark-theme .ant-drawer-content-wrapper *{
+    background: #001529;
+    color:rgba(255, 255, 255, 0.65);
+  }
+  .drawer-light-theme .ant-drawer-content-wrapper *{
+    background: #fff;
+    color:#000;
+  }
+
+
+
+
+   .content-dark-theme {
+    --ad-primary-color: #262626; /* 主题色 */
+    --ad-text-color: #ffffff; /* 文本色 */
+    --ad-border-color: #303030; /* 边框色 */
+    --ad-background-color: #141414; /* 背景色 */
+  }
+   
+  /* 确保覆盖所有相关的样式 */
+   .content-dark-theme .ant-table {
+    color: var(--ad-text-color);
+    background-color: var(--ad-background-color);
+  }
+   
+   .content-dark-theme .ant-table-thead >tr > th {
+    color: var(--ad-text-color);
+    background-color: var(--ad-primary-color);
+    border-color: var(--ad-border-color);
+  }
+   
+   .content-dark-theme .ant-table-tbody  >tr > td {
+    border-color: var(--ad-border-color);
+  }
+   
+   .content-dark-theme .ant-table-cell-row-hover {
+    background-color: #666666 !important; /* 悬停行的背景色 */
+    color:#fff !important;
+  }
+
+
+
+  .content-dark-theme .wanteditortoolbar *{
+    color: var(--ad-text-color) !important;
+    background-color: var(--ad-primary-color) !important;
+    border-color: var(--ad-border-color) !important;
+  }
+
+  .content-dark-theme #w-e-textarea-1 {
+    background-color: #cccccc !important;
+  }

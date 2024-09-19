@@ -4,6 +4,8 @@ import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import md5 from 'js-md5';
 export default defineComponent({
   setup() {
+    $cookies.set('selectedkey','9',"720h") 
+    $cookies.set('openkey','sub1',"720h") 
     const iconLoading = ref(false);
     const { proxy } = getCurrentInstance()
     const formState = ref([])

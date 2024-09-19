@@ -95,6 +95,8 @@ export default {
     InboxOutlined,
   },
   setup() {
+    $cookies.set('selectedkey','3',"720h") 
+    $cookies.set('openkey','') 
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
 

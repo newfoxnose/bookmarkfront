@@ -19,6 +19,8 @@ export default defineComponent({
     PlusOutlined
   },
   setup() {
+    $cookies.set('selectedkey','7',"720h") 
+    $cookies.set('openkey','sub1',"720h") 
     const iconLoading = ref(false);
     const visible = ref(false);
     const updatedDrawerTitle = ref(String);

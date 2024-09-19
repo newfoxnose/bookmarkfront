@@ -1,5 +1,7 @@
 <template>
-  <div style="margin-top:15px;"></div>
+    
+    <h3>登入</h3>
+
   <a-result v-if="logged==0" title="检查是否已登入......" sub-title="请稍等.......">
   </a-result>
   <a-form v-if="logged==1" :model="formState" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
@@ -44,6 +46,8 @@ Object.assign(window, { $: jQuery, jQuery });
 
 export default defineComponent({
   setup() {
+    $cookies.set('selectedkey','15',"720h") 
+    $cookies.set('openkey','') 
     const logged = ref(0);
     const iconLoading = ref(false);
     const murmur = ref('')

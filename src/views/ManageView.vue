@@ -10,14 +10,18 @@ export default defineComponent({
     HomeOutlined
   },
   setup() {
+    $cookies.set('selectedkey','8',"720h") 
+    $cookies.set('openkey','sub1',"720h") 
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
     const visible = ref(false);
     const prompt_visible = ref(false);
     const empty_prompt_visible = ref(false);
     const movebookmark_drawer_visible = ref(false);
+    const drawerclass = ref('');
     const showDrawer = () => {
       visible.value = true;
+      drawerclass.value="drawer-"+$cookies.get('theme')+"-theme"
     };
     const show_prompt = () => {
       prompt_visible.value = true;
@@ -27,6 +31,7 @@ export default defineComponent({
     };
     const show_movebookmark_drawer = () => {
       movebookmark_drawer_visible.value = true;
+      drawerclass.value="drawer-"+$cookies.get('theme')+"-theme"
     };
     const closeDrawer = () => {
       visible.value = false;
@@ -63,7 +68,8 @@ export default defineComponent({
       show_empty_prompt,
       hide_empty_prompt,
       defaultPercent,
-      loadingdone
+      loadingdone,
+      drawerclass
     };
   },
   data() {
@@ -257,7 +263,9 @@ export default defineComponent({
   <a-modal v-model:visible="empty_prompt_visible" title="操作确认" ok-text="确认" cancel-text="取消" @ok="submitModify('清空')">
     <p>此操作将删除所选择目录内的所有书签</p>
   </a-modal>
-  <div style="margin-top:15px;"></div>
+  
+  <h3>管理目录</h3>
+
   <a-table :columns="columns_addnew" :data-source="data_addnew" :pagination="false">
     <template #headerCell="{ column }">
     </template>
@@ -313,7 +321,8 @@ export default defineComponent({
       </template>
     </template>
   </a-table>
-  <a-drawer width="100%" title="修改目录" placement="bottom" :visible="visible" @close="closeDrawer">
+
+  <a-drawer width="100%" title="修改目录" placement="bottom" :visible="visible" @close="closeDrawer" :class="drawerclass">
     <template #extra>
       <a-button type="primary" danger @click="addBookmark(editId, '删除')">删除</a-button>
     </template>
@@ -337,7 +346,7 @@ export default defineComponent({
   </a-drawer>
 
   <a-drawer width="100%" title="移动书签" placement="bottom" :visible="movebookmark_drawer_visible"
-    @close="close_movebookmark_drawer">
+    @close="close_movebookmark_drawer" :class="drawerclass">
     <a-form name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off">
       <a-form-item label="本目录内书签移动到：">
         <a-select style="width: 100%" v-model:value="father_id" v-if="data">

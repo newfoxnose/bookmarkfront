@@ -1,5 +1,6 @@
 <template>
-  <div style="margin-top:15px;"></div>
+    
+    <h3>注册</h3>
   <a-form :model="formState" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
     @finish="reg" @finishFailed="onFinishFailed">
 
@@ -50,6 +51,8 @@ export default defineComponent({
     SettingOutlined,
   },
   setup() {
+    $cookies.set('selectedkey','16',"720h") 
+    $cookies.set('openkey','') 
     const iconLoading = ref(false);
     const { proxy } = getCurrentInstance()
     const murmur = ref('')

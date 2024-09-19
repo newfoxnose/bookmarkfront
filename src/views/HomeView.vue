@@ -20,6 +20,8 @@ export default defineComponent({
     PlusOutlined,
   },
   setup() {
+    $cookies.set('selectedkey','1',"720h") 
+    $cookies.set('openkey','') 
     const iconLoading = ref(false);
     const visible = ref(false);
     const updatedDrawerTitle = ref(String);
@@ -31,6 +33,7 @@ export default defineComponent({
       visible.value = true;
       updatedDrawerTitle.value = drawerTitle;
       urlshot_items.value=null
+      drawerclass.value="drawer-"+$cookies.get('theme')+"-theme"
     };
     const onClose = () => {
       iconLoading.value = false;
@@ -70,6 +73,8 @@ export default defineComponent({
     const loadingdone = ref(false);
     const urlshot_items=ref([]);
     const { proxy } = getCurrentInstance();
+
+    const drawerclass = ref('');
 
     async function takeUrlshot(id,url) {
       console.log(id)
@@ -143,6 +148,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
@@ -311,7 +317,8 @@ export default defineComponent({
       takeUrlshot,
       takeScreenshot,
       screenshot,
-      urlshot_items
+      urlshot_items,
+      drawerclass
     };
   },
   data() {
@@ -561,6 +568,7 @@ export default defineComponent({
   <a-drawer
     :width="500"
     :title="updatedDrawerTitle"
+    :class="drawerclass"
     placement="bottom"
     :visible="visible"
     @close="onClose"

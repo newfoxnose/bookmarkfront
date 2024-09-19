@@ -62,6 +62,7 @@
     :title="updatedDrawerTitle"
     placement="bottom"
     :visible="visible"
+    :class="drawerclass"
     @close="onClose"
   >
     <template #extra>
@@ -161,6 +162,8 @@ export default {
     FormOutlined,
   },
   setup() {
+    $cookies.set('selectedkey','5',"720h") 
+    $cookies.set('openkey','') 
     const formState = ref([]);
     formState.value.title = "";
     formState.value.is_private = false;
@@ -186,7 +189,9 @@ export default {
     const updatedDrawerTitle = ref(String);
     const visible = ref(false);
     const blog_id = ref(0);
+    const drawerclass = ref('');
     const showDrawer = (drawerTitle, id) => {
+      drawerclass.value="drawer-"+$cookies.get('theme')+"-theme"
       visible.value = true;
       updatedDrawerTitle.value = drawerTitle;
       if (id != 0) {
@@ -367,6 +372,7 @@ export default {
       updatedDrawerTitle,
       blog_id,
       showconfirmdelete,
+      drawerclass
     };
   },
   created() {

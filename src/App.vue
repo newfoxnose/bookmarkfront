@@ -1,6 +1,6 @@
 <script>
 import { RouterLink, RouterView } from "vue-router";
-import { defineComponent, ref , reactive, toRefs} from "vue";
+import { onMounted, defineComponent, ref , reactive, toRefs} from "vue";
 import { DownOutlined,PieChartOutlined, DesktopOutlined, UserOutlined, TeamOutlined, FileOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
@@ -14,7 +14,7 @@ export default defineComponent({
   data() {
     return {
       collapsed: ref(false),
-      selectedKeys: ref(['1']),
+      selectedKeys: ref([]),
     };
   },
   setup() {
@@ -22,18 +22,28 @@ export default defineComponent({
     const contenttheme = ref('content-dark-theme');
     const footertheme = ref('footer-dark-theme');
     const state = reactive({
-      theme: 'dark',
-      selectedKeys: ['1'],
-      openKeys: ['sub1'],
+      theme: $cookies.get('theme') ,
+      selectedKeys: [$cookies.get('selectedkey')],
+      openKeys: [$cookies.get('openkey')],
     });
+    onMounted(() => {
+      if (state.theme=='dark'){
+        changeTheme(true)
+      }
+      else{
+        changeTheme(false)
+      }
+    })
     const changeTheme = checked => {
       state.theme = checked ? 'dark' : 'light';
       if (state.theme=='dark'){
+        $cookies.set('theme','dark',"720h") 
         logourl.value="../images/logo-white.png"
         contenttheme.value="content-dark-theme"
         footertheme.value="footer-dark-theme"
       }
       else{
+        $cookies.set('theme','light',"720h") 
         logourl.value="../images/logo.png"
         contenttheme.value="content-light-theme"
         footertheme.value="footer-light-theme"
@@ -56,7 +66,7 @@ export default defineComponent({
       <div class="logo" :theme="theme">
         <img :src="logourl" height="30"/>
       </div>
-      <a-menu v-model:selectedKeys="selectedKeys" mode="inline"  :theme="theme">
+      <a-menu v-model:selectedKeys="selectedKeys" mode="inline"  :theme="theme" v-model:openKeys="openKeys">
         <span
             v-if="$cookies.get('token') != null && $cookies.get('token') != ''"
           >
@@ -130,7 +140,7 @@ export default defineComponent({
       </a-menu>
       <div style="text-align:center;padding-top:30px;">
         <a-switch
-      :checked="theme === 'dark'"
+      :checked="theme == 'dark'"
       checked-children="Dark"
       un-checked-children="Light"
       @change="changeTheme"

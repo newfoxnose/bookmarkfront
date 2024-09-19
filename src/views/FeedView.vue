@@ -88,6 +88,8 @@ export default {
     FormOutlined,SearchOutlined
   },
   setup() {
+    $cookies.set('selectedkey','6',"720h") 
+    $cookies.set('openkey','') 
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
     const iconLoading = ref(false);

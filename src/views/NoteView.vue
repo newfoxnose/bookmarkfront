@@ -25,6 +25,7 @@
       :editor="editorRef"
       :defaultConfig="toolbarConfig"
       :mode="mode"
+      class="wanteditortoolbar"
     />
     <Editor
       style="height: 500px; overflow-y: hidden"
@@ -62,6 +63,8 @@ import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 export default {
   components: { Editor, Toolbar },
   setup() {
+    $cookies.set('selectedkey','2',"720h")
+    $cookies.set('openkey','')  
     // 编辑器实例，必须用 shallowRef
     const editorRef = shallowRef();
 

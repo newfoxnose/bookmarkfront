@@ -28,6 +28,7 @@
 
     <a-drawer
     :width="500"
+    :class="drawerclass"
     :title="articletitle"
     placement="right"
     :visible="visible"
@@ -59,6 +60,8 @@ export default {
     LinkOutlined
   },
   setup() {
+    $cookies.set('selectedkey','6',"720h") 
+    $cookies.set('openkey','') 
     const iconLoading = ref(false);
     const router = useRouter()
     const { proxy } = getCurrentInstance();
@@ -69,10 +72,14 @@ export default {
     const visible = ref(false);
     const articletitle = ref('');
     const articlecontent = ref('');
+    const drawerclass = ref('');
     const showDrawer = (title,url,content) => {
+      
       visible.value = true;
       articletitle.value=title
+      drawerclass.value="drawer-"+$cookies.get('theme')+"-theme"
       articlecontent.value=content+'<p><a href="'+url+'" target=_blank>'+url+'</a></p>'
+
     };
     const onClose = () => {
       visible.value = false;
@@ -114,7 +121,8 @@ export default {
       showDrawer,
       onClose,
       articletitle,
-      articlecontent
+      articlecontent,
+      drawerclass
     };
   },
 };

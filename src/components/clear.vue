@@ -1,6 +1,10 @@
 <script>
 import { message } from 'ant-design-vue';
 export default ({
+  setup(){
+    $cookies.set('selectedkey','10',"720h") 
+    $cookies.set('openkey','sub1',"720h") 
+  },
   mounted() {
 
     let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
