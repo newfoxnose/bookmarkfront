@@ -65,17 +65,6 @@ const router = createRouter({
       component: () => import("../components/email.vue"),
     },
     {
-      path: "/editpost/:id",
-      name: "editpost",
-      component: () => import("../views/EditpostView.vue"),
-    },
-    {
-      path: "/newblog",
-      name: "newblog",
-      component: () => import("../views/NewblogView.vue"),
-      //meta: { "composetype": "diary" }   //这是另一种传参方法，备用
-    },
-    {
       path: "/domain",
       name: "domain",
       component: () => import("../views/DomainView.vue"),
@@ -94,16 +83,7 @@ const router = createRouter({
       path: "/blog",
       name: "blog",
       component: () => import("../views/BlogView.vue"),
-    },
-    {
-      path: "/editblog/:id",
-      name: "editblog",
-      component: () => import("../views/EditblogView.vue"),
-    },
-    {
-      path: "/editdiary/:id",
-      name: "editdiary",
-      component: () => import("../views/EditdiaryView.vue"),
+      //meta: { "composetype": "diary" }   //这是另一种传参方法，备用
     },
     {
       path: "/collection",
@@ -121,10 +101,6 @@ const router = createRouter({
       path: "/rss/:id",
       name: "rss",
       component: () => import("../views/RSSView.vue"),
-    },{
-      path: "/test",
-      name: "test",
-      component: () => import("../views/TestView.vue"),
     },
   ],
 });

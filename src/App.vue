@@ -1,15 +1,17 @@
 <script>
 import { RouterLink, RouterView } from "vue-router";
 import { onMounted, defineComponent, ref , reactive, toRefs} from "vue";
-import { DownOutlined,PieChartOutlined, DesktopOutlined, UserOutlined, TeamOutlined, FileOutlined } from "@ant-design/icons-vue";
+import { StarOutlined,FormOutlined,DatabaseOutlined,CommentOutlined,ProfileOutlined,WifiOutlined,MoreOutlined} from "@ant-design/icons-vue";
 
 export default defineComponent({
   components: {
-    DownOutlined,PieChartOutlined,
-    DesktopOutlined,
-    UserOutlined,
-    TeamOutlined,
-    FileOutlined,
+    StarOutlined,
+    FormOutlined,
+    DatabaseOutlined,
+    CommentOutlined,
+    ProfileOutlined,
+    WifiOutlined,
+    MoreOutlined,
   },
   data() {
     return {
@@ -71,33 +73,33 @@ export default defineComponent({
             v-if="$cookies.get('token') != null && $cookies.get('token') != ''"
           >
         <a-menu-item key="1">
-          <pie-chart-outlined />
+          <star-outlined />
           <RouterLink to="/home" style="padding-left:8px;">书签</RouterLink>
         </a-menu-item>
         <a-menu-item key="2">
-          <desktop-outlined />
+          <form-outlined />
           <RouterLink to="/note" style="padding-left:8px;">随手记</RouterLink>
         </a-menu-item>
         <a-menu-item key="3">
-          <desktop-outlined />
+          <database-outlined />
           <RouterLink to="/qiniu" style="padding-left:8px;">文件</RouterLink>
         </a-menu-item>
         <a-menu-item key="4">
-          <desktop-outlined />
+          <comment-outlined />
           <RouterLink to="/chat" style="padding-left:8px;">CHATGPT</RouterLink>
         </a-menu-item>
         <a-menu-item key="5">
-          <desktop-outlined />
+          <profile-outlined />
           <RouterLink to="/blog" style="padding-left:8px;">笔记</RouterLink>
         </a-menu-item>
         <a-menu-item key="6">
-          <desktop-outlined />
+          <wifi-outlined />
           <RouterLink to="/feed" style="padding-left:8px;">RSS</RouterLink>
         </a-menu-item>
         <a-sub-menu key="sub1">
           <template #title>
             <span>
-              <user-outlined />
+              <more-outlined />
               <span>更多</span>
             </span>
           </template>
