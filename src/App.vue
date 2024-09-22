@@ -1,7 +1,7 @@
 <script>
 import { RouterLink, RouterView } from "vue-router";
 import { onMounted, defineComponent, ref , reactive, toRefs} from "vue";
-import { StarOutlined,FormOutlined,DatabaseOutlined,CommentOutlined,ProfileOutlined,WifiOutlined,MoreOutlined} from "@ant-design/icons-vue";
+import { StarOutlined,FormOutlined,DatabaseOutlined,CommentOutlined,ProfileOutlined,WifiOutlined,MoreOutlined,UserAddOutlined,LoginOutlined} from "@ant-design/icons-vue";
 
 export default defineComponent({
   components: {
@@ -12,6 +12,8 @@ export default defineComponent({
     ProfileOutlined,
     WifiOutlined,
     MoreOutlined,
+    UserAddOutlined,
+    LoginOutlined
   },
   data() {
     return {
@@ -103,9 +105,6 @@ export default defineComponent({
               <span>更多</span>
             </span>
           </template>
-          <a-menu-item key="7">
-            <RouterLink to="/collection">采集</RouterLink>
-          </a-menu-item>
           <a-menu-item key="8">
             <RouterLink to="/manage">管理目录</RouterLink>
           </a-menu-item>
@@ -131,11 +130,11 @@ export default defineComponent({
       </span>
           <span v-else>
             <a-menu-item key="15">
-          <pie-chart-outlined />
+              <login-outlined />
           <RouterLink to="/" style="padding-left:8px;">登入</RouterLink>
         </a-menu-item>
         <a-menu-item key="16">
-          <desktop-outlined />
+          <user-add-outlined />
           <RouterLink to="/reg" style="padding-left:8px;">注册</RouterLink>
         </a-menu-item>
           </span>

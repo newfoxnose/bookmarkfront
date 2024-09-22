@@ -70,21 +70,21 @@ export default defineComponent({
 </script>
 <template>
   <div style="margin-top:15px;"></div>
-  <a-form :model="formState" name="basic" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }" autocomplete="off"
+  <a-form :model="formState" name="basic" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }" autocomplete="off"
     @finish="onFinish" @finishFailed="onFinishFailed">
     <a-form-item label="昵称" name="name" :rules="[{ required: true, message: '昵称不能为空' }]">
-      <a-input v-model:value="formState.name" />
+      <a-input v-model:value="formState.name" disabled/>
     </a-form-item>
 
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
-      <a-input v-model:value="formState.email" />
+      <a-input v-model:value="formState.email" disabled/>
     </a-form-item>
-    <a-form-item label="SLOGAN" name="slogan">
+    <a-form-item label="SLOGAN" name="slogan" style="display:none">
       <a-input v-model:value="formState.slogan" />
     </a-form-item>
     <a-form-item label="七牛域名" name="qiniu_domain" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_domain" suffix="以//开头，结尾不带/" />
-      <a-typography-paragraph>推荐专门新注册一个七牛账号使用，以免泄密，有10G免费空间和每月10G免费http流量。</a-typography-paragraph>
+      <span class="font-color-by-theme">推荐专门新注册一个七牛账号使用，以免泄密，有10G免费空间和每月10G免费http流量。</span>
     </a-form-item>
     <a-form-item label="七牛ACCESSKEY" name="qiniu_accesskey" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_accesskey" />
@@ -95,7 +95,7 @@ export default defineComponent({
     <a-form-item label="七牛BUCKET" name="qiniu_bucket" :rules="[{ required: false }]">
       <a-input v-model:value="formState.qiniu_bucket" />
     </a-form-item>
-    <a-form-item label="个人网站主题" name="theme" :rules="[{ required: false }]">
+    <a-form-item label="个人网站主题" name="theme" :rules="[{ required: false }]" style="display:none">
       <a-radio-group v-model:value="formState.theme" size="large" button-style="solid" class="radio-check">
         <a-radio-button v-for="item in theme_list" :value="item" class="theme_thumbnail"><img :src="'images/'+ item +'.png'" /></a-radio-button>
       </a-radio-group>
@@ -110,7 +110,7 @@ export default defineComponent({
       <a-input-password v-model:value="formState.current_pwd" />
     </a-form-item>
 
-    <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
+    <a-form-item :wrapper-col="{ offset: 6, span: 16}">
       <a-button type="primary" html-type="submit" :loading="iconLoading">提交</a-button>
     </a-form-item>
   </a-form>

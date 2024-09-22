@@ -5,15 +5,9 @@
     padding:5px;
     text-align: center;
   }
-  
-  .content-dark-theme {
-    background: #001529;
-    border-style:solid;
-    border-width:10px;
-    border-color:#001529;
-    padding:10px;
-    color:rgba(255, 255, 255, 0.65);
-  }
+
+
+
   .content-light-theme {
     background: #fff;
     border-style:solid;
@@ -23,7 +17,27 @@
     color:#000;
   }
   
+
+    
+  .content-dark-theme {
+    background: #001529;
+    border-style:solid;
+    border-width:10px;
+    border-color:#001529;
+    padding:10px;
+    color:rgba(255, 255, 255, 0.65);
+  }
+
   
+  .content-dark-theme .ant-result-title ,  .content-dark-theme .ant-result-subtitle{
+    color:rgba(255, 255, 255, 0.65);
+  }
+
+
+  .content-dark-theme .font-color-by-theme{
+    color:rgba(255, 255, 255, 0.65);
+  }
+
   
   .footer-dark-theme {
     background: #001529;
@@ -39,32 +53,20 @@
     color:rgba(255, 255, 255, 0.65) !important;
   }
   
-  .content-light-theme h3{
-    color:#000 !important;
-  }
   
   .content-dark-theme label{
     color:rgba(255, 255, 255, 0.65) !important;
   }
   
-  .content-light-theme label{
-    color:#000 !important;
-  }
-  
-
 
   .drawer-dark-theme .ant-drawer-content-wrapper *{
     background: #001529;
     color:rgba(255, 255, 255, 0.65);
   }
-  .drawer-light-theme .ant-drawer-content-wrapper *{
+
+  .xxdrawer-light-theme .ant-drawer-content-wrapper *{
     background: #fff;
     color:#000;
-  }
-
-  .drawer-dark-theme .ant-drawer-content-wrapper *{
-    background: #001529;
-    color:rgba(255, 255, 255, 0.65);
   }
 
 
@@ -103,14 +105,16 @@
     background-color: var(--ad-primary-color) !important;
     border-color: var(--ad-border-color) !important;
   }
-
   .content-dark-theme  {
     --w-e-textarea-bg-color: #cccccc;   /*wanteditor深色模式*/
   }
 
+      
+ iframe {
+    background-color: #cccccc !important;  /*百度编辑器背景颜色不好切换，固定*/
+  }
 
 
-    
   .drawer-dark-theme .ant-select-selector {
     background-color: #001529 !important;
   }

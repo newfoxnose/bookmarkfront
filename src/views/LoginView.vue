@@ -4,7 +4,7 @@
 
   <a-result v-if="logged==0" title="检查是否已登入......" sub-title="请稍等.......">
   </a-result>
-  <a-form v-if="logged==1" :model="formState" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
+  <a-form v-if="logged==1" :model="formState" name="basic" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }" autocomplete="off"
     @finish="login" @finishFailed="onFinishFailed">
 
     <a-form-item label="邮箱" name="email" :rules="[{ type: 'email', required: true, message: '请输入有效邮箱地址' }]">
@@ -24,11 +24,11 @@
       </a-input>
     </a-form-item>
 
-    <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+    <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
       <a-checkbox v-model:checked="checked">仅在此设备登入</a-checkbox>
     </a-form-item>
 
-    <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+    <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
       <a-button type="primary" html-type="submit" :loading="iconLoading">登入</a-button>
     </a-form-item>
   </a-form>

@@ -84,11 +84,6 @@ const router = createRouter({
       name: "blog",
       component: () => import("../views/BlogView.vue"),
       //meta: { "composetype": "diary" }   //这是另一种传参方法，备用
-    },
-    {
-      path: "/collection",
-      name: "collection",
-      component: () => import("../views/CollectionView.vue"),
     },{
       path: "/chat",
       name: "chat",

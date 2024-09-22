@@ -1,7 +1,7 @@
 <template>
     
     <h3>注册</h3>
-  <a-form :model="formState" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
+  <a-form :model="formState" name="basic" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }" autocomplete="off"
     @finish="reg" @finishFailed="onFinishFailed">
 
     <a-form-item label="邮箱" name="email" :rules="[{ type: 'email', required: true, message: '请输入有效邮箱地址' }]">
@@ -25,7 +25,7 @@
     </a-form-item>
 
 
-    <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+    <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
       <a-button type="primary" html-type="submit" :loading="iconLoading">注册</a-button>
     </a-form-item>
   </a-form>
