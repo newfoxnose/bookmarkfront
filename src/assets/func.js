@@ -29,6 +29,19 @@ export default {
     const regex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
     return regex.test(url);
   },
+  current_date_time(){
+    var currentDateTime = new Date();
+ 
+    // 获取日期的各个部分
+    var year = currentDateTime.getFullYear(); // 年份
+    var month = currentDateTime.getMonth() + 1; // 月份，+1因为getMonth()返回的月份从0开始
+    var day = currentDateTime.getDate(); // 日期
+    var hours = currentDateTime.getHours(); // 小时
+    var minutes = currentDateTime.getMinutes(); // 分钟
+    var seconds = currentDateTime.getSeconds(); // 秒钟
+    var formattedDateTime = year + '-' + month.toString().padStart(2, '0') + '-' + day.toString().padStart(2, '0') + ' ' + hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+    return formattedDateTime;
+  },
   timeFormat(timeStamp) {
     timeStamp = String(timeStamp).slice(0, 13);
     timeStamp = Number(timeStamp);
