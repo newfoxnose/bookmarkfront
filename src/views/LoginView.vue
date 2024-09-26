@@ -105,6 +105,7 @@ export default defineComponent({
             window.location.href ="/home"
           }
           else{
+            $cookies.set("token", "", "-720h");
             logged.value = 1;
           }
       }).catch(error => {

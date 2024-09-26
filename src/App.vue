@@ -13,7 +13,7 @@ import {
   WifiOutlined,
   MoreOutlined,
   UserAddOutlined,
-  LoginOutlined,
+  LoginOutlined,CalendarOutlined,
 } from "@ant-design/icons-vue";
 
 export default defineComponent({
@@ -26,7 +26,7 @@ export default defineComponent({
     WifiOutlined,
     MoreOutlined,
     UserAddOutlined,
-    LoginOutlined,
+    LoginOutlined,CalendarOutlined
   },
   data() {
     return {
@@ -115,6 +115,10 @@ export default defineComponent({
           <a-menu-item key="6">
             <wifi-outlined />
             <RouterLink to="/feed" style="padding-left: 8px">RSS</RouterLink>
+          </a-menu-item>
+          <a-menu-item key="17">
+            <calendar-outlined />
+            <RouterLink to="/calendar" style="padding-left: 8px">日历</RouterLink>
           </a-menu-item>
           <a-sub-menu key="sub1">
             <template #title>
