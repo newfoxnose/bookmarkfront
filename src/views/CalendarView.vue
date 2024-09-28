@@ -58,11 +58,12 @@
         :rules="[{ required: true, message: '颜色' }]"
       >
         <a-radio-group v-model:value="formState.badge_type">
-          <a-radio value="success"><a-badge status="success" /></a-radio>
-          <a-radio value="error"><a-badge status="error" /></a-radio>
-          <a-radio value="default"> <a-badge status="default" /></a-radio>
-          <a-radio value="processing"><a-badge status="processing" /></a-radio>
-          <a-radio value="warning"><a-badge status="warning" /></a-radio>
+          <a-radio value="red"><a-badge color="red"  class="big-dot" /></a-radio>
+          <a-radio value="yellow"><a-badge color="yellow"  class="big-dot" /></a-radio>
+          <a-radio value="orange"> <a-badge color="orange"  class="big-dot" /></a-radio>
+          <a-radio value="green"><a-badge color="green"  class="big-dot" /></a-radio>
+          <a-radio value="blue"><a-badge color="blue"  class="big-dot" /></a-radio>
+          <a-radio value="purple"><a-badge color="purple" class="big-dot" /></a-radio>
         </a-radio-group>
       </a-form-item>
 
@@ -161,6 +162,7 @@
 .notes-month section {
   font-size: 28px;
 }
+
 </style>
 <script>
 import { message, Modal } from "ant-design-vue";
@@ -229,7 +231,7 @@ export default defineComponent({
           formState.value.remark = event.remark;
         });
       } else {
-        formState.value.event_id = '';
+        formState.value.event_id = "";
         formState.value.start_time = ref(
           dayjs(selectedValue, "YYYY-MM-DD HH:mm:ss")
         );
@@ -268,7 +270,7 @@ export default defineComponent({
       console.log("select" + dayjs(value).format("YYYY-MM-DD HH:mm:ss"));
     };
     const onPanelChange = (value) => {
-      console.log("PanelChanged的参数是："+value);
+      console.log("PanelChanged的参数是：" + value);
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
@@ -283,7 +285,7 @@ export default defineComponent({
       onPanelChange(selectedValue.value);
     });
     const getListData = (value) => {
-      console.log("事件数量："+eventList.value.length)
+      console.log("事件数量：" + eventList.value.length);
       let listData = [];
       //console.log(value.format("MM-DD"));
       for (let i = 0; i < eventList.value.length; i++) {
@@ -301,7 +303,7 @@ export default defineComponent({
       return listData || [];
     };
     const getMonthData = (value) => {
-      console.log(value.month())
+      console.log(value.month());
     };
     const save = () => {
       iconLoading.value = true;

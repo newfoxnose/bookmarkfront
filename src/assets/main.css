@@ -55,11 +55,11 @@
   
   
   .content-dark-theme label{
-    color:rgba(255, 255, 255, 0.65) !important;
+    color:#999 !important;
   }
   
 
-  .drawer-dark-theme .ant-drawer-content-wrapper *{
+  .drawer-dark-theme .ant-drawer-content-wrapper *:not(.ant-badge-status-dot){
     background: #001529;
     color:rgba(255, 255, 255, 0.65);
   }
@@ -98,6 +98,32 @@
     color:#fff !important;
   }
 
+
+  .content-dark-theme .ant-picker-calendar-header{
+    background-color: #336699 !important;
+    color:#fff !important;
+  }
+
+  .content-dark-theme .ant-picker-calendar{
+    background-color: #336699 !important;
+    color:#fff !important;
+  }
+  .content-dark-theme .ant-picker-content{
+    background-color: #336699 !important;
+    color:#fff !important;
+  }
+
+  .content-dark-theme  .ant-picker-date-panel .ant-picker-body{
+    padding:0;
+  }
+  .content-dark-theme  .ant-picker-month-panel .ant-picker-body{
+    padding:0;
+  }
+
+  .ant-form-item-control-input-content .ant-badge-status-dot{
+    height:12px;
+    width:12px;
+  }
 
 
   .content-dark-theme .wanteditortoolbar *{
@@ -159,3 +185,8 @@
  .drawer-light-theme.ant-select-item-option-active  {
     background-color: #eee;
   }
+
+
+
+
+  
