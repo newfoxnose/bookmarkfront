@@ -12,16 +12,21 @@
     />
   </div>
   <p style="margin-top: 15px">
-    <a-button type="primary" @click="showDrawer('新建笔记', 0, 0)"
-      ><form-outlined />新建笔记</a-button
-    >
+    <a-button type="primary" @click="showDrawer('新建笔记', 0)" ><form-outlined />新建笔记</a-button>
   </p>
   <div>
     <a-image-preview-group>
       <div v-for="item in fileitems" style="margin-bottom: 5px">
+       
         <span class="ext">{{ item.id }}</span>
-        <a @click="showDrawer(item.title, item.id, item.is_private)">
-          {{ item.title == "" ? "无标题" : item.title }}
+        <a @click="showDrawer(item.title, item.id)">
+          
+
+
+          {{ item.is_private == "1" ? "该笔记为私密" : item.title }}
+
+
+
         </a>
         <eye-invisible-two-tone
           v-if="item.is_private == '1'"
@@ -55,16 +60,17 @@
       show-less-items
     />
   </div>
-  <a-modal
-    v-model:visible="visible"
+
+  <a-drawer
+    :width="500"
+    :height="600"
     :title="updatedDrawerTitle"
-    width="100%"
-    wrap-class-name="full-modal"
+    placement="bottom"
+    :visible="visible"
     :class="drawerclass"
     @close="onClose"
-    @ok="save"
   >
-    <template #footer>
+    <template #extra>
       <a-button type="primary" @click="save()" :loading="iconLoading"
         >保存</a-button
       >
@@ -76,35 +82,35 @@
       <a-row>
         <a-col :span="8">
           <p>
-            <a-input
-              v-model:value="formState.title"
-              placeholder="请输入标题"
-            /></p
+              <a-input v-model:value="formState.title" placeholder="请输入标题" />
+        </p
         ></a-col>
         <a-col :span="8">
           <p style="padding-left: 20px">
-            <a-select
-              style="width: 100%"
-              v-model:value="formState.folder_id"
-              v-if="folder_list"
-            >
-              <a-select-option
-                v-for="item in folder_list"
-                :value="item.value"
-                :lv="item.lv"
-                :class="drawerclass"
+              <a-select
+                style="width: 100%"
+                v-model:value="formState.folder_id"
+                v-if="folder_list"
               >
-                {{ item.name }}</a-select-option
-              >
-            </a-select>
+                <a-select-option
+                  v-for="item in folder_list"
+                  :value="item.value"
+                  :lv="item.lv"
+                  :class="drawerclass"
+                >
+                  {{ item.name }}</a-select-option
+                >
+              </a-select>
           </p></a-col
         >
         <a-col :span="8">
-          <p style="padding-left: 20px; white-space: nowrap">
+          <p style="padding-left: 20px;white-space: nowrap;">
             <a-checkbox v-model:checked="formState.is_recommend"
               >置顶</a-checkbox
             >
-            <a-checkbox v-model:checked="formState.is_private">私密</a-checkbox>
+            <a-checkbox v-model:checked="formState.is_private"
+              >私密</a-checkbox
+            >
           </p></a-col
         >
       </a-row>
@@ -114,57 +120,8 @@
       :config="editorConfig"
       editor-id="editor-demo-01"
     ></vue-ueditor-wrap>
-  </a-modal>
-  <a-modal
-    v-model:visible="visible_inputpassword"
-    title="请输入密码查看私密笔记"
-  >
-    <a-form :model="formState_inputpassword">
-      <a-form-item
-        label="密码"
-        name="password2"
-        :rules="[{ required: true, message: '请输入至少6位密码' }]"
-      >
-        <a-input-password v-model:value="formState_inputpassword.password" />
-      </a-form-item>
-    </a-form>
-    <template #footer>
-      <a-button
-        type="primary"
-        @click="
-          showDrawer(
-            private_blog.title,
-            private_blog.id,
-            0,
-            formState_inputpassword.password
-          )
-        "
-        :loading="iconLoading"
-        >提交</a-button
-      >
-      &nbsp;
-      <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
-    </template>
-  </a-modal>
+  </a-drawer>
 </template>
-<style lang="less">
-.full-modal {
-  .ant-modal {
-    max-width: 100%;
-    top: 0;
-    padding-bottom: 0;
-    margin: 0;
-  }
-  .ant-modal-content {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh);
-  }
-  .ant-modal-body {
-    flex: 1;
-  }
-}
-</style>
 <style scoped>
 .ext {
   text-align: center;
@@ -178,7 +135,7 @@
   border-color: crimson;
   padding: 2px;
   margin: 3px;
-  margin-right: 5px;
+  margin-right:5px;
 }
 
 .loadingbar {
@@ -212,8 +169,8 @@ export default {
     FormOutlined,
   },
   setup() {
-    $cookies.set("selectedkey", "5", "720h");
-    $cookies.set("openkey", "");
+    $cookies.set('selectedkey','5',"720h") 
+    $cookies.set('openkey','') 
     const formState = ref([]);
     formState.value.title = "";
     formState.value.is_private = false;
@@ -239,59 +196,41 @@ export default {
     const updatedDrawerTitle = ref(String);
     const visible = ref(false);
     const blog_id = ref(0);
-    const drawerclass = ref("");
-
-    const visible_inputpassword = ref(false);
-    const formState_inputpassword = ref([]);
-    const private_blog = ref([]);
-    const showDrawer = (drawerTitle, id, is_private, password) => {
-      console.log(drawerTitle, id, is_private, password)
-      if (is_private == 0) {
-        drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
-        updatedDrawerTitle.value = drawerTitle;
-        if (id != 0) {
-          blog_id.value = id;
-          let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-          params.append("token", $cookies.get("token"));
-          params.append("timestamp", new Date().getTime());
-          params.append("blog_id", blog_id.value);
-          params.append("password", password);
-          proxy.$http.post("/ajax/get_blog_ajax/", params).then((res) => {
-            console.log(res.data)
-            if (res.data.code == "201") {
-              message.error("密码错误");
-            } else {
-              visible.value = true;
-              visible_inputpassword.value = false;
-              valueHtml.value = res.data.data.blog.content;
-              defaultPercent.value = 100;
-              loadingdone.value = true;
-              formState.value.title = res.data.data.blog.title;
-              formState.value.folder_id = res.data.data.blog.folder_id;
-              if (res.data.data.blog.is_private == 1) {
-                formState.value.is_private = true;
-              } else {
-                formState.value.is_private = false;
-              }
-              if (res.data.data.blog.is_recommend == 1) {
-                formState.value.is_recommend = true;
-              } else {
-                formState.value.is_recommend = false;
-              }
-            }
-          });
-        } else {
-          visible.value = true;
-          formState.value.title = "无标题";
-          formState.value.folder_id = -1;
-          formState.value.is_private = false;
-          formState.value.is_recommend = false;
-          valueHtml.value = "<p>写点什么呢？</p>";
-        }
+    const drawerclass = ref('');
+    const showDrawer = (drawerTitle, id) => {
+      drawerclass.value="drawer-"+$cookies.get('theme')+"-theme"
+      visible.value = true;
+      updatedDrawerTitle.value = drawerTitle;
+      if (id != 0) {
+        blog_id.value = id;
+        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+        params.append("token", $cookies.get("token"));
+        params.append("timestamp", new Date().getTime());
+        params.append("blog_id", blog_id.value);
+        proxy.$http.post("/ajax/get_blog_ajax/", params).then((res) => {
+          //console.log(res.data.data.blog)
+          valueHtml.value = res.data.data.blog.content;
+          defaultPercent.value = 100;
+          loadingdone.value = true;
+          formState.value.title = res.data.data.blog.title;
+          formState.value.folder_id = res.data.data.blog.folder_id;
+          if (res.data.data.blog.is_private == 1) {
+            formState.value.is_private = true;
+          } else {
+            formState.value.is_private = false;
+          }
+          if (res.data.data.blog.is_recommend == 1) {
+            formState.value.is_recommend = true;
+          } else {
+            formState.value.is_recommend = false;
+          }
+        });
       } else {
-        private_blog.value.title = drawerTitle;
-        private_blog.value.id = id;
-        visible_inputpassword.value = true;
+        formState.value.title = "";
+        formState.value.folder_id = -1;
+        formState.value.is_private = false;
+        formState.value.is_recommend = false;
+        valueHtml.value = "<p>写点什么呢？</p>";
       }
     };
 
@@ -309,7 +248,6 @@ export default {
     const onClose = () => {
       iconLoading.value = false;
       visible.value = false;
-      visible_inputpassword.value = false;
       blog_id.value = 0;
     };
 
@@ -441,10 +379,7 @@ export default {
       updatedDrawerTitle,
       blog_id,
       showconfirmdelete,
-      drawerclass,
-      visible_inputpassword,
-      formState_inputpassword,
-      private_blog,
+      drawerclass
     };
   },
   created() {
