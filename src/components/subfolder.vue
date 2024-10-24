@@ -21,6 +21,10 @@ defineProps({
     type: Number,
     required: false,
   },
+  father_id: {
+    type: Number,
+    required: false,
+  },
   folder_id: {
     type: String,
     required: true,
@@ -95,15 +99,17 @@ export default {
     v-show="showTitle(subFolderRefs)"
     :folderid="folder_id"
     :display_offset="display_offset"
-    :style="{ 'margin-left': display_offset * 15 + 'px' }"
+    :style="{ 'margin-left': display_offset * 20 + 'px' }"
   >
-    <h3>{{ folder_name }}</h3>
+    <h3 v-if="father_id!='-1'">{{ folder_name }}</h3>
     <div
       class="item"
       v-show="isShow(bookmarkitem.title, bookmarkitem.pinyin, bookmarkitem.url)"
       v-for="bookmarkitem in folder_bookmark"
       :itemid="bookmarkitem.id"
     >
+    
+    <span v-if="father_id!='-1'" style="padding-left:20px;"></span>
       <img
         v-if="editable == 'yes'"
         :src="bookmarkitem.icon_display"
@@ -201,7 +207,9 @@ export default {
   .item {
     width: 33%;
     margin-top: 0;
-    padding: 0.4rem 0 1rem 2rem;
+    padding-top:0.4rem;
+    padding-left:0rem;
+    padding-bottom:1rem;
   }
 }
 </style>

@@ -54,7 +54,8 @@ export default {
   .item {
     width: 33%;
     margin-top: 0;
-    padding: 0.4rem 0 1rem 2rem;
+    padding-top:0.4rem;
+    padding-bottom:1rem;
   }
 }
 </style>

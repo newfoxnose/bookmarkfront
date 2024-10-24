@@ -529,7 +529,6 @@ export default defineComponent({
   >
     <a-tab-pane :key="0" tab="根目录">
       <div :folderid="-1">
-        <h3>根目录</h3>
         <bookmarkitem
           v-for="bookmarkitem in items.root_bookmarks"
           :id="bookmarkitem.id"
@@ -552,7 +551,6 @@ export default defineComponent({
     </a-tab-pane>
     <a-tab-pane :key="1" tab="最近收藏">
       <div>
-        <h3>最近收藏</h3>
         <bookmarkitem
           v-for="bookmarkitem in items.latest_bookmarks"
           :id="bookmarkitem.id"
@@ -581,6 +579,7 @@ export default defineComponent({
       <subfolder
         :folder_name="item.folder_name"
         :folder_id="item.id"
+        :father_id="item.father_id"
         :folder_bookmark="item.bookmarks"
         :subfolder="item.subfolder"
         :search="''"
