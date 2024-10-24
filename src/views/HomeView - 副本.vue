@@ -7,13 +7,7 @@ import {
   StarOutlined,
   PlusOutlined,
 } from "@ant-design/icons-vue";
-import {
-  defineComponent,
-  ref,
-  reactive,
-  getCurrentInstance,
-  onMounted,
-} from "vue";
+import { defineComponent, ref, reactive, getCurrentInstance,onMounted } from "vue";
 import { message, Modal } from "ant-design-vue";
 import html2canvas from "html2canvas";
 export default defineComponent({
@@ -26,19 +20,20 @@ export default defineComponent({
     PlusOutlined,
   },
   setup() {
-    $cookies.set("selectedkey", "1", "720h");
-    $cookies.set("openkey", "");
+    $cookies.set('selectedkey','1',"720h") 
+    $cookies.set('openkey','') 
     const iconLoading = ref(false);
     const visible = ref(false);
     const updatedDrawerTitle = ref(String);
 
     const screenshot = ref(null);
 
+
     const showDrawer = (drawerTitle) => {
       visible.value = true;
       updatedDrawerTitle.value = drawerTitle;
-      urlshot_items.value = null;
-      drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
+      urlshot_items.value=null
+      drawerclass.value="drawer-"+$cookies.get('theme')+"-theme"
     };
     const onClose = () => {
       iconLoading.value = false;
@@ -56,7 +51,8 @@ export default defineComponent({
     const showconfirmdelete = (editId) => {
       Modal.confirm({
         title: "确认删除该项目吗？",
-        content: "点击OK删除且无法找回, 点击cancel取消",
+        content:
+          "点击OK删除且无法找回, 点击cancel取消",
         onOk() {
           addBookmark(editId, "删除");
         },
@@ -75,19 +71,14 @@ export default defineComponent({
     const is_recommend = ref(false);
     const is_friendlink = ref(false);
     const loadingdone = ref(false);
-    const urlshot_items = ref([]);
+    const urlshot_items=ref([]);
     const { proxy } = getCurrentInstance();
 
-    const drawerclass = ref("");
+    const drawerclass = ref('');
 
-    const activeKey = ref(0);
-    const callback = (val) => {
-      console.log(val);
-    };
-
-    async function takeUrlshot(id, url) {
-      console.log(id);
-      console.log(url);
+    async function takeUrlshot(id,url) {
+      console.log(id)
+      console.log(url)
       try {
         let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
         //params.append("url", formState.value.feed_url);
@@ -102,7 +93,7 @@ export default defineComponent({
             if (res.data.data != "") {
               //console.log(res.data.data);
               message.info("成功获取网页内容");
-              takeScreenshot(id, res.data.data);
+              takeScreenshot(id,res.data.data);
             } else {
               message.info("未获取到网页内容");
             }
@@ -116,8 +107,8 @@ export default defineComponent({
         console.error("生成快照失败:", error);
       }
     }
-
-    async function takeScreenshot(id, content) {
+    
+    async function takeScreenshot(id,content) {
       try {
         let tempNode = document.createElement("div");
         //tempNode.innerHTML ='<div><h1>哈哈哈</h1></div>';
@@ -157,21 +148,24 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
 
-      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
-        if (folder_res.data.code == "401") {
-          //不在登陆状态跳转到首页
-          window.location.href = "/";
-        }
-        folder_list.value = folder_res.data.data.data;
-        folder_id.value = folder_res.data.data.data[0].value;
-      });
+      proxy.$http
+        .post("/ajax/get_folder_ajax/", params)
+        .then((folder_res) => {
+          if (folder_res.data.code == "401") {
+            //不在登陆状态跳转到首页
+            window.location.href = "/";
+          }
+          folder_list.value = folder_res.data.data.data;
+          folder_id.value = folder_res.data.data.data[0].value;
+        });
 
       proxy.$http.post("/ajax/home_stream_ajax/0/", params).then((res) => {
-        console.log(res.data);
+        console.log(res.data)
         items.value = res.data.data;
         if (res.data.data.next_folder_index != -1) {
           home_stream_ajax(0);
@@ -201,7 +195,7 @@ export default defineComponent({
             });
           }
         });
-    };
+    }
 
     const addBookmark = (id, action) => {
       if (url.value != "" && title.value != "" && folder_id.value != "") {
@@ -212,22 +206,26 @@ export default defineComponent({
         params.append("folder_id", folder_id.value);
         if (is_private.value == true) {
           params.append("is_private", 1);
-        } else {
+        }
+        else {
           params.append("is_private", 0);
         }
         if (is_published.value == true) {
           params.append("is_published", 1);
-        } else {
+        }
+        else {
           params.append("is_published", 0);
         }
         if (is_recommend.value == true) {
           params.append("is_recommend", 1);
-        } else {
+        }
+        else {
           params.append("is_recommend", 0);
         }
         if (is_friendlink.value == true) {
           params.append("is_friendlink", 1);
-        } else {
+        }
+        else {
           params.append("is_friendlink", 0);
         }
         params.append("timestamp", new Date().getTime());
@@ -281,12 +279,6 @@ export default defineComponent({
                   temp_item
                 );
               }
-              proxy.$http
-                .post("/ajax/latest_stream_ajax", params)
-                .then((res) => {
-                  //console.log(folder_index);
-                  items.value.latest_bookmarks = res.data.data.latest_bookmarks;
-                });
               onClose();
             }
           })
@@ -326,9 +318,7 @@ export default defineComponent({
       takeScreenshot,
       screenshot,
       urlshot_items,
-      drawerclass,
-      callback,
-      activeKey,
+      drawerclass
     };
   },
   data() {
@@ -339,7 +329,7 @@ export default defineComponent({
       clicked: false,
       editId: "",
       new_folder: "",
-      new_folder_clicked: false,
+      new_folder_clicked: false
     };
   },
   watch: {
@@ -391,16 +381,18 @@ export default defineComponent({
           this.folder_id = folder_id;
         }
         let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("id", id);
-        this.$http.post("/ajax/list_urlshot_ajax/", params).then((res) => {
-          console.log(res.data.data);
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+      params.append("id", id);
+      this.$http
+        .post("/ajax/list_urlshot_ajax/", params)
+        .then((res) => {
+          console.log(res.data.data)
           if (res.data.code == "401") {
             //不在登陆状态
             window.location.href = "/";
           }
-          this.urlshot_items = res.data.data.urlshot;
+          this.urlshot_items=res.data.data.urlshot;
         });
       } else {
         this.showDrawer("新建书签");
@@ -522,87 +514,7 @@ export default defineComponent({
     />
   </div>
 
-  <a-tabs
-    v-if="search == ''"
-    v-model:activeKey="activeKey"
-    @tabScroll="callback"
-  >
-    <a-tab-pane :key="0" tab="最新收藏">
-      <div>
-        <h3>最新收藏</h3>
-        <bookmarkitem
-          v-for="bookmarkitem in items.latest_bookmarks"
-          :id="bookmarkitem.id"
-          :folder_id="bookmarkitem.folder_id"
-          :url="bookmarkitem.url"
-          :title="bookmarkitem.title"
-          :pinyin="bookmarkitem.pinyin"
-          :short_title="bookmarkitem.short_title"
-          :is_private="bookmarkitem.is_private"
-          :is_published="bookmarkitem.is_published"
-          :is_recommend="bookmarkitem.is_recommend"
-          :is_friendlink="bookmarkitem.is_friendlink"
-          :http_code="bookmarkitem.http_code"
-          :icon="bookmarkitem.icon_display"
-          :search="''"
-          :editable="editable"
-          @editbookmark="fatherMethod"
-        ></bookmarkitem>
-      </div>
-    </a-tab-pane>
-    <a-tab-pane :key="1" tab="根目录">
-      <div :folderid="-1">
-        <h3>根目录</h3>
-        <bookmarkitem
-          v-for="bookmarkitem in items.root_bookmarks"
-          :id="bookmarkitem.id"
-          :folder_id="bookmarkitem.folder_id"
-          :url="bookmarkitem.url"
-          :title="bookmarkitem.title"
-          :pinyin="bookmarkitem.pinyin"
-          :short_title="bookmarkitem.short_title"
-          :is_private="bookmarkitem.is_private"
-          :is_published="bookmarkitem.is_published"
-          :is_recommend="bookmarkitem.is_recommend"
-          :is_friendlink="bookmarkitem.is_friendlink"
-          :http_code="bookmarkitem.http_code"
-          :icon="bookmarkitem.icon_display"
-          :search="''"
-          :editable="editable"
-          @editbookmark="fatherMethod"
-        ></bookmarkitem>
-      </div>
-    </a-tab-pane>
-    <a-tab-pane
-      v-for="item in items.folder"
-      :key="item.folder_name"
-      :tab="`${item.folder_name}`"
-    >
-      <subfolder
-        :folder_name="item.folder_name"
-        :folder_id="item.id"
-        :folder_bookmark="item.bookmarks"
-        :subfolder="item.subfolder"
-        :search="''"
-        :editable="editable"
-        :fatherMethod="fatherMethod"
-        :display_offset="item.display_offset"
-      >
-      </subfolder>
-    </a-tab-pane>
-  </a-tabs>
-
-  <div v-if="search !== ''">
-    关键词<span
-      style="
-        color: red;
-        padding-left: 3px;
-        padding-right: 3px;
-        font-weight: bold;
-      "
-      >{{ search }}</span
-    >的搜索结果：
-    <hr />
+  <div :folderid="-1">
     <h3>根目录</h3>
     <bookmarkitem
       v-for="bookmarkitem in items.root_bookmarks"
@@ -622,20 +534,22 @@ export default defineComponent({
       :editable="editable"
       @editbookmark="fatherMethod"
     ></bookmarkitem>
-    <div v-for="item in items.folder">
-      <subfolder
-        :folder_name="item.folder_name"
-        :folder_id="item.id"
-        :folder_bookmark="item.bookmarks"
-        :subfolder="item.subfolder"
-        :search="search"
-        :editable="editable"
-        :fatherMethod="fatherMethod"
-        :display_offset="item.display_offset"
-      >
-      </subfolder>
-    </div>
   </div>
+
+  <div v-for="item in items.folder">
+    <subfolder
+      :folder_name="item.folder_name"
+      :folder_id="item.id"
+      :folder_bookmark="item.bookmarks"
+      :subfolder="item.subfolder"
+      :search="search"
+      :editable="editable"
+      :fatherMethod="fatherMethod"
+      :display_offset="item.display_offset"
+    >
+    </subfolder>
+  </div>
+
   <div style="margin-bottom: 20px">&nbsp;</div>
 
   <div class="search-div">
@@ -668,14 +582,14 @@ export default defineComponent({
         >删除</a-button
       >
     </template>
-    <p style="display: none">
+    <p style="display:none">
       <span v-if="urlshot_items">已有快照：</span>
       <span v-for="item in urlshot_items">
         <a :href="item.key" target="_blank">{{ item.date }}</a>
       </span>
       <a-button
         type="primary"
-        @click="takeUrlshot(editId, url)"
+        @click="takeUrlshot(editId,url)"
         :loading="iconLoading"
         >生成快照</a-button
       >
@@ -706,13 +620,9 @@ export default defineComponent({
           {{ item.name }}</a-select-option
         >
       </a-select>
-    </p>
-    <p>
-      <a-input
-        v-model:value="new_folder"
-        placeholder="在当前位置创建新目录"
-        style="width: 100%"
-      >
+      </p>
+      <p>
+      <a-input v-model:value="new_folder" placeholder="在当前位置创建新目录" style="width: 100%">
         <template #addonAfter>
           <plus-outlined @click="newFolder" v-if="!new_folder_clicked" />
           <a-spin size="small" v-if="new_folder_clicked" />
@@ -737,6 +647,8 @@ export default defineComponent({
 </template>
 
 <style scoped>
+
+
 .folder-name {
   margin-top: 2rem;
   display: flex;
