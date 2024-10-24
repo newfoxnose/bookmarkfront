@@ -527,11 +527,11 @@ export default defineComponent({
     v-model:activeKey="activeKey"
     @tabScroll="callback"
   >
-    <a-tab-pane :key="0" tab="最新收藏">
-      <div>
-        <h3>最新收藏</h3>
+    <a-tab-pane :key="0" tab="根目录">
+      <div :folderid="-1">
+        <h3>根目录</h3>
         <bookmarkitem
-          v-for="bookmarkitem in items.latest_bookmarks"
+          v-for="bookmarkitem in items.root_bookmarks"
           :id="bookmarkitem.id"
           :folder_id="bookmarkitem.folder_id"
           :url="bookmarkitem.url"
@@ -550,11 +550,11 @@ export default defineComponent({
         ></bookmarkitem>
       </div>
     </a-tab-pane>
-    <a-tab-pane :key="1" tab="根目录">
-      <div :folderid="-1">
-        <h3>根目录</h3>
+    <a-tab-pane :key="1" tab="最新收藏">
+      <div>
+        <h3>最新收藏</h3>
         <bookmarkitem
-          v-for="bookmarkitem in items.root_bookmarks"
+          v-for="bookmarkitem in items.latest_bookmarks"
           :id="bookmarkitem.id"
           :folder_id="bookmarkitem.folder_id"
           :url="bookmarkitem.url"
