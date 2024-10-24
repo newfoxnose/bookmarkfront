@@ -188,5 +188,6 @@
 
 
 
-
-  
+  .content-dark-theme .ant-tabs-tab-btn[aria-selected=false] {
+    color: rgba(255, 255, 255, 0.65);
+  }

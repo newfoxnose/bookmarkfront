@@ -525,7 +525,7 @@ export default defineComponent({
   <a-tabs
     v-if="search == ''"
     v-model:activeKey="activeKey"
-    @tabScroll="callback"
+    @tabScroll="callback" 
   >
     <a-tab-pane :key="0" tab="根目录">
       <div :folderid="-1">
@@ -550,9 +550,9 @@ export default defineComponent({
         ></bookmarkitem>
       </div>
     </a-tab-pane>
-    <a-tab-pane :key="1" tab="最新收藏">
+    <a-tab-pane :key="1" tab="最近收藏">
       <div>
-        <h3>最新收藏</h3>
+        <h3>最近收藏</h3>
         <bookmarkitem
           v-for="bookmarkitem in items.latest_bookmarks"
           :id="bookmarkitem.id"
