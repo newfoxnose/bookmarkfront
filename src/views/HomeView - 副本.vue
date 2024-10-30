@@ -34,27 +34,6 @@ export default defineComponent({
 
     const screenshot = ref(null);
 
-    const url = ref(String);
-    const title = ref(String);
-    const folder_id = ref(String);
-    const items = ref([]);
-    const folder_list = ref([]);
-    const is_private = ref(false);
-    const is_published = ref(false);
-    const is_recommend = ref(false);
-    const is_friendlink = ref(false);
-    const loadingdone = ref(false);
-    const urlshot_items = ref([]);
-    const { proxy } = getCurrentInstance();
-
-    const drawerclass = ref("");
-
-    const activeKey = ref(0);
-
-    const visible_inputpassword = ref(false);
-    const formState_inputpassword = ref([]);
-    const show_private = ref(false);
-
     const showDrawer = (drawerTitle) => {
       visible.value = true;
       updatedDrawerTitle.value = drawerTitle;
@@ -64,7 +43,6 @@ export default defineComponent({
     const onClose = () => {
       iconLoading.value = false;
       visible.value = false;
-      visible_inputpassword.value = false;
     };
     const defaultPercent = ref(5);
     const increaseloading = () => {
@@ -87,15 +65,24 @@ export default defineComponent({
       });
     };
 
-    const clicktab = (key) => {
-      console.log(key);
-      if (key == -1) {
-        visible_inputpassword.value = true;
-      } else {
-        show_private.value = false;
-        visible_inputpassword.value = false;
-        formState_inputpassword.value.password = "";
-      }
+    const url = ref(String);
+    const title = ref(String);
+    const folder_id = ref(String);
+    const items = ref([]);
+    const folder_list = ref([]);
+    const is_private = ref(false);
+    const is_published = ref(false);
+    const is_recommend = ref(false);
+    const is_friendlink = ref(false);
+    const loadingdone = ref(false);
+    const urlshot_items = ref([]);
+    const { proxy } = getCurrentInstance();
+
+    const drawerclass = ref("");
+
+    const activeKey = ref(0);
+    const callback = (val) => {
+      console.log(val);
     };
 
     async function takeUrlshot(id, url) {
@@ -191,22 +178,7 @@ export default defineComponent({
         }
       });
     });
-    const private_stream_ajax = (password) => {
-      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("timestamp", new Date().getTime());
-      params.append("token", $cookies.get("token"));
-      params.append("password", password);
-      proxy.$http.post("/ajax/private_stream_ajax", params).then((res) => {
-        if (res.data.code == 200) {
-          console.log(res.data.data);
-          items.value.private_bookmarks = res.data.data.private_bookmarks;
-          visible_inputpassword.value = false;
-          show_private.value = true;
-        } else {
-          message.error("密码错误");
-        }
-      });
-    };
+
     const home_stream_ajax = (folder_index) => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("timestamp", new Date().getTime());
@@ -281,9 +253,7 @@ export default defineComponent({
               let temp_item = res.data.data;
               let folder_path = res.data.data.folder_path;
               if (id != "" && action == "删除") {
-                console.log(
-                  "start to delete item,folder_path is " + folder_path
-                );
+                console.log("start to delete item");
                 items.value = proxy.$func.insert_item(
                   items.value,
                   folder_path,
@@ -299,21 +269,17 @@ export default defineComponent({
                   temp_item,
                   "delete"
                 ); //删除旧的
-                if (is_private.value == false) {
-                  items.value = proxy.$func.insert_item(
-                    items.value,
-                    folder_path,
-                    temp_item
-                  ); //插入新的
-                }
+                items.value = proxy.$func.insert_item(
+                  items.value,
+                  folder_path,
+                  temp_item
+                ); //插入新的
               } else {
-                if (is_private.value == false) {
-                  items.value = proxy.$func.insert_item(
-                    items.value,
-                    folder_path,
-                    temp_item
-                  );
-                }
+                items.value = proxy.$func.insert_item(
+                  items.value,
+                  folder_path,
+                  temp_item
+                );
               }
               proxy.$http
                 .post("/ajax/latest_stream_ajax", params)
@@ -321,20 +287,6 @@ export default defineComponent({
                   //console.log(folder_index);
                   items.value.latest_bookmarks = res.data.data.latest_bookmarks;
                 });
-              if (formState_inputpassword.value.password != "") {
-                params.append(
-                  "password",
-                  formState_inputpassword.value.password
-                );
-                proxy.$http
-                  .post("/ajax/private_stream_ajax", params)
-                  .then((res) => {
-                    if (res.data.code == 200) {
-                      items.value.private_bookmarks =
-                        res.data.data.private_bookmarks;
-                    }
-                  });
-              }
               onClose();
             }
           })
@@ -375,12 +327,8 @@ export default defineComponent({
       screenshot,
       urlshot_items,
       drawerclass,
+      callback,
       activeKey,
-      clicktab,
-      visible_inputpassword,
-      formState_inputpassword,
-      show_private,
-      private_stream_ajax,
     };
   },
   data() {
@@ -447,12 +395,12 @@ export default defineComponent({
         params.append("timestamp", new Date().getTime());
         params.append("id", id);
         this.$http.post("/ajax/list_urlshot_ajax/", params).then((res) => {
-          //console.log(res.data);
-          if (res.data.code == "200") {
-            if (res.data.data != null) {
-              this.urlshot_items = res.data.data.urlshot;
-            }
+          console.log(res.data.data);
+          if (res.data.code == "401") {
+            //不在登陆状态
+            window.location.href = "/";
           }
+          this.urlshot_items = res.data.data.urlshot;
         });
       } else {
         this.showDrawer("新建书签");
@@ -575,35 +523,10 @@ export default defineComponent({
     />
   </div>
 
-  <a-modal
-    v-model:visible="visible_inputpassword"
-    title="请输入密码查看私密笔记"
-  >
-    <a-form :model="formState_inputpassword">
-      <a-form-item
-        label="密码"
-        name="password2"
-        :rules="[{ required: true, message: '请输入至少6位密码' }]"
-      >
-        <a-input-password v-model:value="formState_inputpassword.password" />
-      </a-form-item>
-    </a-form>
-    <template #footer>
-      <a-button
-        type="primary"
-        @click="private_stream_ajax(formState_inputpassword.password)"
-        :loading="iconLoading"
-        >提交</a-button
-      >
-      &nbsp;
-      <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
-    </template>
-  </a-modal>
-
   <a-tabs
     v-if="search == ''"
     v-model:activeKey="activeKey"
-    @tabClick="clicktab"
+    @tabScroll="callback" 
   >
     <a-tab-pane :key="0" tab="根目录">
       <div :folderid="-1">
@@ -651,7 +574,7 @@ export default defineComponent({
     </a-tab-pane>
     <a-tab-pane
       v-for="item in items.folder"
-      :key="item.id"
+      :key="item.folder_name"
       :tab="`${item.folder_name}`"
     >
       <subfolder
@@ -666,29 +589,6 @@ export default defineComponent({
         :display_offset="item.display_offset"
       >
       </subfolder>
-    </a-tab-pane>
-
-    <a-tab-pane :key="-1" tab="私有">
-      <div v-if="show_private == true">
-        <bookmarkitem
-          v-for="bookmarkitem in items.private_bookmarks"
-          :id="bookmarkitem.id"
-          :folder_id="bookmarkitem.folder_id"
-          :url="bookmarkitem.url"
-          :title="bookmarkitem.title"
-          :pinyin="bookmarkitem.pinyin"
-          :short_title="bookmarkitem.short_title"
-          :is_private="bookmarkitem.is_private"
-          :is_published="bookmarkitem.is_published"
-          :is_recommend="bookmarkitem.is_recommend"
-          :is_friendlink="bookmarkitem.is_friendlink"
-          :http_code="bookmarkitem.http_code"
-          :icon="bookmarkitem.icon_display"
-          :search="''"
-          :editable="editable"
-          @editbookmark="fatherMethod"
-        ></bookmarkitem>
-      </div>
     </a-tab-pane>
   </a-tabs>
 

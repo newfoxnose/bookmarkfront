@@ -22,7 +22,7 @@ defineProps({
     required: false,
   },
   father_id: {
-    type: Number,
+    type: String,
     required: false,
   },
   folder_id: {
@@ -101,7 +101,7 @@ export default {
     :display_offset="display_offset"
     :style="{ 'margin-left': display_offset * 20 + 'px' }"
   >
-    <h3 v-if="father_id!='-1'">{{ folder_name }}</h3>
+    <h3 v-if="father_id!=-1">{{ folder_name }}</h3>
     <div
       class="item"
       v-show="isShow(bookmarkitem.title, bookmarkitem.pinyin, bookmarkitem.url)"
@@ -109,7 +109,7 @@ export default {
       :itemid="bookmarkitem.id"
     >
     
-    <span v-if="father_id!='-1'" style="padding-left:20px;"></span>
+    <span v-if="father_id!=-1" style="padding-left:20px;"></span>
       <img
         v-if="editable == 'yes'"
         :src="bookmarkitem.icon_display"
