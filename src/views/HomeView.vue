@@ -577,7 +577,7 @@ export default defineComponent({
 
   <a-modal
     v-model:visible="visible_inputpassword"
-    title="请输入密码查看私密笔记"
+    title="请输入密码查看私有书签"
   >
     <a-form :model="formState_inputpassword">
       <a-form-item

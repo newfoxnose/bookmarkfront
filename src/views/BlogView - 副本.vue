@@ -12,109 +12,49 @@
     />
   </div>
   <p style="margin-top: 15px">
-    <a-button type="primary" @click="showDrawer('新建笔记', 0)"
+    <a-button type="primary" @click="showDrawer('新建笔记', 0, 0)"
       ><form-outlined />新建笔记</a-button
     >
   </p>
-
-  <a-tabs v-model:activeKey="activeKey" @tabClick="clicktab">
-    <a-tab-pane :key="0" tab="公开">
-      <div>
-        <a-image-preview-group>
-          <div v-for="(item, index) in fileitems" style="margin-bottom: 5px">
-            <span class="ext">{{ index + 1 }}</span>
-            <a @click="showDrawer(item.title, item.id)">
-              {{ item.title }}
-            </a>
-            <eye-invisible-two-tone
-              v-if="item.is_private == '1'"
-              style="margin-left: 3px"
-            />
-            <like-two-tone
-              v-if="item.is_recommend == '1'"
-              style="margin-left: 3px"
-            />
-            <span style="margin-left: 20px">( {{ item.createtime }})</span>
-            <a
-              style="margin-left: 20px"
-              @click="showconfirmdelete(item.id,  '')"
-              >删除</a
-            >
-            <br /><a-image
-              v-for="img in item.img_arr"
-              :key="img.label"
-              :width="200"
-              :src="img"
-            />
-          </div>
-        </a-image-preview-group>
-      </div>
-      <div style="clear: both">
-        <a-pagination
-          v-model:current="currentpage"
-          v-model:pageSize="pagesize"
-          :total="total"
-          @change="handlepagechange"
-          show-less-items
+  <div>
+    <a-image-preview-group>
+      <div v-for="item in fileitems" style="margin-bottom: 5px">
+        <span class="ext">{{ item.id }}</span>
+        <a @click="showDrawer(item.title, item.id, item.is_private)">
+          {{ item.title == "" ? "无标题" : item.title }}
+        </a>
+        <eye-invisible-two-tone
+          v-if="item.is_private == '1'"
+          style="margin-left: 3px"
+        />
+        <like-two-tone
+          v-if="item.is_recommend == '1'"
+          style="margin-left: 3px"
+        />
+        <span style="margin-left: 20px">( {{ item.createtime }})</span>
+        <a
+          style="margin-left: 20px"
+          @click="showconfirmdelete(item.id, currentpage)"
+          >删除</a
+        >
+        <br /><a-image
+          v-for="img in item.img_arr"
+          :key="img.label"
+          :width="200"
+          :src="img"
         />
       </div>
-    </a-tab-pane>
-    <a-tab-pane :key="-1" tab="私有">
-      <div v-if="show_private == true">
-        <div>
-          <a-image-preview-group>
-            <div v-for="(item, index) in fileitems" style="margin-bottom: 5px">
-              <span class="ext">{{ index + 1 }}</span>
-              <a
-                @click="
-                  showDrawer(
-                    item.title,
-                    item.id,
-                    formState_inputpassword.password
-                  )
-                "
-              >
-                {{ item.title }}
-              </a>
-              <eye-invisible-two-tone
-                v-if="item.is_private == '1'"
-                style="margin-left: 3px"
-              />
-              <like-two-tone
-                v-if="item.is_recommend == '1'"
-                style="margin-left: 3px"
-              />
-              <span style="margin-left: 20px">( {{ item.createtime }})</span>
-              <a
-                style="margin-left: 20px"
-                @click="
-                  showconfirmdelete(
-                    item.id,formState_inputpassword.password
-                  )
-                "
-                >删除</a
-              >
-              <br /><a-image
-                v-for="img in item.img_arr"
-                :key="img.label"
-                :width="200"
-                :src="img"
-              />
-            </div>
-          </a-image-preview-group>
-        </div>
-        <div style="clear: both">
-          <a-pagination
-            v-model:current="currentpage"
-            v-model:pageSize="pagesize"
-            :total="total"
-            @change="handleprivatepagechange(formState_inputpassword.password)"
-            show-less-items
-          />
-        </div>
-      </div>
-    </a-tab-pane>
-  </a-tabs>
+    </a-image-preview-group>
+  </div>
+  <div style="clear: both">
+    <a-pagination
+      v-model:current="currentpage"
+      v-model:pageSize="pagesize"
+      :total="total"
+      @change="handlepagechange"
+      show-less-items
+    />
+  </div>
   <a-modal
     v-model:visible="visible"
     :title="updatedDrawerTitle"
@@ -122,12 +62,10 @@
     wrap-class-name="full-modal"
     :class="drawerclass"
     @close="onClose"
+    @ok="save"
   >
     <template #footer>
-      <a-button
-        type="primary"
-        @click="save(formState_inputpassword.password)"
-        :loading="iconLoading"
+      <a-button type="primary" @click="save()" :loading="iconLoading"
         >保存</a-button
       >
       &nbsp;
@@ -193,7 +131,14 @@
     <template #footer>
       <a-button
         type="primary"
-        @click="handleprivatepagechange(formState_inputpassword.password)"
+        @click="
+          showDrawer(
+            private_blog.title,
+            private_blog.id,
+            0,
+            formState_inputpassword.password
+          )
+        "
         :loading="iconLoading"
         >提交</a-button
       >
@@ -283,7 +228,7 @@ export default {
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
     const currentpage = ref(1);
-    const pagesize = ref(10);
+    const pagesize = ref(1);
     const total = ref(1);
 
     const { proxy } = getCurrentInstance();
@@ -299,72 +244,63 @@ export default {
     const visible_inputpassword = ref(false);
     const formState_inputpassword = ref([]);
     const private_blog = ref([]);
-
-    const activeKey = ref(0);
-    const show_private = ref(false);
-
-    const clicktab = (key) => {
-      console.log(key);
-      if (key == -1) {
+    const showDrawer = (drawerTitle, id, is_private, password) => {
+      console.log(drawerTitle, id, is_private, password)
+      if (is_private == 0) {
+        drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
+        updatedDrawerTitle.value = drawerTitle;
+        if (id != 0) {
+          blog_id.value = id;
+          let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+          params.append("token", $cookies.get("token"));
+          params.append("timestamp", new Date().getTime());
+          params.append("blog_id", blog_id.value);
+          params.append("password", password);
+          proxy.$http.post("/ajax/get_blog_ajax/", params).then((res) => {
+            console.log(res.data)
+            if (res.data.code == "201") {
+              message.error("密码错误");
+            } else {
+              visible.value = true;
+              visible_inputpassword.value = false;
+              valueHtml.value = res.data.data.blog.content;
+              defaultPercent.value = 100;
+              loadingdone.value = true;
+              formState.value.title = res.data.data.blog.title;
+              formState.value.folder_id = res.data.data.blog.folder_id;
+              if (res.data.data.blog.is_private == 1) {
+                formState.value.is_private = true;
+              } else {
+                formState.value.is_private = false;
+              }
+              if (res.data.data.blog.is_recommend == 1) {
+                formState.value.is_recommend = true;
+              } else {
+                formState.value.is_recommend = false;
+              }
+            }
+          });
+        } else {
+          visible.value = true;
+          formState.value.title = "无标题";
+          formState.value.folder_id = -1;
+          formState.value.is_private = false;
+          formState.value.is_recommend = false;
+          valueHtml.value = "<p>写点什么呢？</p>";
+        }
+      } else {
+        private_blog.value.title = drawerTitle;
+        private_blog.value.id = id;
         visible_inputpassword.value = true;
-      } else {
-        show_private.value = false;
-        visible_inputpassword.value = false;
-        formState_inputpassword.value.password = "";
-        handlepagechange(1);
       }
     };
 
-    const showDrawer = (drawerTitle, id, password) => {
-      drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
-      updatedDrawerTitle.value = drawerTitle;
-      if (id != 0) {
-        blog_id.value = id;
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("blog_id", blog_id.value);
-        params.append("password", password);
-        proxy.$http.post("/ajax/get_blog_ajax/", params).then((res) => {
-          console.log(res.data);
-          if (res.data.code == "201") {
-            message.error("密码错误");
-          } else {
-            visible.value = true;
-            visible_inputpassword.value = false;
-            valueHtml.value = res.data.data.blog.content;
-            defaultPercent.value = 100;
-            loadingdone.value = true;
-            formState.value.title = res.data.data.blog.title;
-            formState.value.folder_id = res.data.data.blog.folder_id;
-            if (res.data.data.blog.is_private == 1) {
-              formState.value.is_private = true;
-            } else {
-              formState.value.is_private = false;
-            }
-            if (res.data.data.blog.is_recommend == 1) {
-              formState.value.is_recommend = true;
-            } else {
-              formState.value.is_recommend = false;
-            }
-          }
-        });
-      } else {
-        visible.value = true;
-        formState.value.title = "无标题";
-        formState.value.folder_id = -1;
-        formState.value.is_private = false;
-        formState.value.is_recommend = false;
-        valueHtml.value = "<p>写点什么呢？</p>";
-      }
-    };
-
-    const showconfirmdelete = (editId,  password) => {
+    const showconfirmdelete = (editId, currentpage) => {
       Modal.confirm({
         title: "确认删除该项目吗？",
         content: "点击OK删除且无法找回, 点击cancel取消",
         onOk() {
-          deletepost(editId, password);
+          deletepost(editId, currentpage);
         },
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         onCancel() {},
@@ -391,33 +327,7 @@ export default {
       });
       handlepagechange(1);
     });
-    const handlepagechange = (page) => {
-      const interval = setInterval(() => {
-        const percent =
-          defaultPercent.value + Math.round(Math.random() * 7 + 2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value > 90) {
-          clearInterval(interval);
-        }
-      }, 100);
-      if (page != 1) {
-        page = currentpage.value;
-      }
-      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get("token"));
-      params.append("timestamp", new Date().getTime());
-      params.append("pagesize", pagesize.value);
-      proxy.$http.post("/ajax/list_blog_ajax/" + page, params).then((res) => {
-        //console.log(res.data);
-        fileitems.value = res.data.data.blog;
-        pagesize.value = res.data.data.pagesize;
-        total.value = res.data.data.total;
-        defaultPercent.value = 100;
-        loadingdone.value = true;
-      });
-    };
-
-    const handleprivatepagechange = (password) => {
+    const handlepagechange = (values) => {
       const interval = setInterval(() => {
         const percent =
           defaultPercent.value + Math.round(Math.random() * 7 + 2);
@@ -430,32 +340,24 @@ export default {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
-      params.append("password", password);
-      params.append("pagesize", pagesize.value);
+
       proxy.$http
-        .post("/ajax/list_private_blog_ajax/" + currentpage.value, params)
+        .post("/ajax/list_blog_ajax/" + currentpage.value, params)
         .then((res) => {
-          console.log(res.data);
-          if (res.data.code == 200) {
-            fileitems.value = res.data.data.blog;
-            total.value = res.data.data.total;
-            defaultPercent.value = 100;
-            loadingdone.value = true;
-            visible_inputpassword.value = false;
-            show_private.value = true;
-          } else {
-            message.error("密码错误");
-          }
+          //console.log(res.data);
+          fileitems.value = res.data.data.blog;
+          pagesize.value = res.data.data.pagesize;
+          total.value = res.data.data.total;
+          defaultPercent.value = 100;
+          loadingdone.value = true;
         });
     };
-    const deletepost = (id, password) => {
+    const deletepost = (id, page) => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
       params.append("id_b64", proxy.$func.urlsafe_b64encode(Base64.encode(id)));
-      params.append("password", password);
-      params.append("page", currentpage.value);
-      params.append("pagesize", pagesize.value);
+      params.append("page", page);
       //params.append("is_private", 0);   //博客都为公开
       proxy.$http.post("/ajax/delete_blog_ajax/", params).then((res) => {
         fileitems.value = res.data.data.blog;
@@ -465,7 +367,7 @@ export default {
         loadingdone.value = true;
       });
     };
-    const save = (password) => {
+    const save = () => {
       console.log(router.currentRoute.value.params);
       iconLoading.value = true;
       if (
@@ -481,7 +383,6 @@ export default {
         params.append("content", valueHtml.value);
         params.append("title", formState.value.title);
         params.append("folder_id", formState.value.folder_id);
-        params.append("password", password);
         if (blog_id.value != 0) {
           params.append("post_id", blog_id.value);
         }
@@ -499,12 +400,15 @@ export default {
           .post("/ajax/save_blog_ajax/", params)
           .then((res) => {
             //console.log(res.data.msg);
-            message.info(res.data.msg);
-            iconLoading.value = false;
-            if (password == "") {
-              handlepagechange();
+            if (res.data.msg == "新建成功") {
+              //这条提示如果改的话要和后端一起改
+              message.info("新建笔记成功"); //看不到效果
+              iconLoading.value = false;
+              handlepagechange(1);
             } else {
-              handleprivatepagechange(password);
+              message.info(res.data.msg);
+              iconLoading.value = false;
+              handlepagechange(1);
             }
             onClose();
           })
@@ -541,10 +445,6 @@ export default {
       visible_inputpassword,
       formState_inputpassword,
       private_blog,
-      activeKey,
-      clicktab,
-      show_private,
-      handleprivatepagechange,
     };
   },
   created() {
