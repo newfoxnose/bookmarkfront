@@ -12,9 +12,7 @@
     />
   </div>
   <p style="margin-top: 15px">
-    <a-button type="primary" @click="showDrawer('新建笔记', 0)"
-      ><form-outlined />新建笔记</a-button
-    >
+    <a-button type="primary" @click="showDrawer('新建笔记', 0)"><form-outlined />新建笔记</a-button>
   </p>
 
   <a-tabs v-model:activeKey="activeKey" @tabClick="clicktab">
@@ -121,19 +119,9 @@
     width="100%"
     wrap-class-name="full-modal"
     :class="drawerclass"
+    :footer="null"
     @close="onClose"
   >
-    <template #footer>
-      <a-button
-        type="primary"
-        @click="save(formState_inputpassword.password)"
-        :loading="iconLoading"
-        >保存</a-button
-      >
-      &nbsp;
-      <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
-    </template>
-
     <a-form :model="formState">
       <a-row>
         <a-col :span="8">
@@ -161,13 +149,23 @@
             </a-select>
           </p></a-col
         >
-        <a-col :span="8">
+        <a-col :span="4">
           <p style="padding-left: 20px; white-space: nowrap">
             <a-checkbox v-model:checked="formState.is_recommend"
               >置顶</a-checkbox
             >
             <a-checkbox v-model:checked="formState.is_private">私密</a-checkbox>
           </p></a-col
+        >
+        <a-col :span="4" align="right">
+          <a-button
+        type="primary"
+        @click="save(formState_inputpassword.password)"
+        :loading="iconLoading"
+        >保存</a-button
+      >
+      &nbsp;
+      <a-button style="margin-right: 8px" @click="onClose">取消</a-button></a-col
         >
       </a-row>
     </a-form>
