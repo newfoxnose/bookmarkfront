@@ -304,7 +304,7 @@ export default {
     const show_private = ref(false);
 
     const clicktab = (key) => {
-      console.log(key);
+      currentpage.value=1;
       if (key == -1) {
         visible_inputpassword.value = true;
       } else {
