@@ -499,7 +499,7 @@ export default {
             //console.log(res.data.msg);
             message.info(res.data.msg);
             iconLoading.value = false;
-            if (password == "") {
+            if (show_private.value == false) {
               handlepagechange();
             } else {
               handleprivatepagechange(password);
