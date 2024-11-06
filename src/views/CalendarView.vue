@@ -41,7 +41,9 @@
         >保存</a-button
       >
       &nbsp;
-      <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
+      <a-button @click="onClose">取消</a-button>
+      &nbsp;
+      <a-button type="danger" @click="deleteEvent()">删除</a-button>
     </template>
 
     <a-form :model="formState">
@@ -58,12 +60,22 @@
         :rules="[{ required: true, message: '颜色' }]"
       >
         <a-radio-group v-model:value="formState.badge_type">
-          <a-radio value="#666"><a-badge color="#666"  class="big-dot" /></a-radio>
-          <a-radio value="red"><a-badge color="red"  class="big-dot" /></a-radio>
-          <a-radio value="orange"> <a-badge color="orange"  class="big-dot" /></a-radio>
-          <a-radio value="green"><a-badge color="green"  class="big-dot" /></a-radio>
-          <a-radio value="blue"><a-badge color="blue"  class="big-dot" /></a-radio>
-          <a-radio value="purple"><a-badge color="purple" class="big-dot" /></a-radio>
+          <a-radio value="#666"
+            ><a-badge color="#666" class="big-dot"
+          /></a-radio>
+          <a-radio value="red"><a-badge color="red" class="big-dot" /></a-radio>
+          <a-radio value="orange">
+            <a-badge color="orange" class="big-dot"
+          /></a-radio>
+          <a-radio value="green"
+            ><a-badge color="green" class="big-dot"
+          /></a-radio>
+          <a-radio value="blue"
+            ><a-badge color="blue" class="big-dot"
+          /></a-radio>
+          <a-radio value="purple"
+            ><a-badge color="purple" class="big-dot"
+          /></a-radio>
         </a-radio-group>
       </a-form-item>
 
@@ -162,7 +174,6 @@
 .notes-month section {
   font-size: 28px;
 }
-
 </style>
 <script>
 import { message, Modal } from "ant-design-vue";
@@ -175,6 +186,9 @@ import {
 } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
 import { defineComponent, ref, onMounted, getCurrentInstance } from "vue";
+// 在子组件中注入刷新方法
+import { inject } from 'vue';
+
 export default defineComponent({
   components: {
     InboxOutlined,
@@ -191,7 +205,7 @@ export default defineComponent({
     formState.value.location = "";
     formState.value.badge_type = "#666";
     formState.value.repetition = ref("onetime");
-    formState.value.alert = ref(['0']);
+    formState.value.alert = ref(["0"]);
     formState.value.is_private = false;
     formState.value.is_recommend = false;
 
@@ -203,6 +217,8 @@ export default defineComponent({
     const iconLoading = ref(false);
     const datetimeformat = ref("YYYY-MM-DD HH:mm:ss");
     const eventList = ref([]);
+
+    const reloadtodo = inject('reloadtodo');   //注入刷新方法
 
     const showDrawer = (drawerTitle, selectedValue, id) => {
       drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
@@ -343,6 +359,7 @@ export default defineComponent({
             }
             onClose();
             onPanelChange(selectedValue.value);
+            reloadtodo();   //调用app.vue里的刷新方法
           })
           .catch((error) => {
             message.info("无法正常保存");
@@ -350,6 +367,30 @@ export default defineComponent({
             console.log(error);
           });
       }
+    };
+
+    const deleteEvent = () => {
+      iconLoading.value = true;
+
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+      params.append("event_id", formState.value.event_id);
+      proxy.$http
+        .post("/ajax/delete_event_ajax/", params)
+        .then((res) => {
+          //console.log(res.data.msg);
+          message.info(res.data.msg);
+          iconLoading.value = false;
+          onClose();
+          onPanelChange(selectedValue.value);
+          reloadtodo();   //调用app.vue里的刷新方法
+        })
+        .catch((error) => {
+          message.info("无法正常删除");
+          iconLoading.value = false;
+          console.log(error);
+        });
     };
     return {
       value,
@@ -371,6 +412,7 @@ export default defineComponent({
       datetimeformat,
       save,
       eventList,
+      deleteEvent,
     };
   },
 });
@@ -386,5 +428,4 @@ function jsonsafe(str) {
   str = str.replaceAll('"', '\\"');
   return str;
 }
-
 </script>

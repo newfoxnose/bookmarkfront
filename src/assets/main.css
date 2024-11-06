@@ -187,7 +187,36 @@
   }
 
 
-
   .content-dark-theme .ant-tabs-tab-btn[aria-selected=false] {
     color: rgba(255, 255, 255, 0.65);
+  }
+
+/*顶部折叠面板的深色模式*/
+  .collapse-dark-theme .ant-collapse-header{
+    background-color: #666;
+    border:none !important;
+    border-radius:0 !important;
+    color:rgba(255, 255, 255, 0.65) !important;
+  }
+
+  .collapse-dark-theme .ant-collapse-content{
+    background-color: #001529;
+    border:none !important;
+  }
+  .collapse-dark-theme del{
+    text-decoration-style: solid;
+    text-decoration-color: white;
+  }
+
+/*去掉顶部折叠面板的边框*/
+  .ant-collapse {
+    border:none !important;
+  }
+  .ant-collapse-item{
+    border:none !important;
+  }
+
+/*去掉左侧导航菜单与顶部折叠面板的间距*/
+  .ant-menu-item{
+    margin-top:0 !important;
   }

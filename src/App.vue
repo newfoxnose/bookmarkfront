@@ -25,6 +25,8 @@ import {
   PlusOutlined,
 } from "@ant-design/icons-vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
+// 在 App.vue 或父组件中提供刷新方法
+import { provide } from 'vue';
 
 export default defineComponent({
   components: {
@@ -47,9 +49,12 @@ export default defineComponent({
     };
   },
   setup() {
+    
+
     const logourl = ref("../images/logo-white.png");
     const contenttheme = ref("content-dark-theme");
     const footertheme = ref("footer-dark-theme");
+    const collapsetheme = ref("collapse-dark-theme");
     const state = reactive({
       theme: $cookies.get("theme"),
       selectedKeys: [$cookies.get("selectedkey")],
@@ -117,19 +122,23 @@ export default defineComponent({
         logourl.value = "../images/logo-white.png";
         contenttheme.value = "content-dark-theme";
         footertheme.value = "footer-dark-theme";
+        collapsetheme.value = "collapse-dark-theme";
       } else {
         $cookies.set("theme", "light", "720h");
         logourl.value = "../images/logo.png";
         contenttheme.value = "content-light-theme";
         footertheme.value = "footer-light-theme";
+        collapsetheme.value = "collapse-light-theme";
       }
     };
+    provide('reloadtodo', toggleTodo);   //向其他组件提供刷新方法，要在本页函数初始化之后
     return {
       ...toRefs(state),
       changeTheme,
       logourl,
       contenttheme,
       footertheme,
+      collapsetheme,
       todo_items,
       toggleTodo,
       newtodosummary,
@@ -147,7 +156,7 @@ export default defineComponent({
       <div class="logo" :theme="theme">
         <img :src="logourl" height="30" />
       </div>
-      <a-collapse v-model:activeKey="activeKey">
+      <a-collapse v-model:activeKey="activeKey" :class="collapsetheme">
             <a-collapse-panel key="xx" header="待办">
               <p v-for="item in todo_items">
                 <a-checkbox
