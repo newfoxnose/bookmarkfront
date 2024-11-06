@@ -15,7 +15,7 @@
           :key="item.content"
           @click="showDrawer('编辑事件', selectedValue, item.event_id)"
         >
-          <a-badge :status="item.type" :text="item.content" />
+          <a-badge :color="item.badge_type" :text="item.content" />
         </li>
       </ul>
     </template>
@@ -58,8 +58,8 @@
         :rules="[{ required: true, message: '颜色' }]"
       >
         <a-radio-group v-model:value="formState.badge_type">
+          <a-radio value="#666"><a-badge color="#666"  class="big-dot" /></a-radio>
           <a-radio value="red"><a-badge color="red"  class="big-dot" /></a-radio>
-          <a-radio value="yellow"><a-badge color="yellow"  class="big-dot" /></a-radio>
           <a-radio value="orange"> <a-badge color="orange"  class="big-dot" /></a-radio>
           <a-radio value="green"><a-badge color="green"  class="big-dot" /></a-radio>
           <a-radio value="blue"><a-badge color="blue"  class="big-dot" /></a-radio>
@@ -188,8 +188,10 @@ export default defineComponent({
     $cookies.set("openkey", "");
     const formState = ref([]);
     formState.value.summary = "";
-    formState.value.badge_type = "default";
-    formState.value.repetition = ref("一次性活动");
+    formState.value.location = "";
+    formState.value.badge_type = "#666";
+    formState.value.repetition = ref("onetime");
+    formState.value.alert = ref(['0']);
     formState.value.is_private = false;
     formState.value.is_recommend = false;
 
@@ -294,7 +296,7 @@ export default defineComponent({
           value.format("MM-DD")
         ) {
           listData.push({
-            type: eventList.value[i]["badge_type"],
+            badge_type: eventList.value[i]["badge_type"],
             content: eventList.value[i]["summary"],
             event_id: eventList.value[i]["id"],
           });
@@ -385,66 +387,4 @@ function jsonsafe(str) {
   return str;
 }
 
-function sendquestion() {
-  if ($("#msg_input").val().length < 3) {
-    alert("输入内容至少为3个字符");
-  } else {
-    var content = $("#msg_input").val();
-    $("#content")
-      .append(
-        '<li class="msgContent right" style="width: auto;  height: auto;  word-break: break-all;  margin: 5px;  padding: 5px;  border-radius: 5px;  font-size: 16px;float: right;  text-align: left;  max-width: 90%;  background-color: yellowgreen;">' +
-          content +
-          "<li>"
-      )
-      .append('<div style="clear:both"></div>');
-    //msgContent right left这3个class不能删
-    $("#content").animate({ scrollTop: 999999 }, 600);
-    $("#msg_input").val("");
-    let queryarr = new Array();
-    let historylimit = $(".msgContent").length - 5;
-    if (historylimit < 0) {
-      historylimit = 0;
-    }
-    $(".msgContent").each(function (index) {
-      //console.log(index);
-      if (index >= historylimit) {
-        if ($(this).hasClass("right")) {
-          queryarr.push(
-            '{"role":"user","content":"' + jsonsafe($(this).html()) + '"}'
-          );
-        } else {
-          queryarr.push(
-            '{"role":"assistant","content":"' + jsonsafe($(this).html()) + '"}'
-          );
-        }
-      }
-    });
-    $.post(
-      $("#chat_url").html() + "/ajax/chat_ajax",
-      //$.post("http://localhost:800/riyutool.com/api/chatgpt.php",
-      {
-        token: $cookies.get("token"),
-        timestamp: new Date().getTime(),
-        questions: queryarr.join(","),
-      },
-      function (data, status) {
-        let result_json = JSON.parse(data.data);
-        //console.log(result_json);
-        //alert("数据: \n" + data + "\n状态: " + status);
-        if (data.error) {
-          alert(data.error.message);
-        } else {
-          $("#content")
-            .append(
-              '<li class="msgContent left" style="width: auto;  height: auto;  word-break: break-all;  margin: 5px;  padding: 5px;  border-radius: 5px;  font-size: 16px;float: left;  text-align: left;  max-width: 90%;  background-color: grey;">' +
-                result_json.choices[0].message.content.replace(/\n/gi, "<br>") +
-                "<li>"
-            )
-            .append('<div style="clear:both"></div>');
-          $("#content").animate({ scrollTop: 999999 }, 600);
-        }
-      }
-    );
-  }
-}
 </script>

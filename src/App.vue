@@ -59,6 +59,7 @@ export default defineComponent({
     const todo_items = ref([]);
     const newtodosummary = ref("");
     const activeKey = ref(['xx']);
+    const badge_type = ref('#666');
     watch(activeKey, val => {
   console.log(val);
 });
@@ -92,6 +93,7 @@ export default defineComponent({
         params.append("token", $cookies.get("token"));
         params.append("timestamp", new Date().getTime());
         params.append("newtodosummary", value);
+        params.append("badge_type", badge_type.value);
         proxy.$http.post("/ajax/create_todo_ajax", params).then((res) => {
           console.log(res.data.data.todo);
           todo_items.value = res.data.data.todo;
@@ -132,7 +134,8 @@ export default defineComponent({
       toggleTodo,
       newtodosummary,
       createTodo,
-      activeKey
+      activeKey,
+      badge_type
     };
   },
 });
@@ -151,19 +154,34 @@ export default defineComponent({
                   v-if="item.is_done == 0"
                   @change="toggleTodo(item.id)"
                   v-model:checked="item.is_done"
-                  >{{ item.summary }}</a-checkbox
+                  ><span :style="{color:item.badge_type}">{{ item.summary }}</span></a-checkbox
                 >
                 <a-checkbox
                   v-else
                   @change="toggleTodo(item.id)"
                   v-model:checked="item.is_done"
-                  ><a-typography-text delete @change="toggleTodo(item.id)">{{
-                    item.summary
-                  }}</a-typography-text></a-checkbox
+                  ><a-typography-text delete @change="toggleTodo(item.id)">
+                    <span :style="{color:item.badge_type}">{{item.summary }}</span>
+                 </a-typography-text></a-checkbox
                 >
               </p>
               <div class="search">
                 <a-input v-model:value="newtodosummary">
+
+                  <template #addonBefore>
+                    <a-select :showArrow=false
+      ref="select"
+      v-model:value="badge_type"
+      style="width: 32px"
+    >
+      <a-select-option value="#666"><a-badge color="#666"  class="big-dot" /></a-select-option>
+      <a-select-option value="red"><a-badge color="red"  class="big-dot" /></a-select-option>
+      <a-select-option value="orange"><a-badge color="orange"  class="big-dot" /></a-select-option>
+      <a-select-option value="green"><a-badge color="green"  class="big-dot" /></a-select-option>
+      <a-select-option value="blue"><a-badge color="blue"  class="big-dot" /></a-select-option>
+      <a-select-option value="purple"><a-badge color="purple"  class="big-dot" /></a-select-option>
+    </a-select>
+</template>
                   <template #addonAfter>
                     <plus-outlined @click="createTodo(newtodosummary)" />
                   </template>
