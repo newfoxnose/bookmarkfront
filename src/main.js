@@ -15,8 +15,13 @@ import func from '@/assets/func'
 
 //导入ueditor
 import VueUeditorWrap from 'vue-ueditor-wrap';
+// Plugins，给vuetify用的
+import { registerPlugins } from '@/plugins'
+
 
 const app = createApp(App);
+
+registerPlugins(app)   //vuetify插件注册
 
 /* 配置请求的根路径，远程后端 */
 axios.defaults.baseURL = "https://bm.gm.ws";

@@ -1,4 +1,5 @@
 <script>
+import IndexView from './views/IndexView.vue';
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 dayjs.locale("zh-cn");
@@ -30,6 +31,7 @@ import { provide } from 'vue';
 
 export default defineComponent({
   components: {
+    IndexView,
     StarOutlined,
     FormOutlined,
     DatabaseOutlined,
@@ -74,7 +76,9 @@ export default defineComponent({
       } else {
         changeTheme(false);
       }
+      if ($cookies.get('token') != null && $cookies.get('token') != ''){
       toggleTodo();
+      }
     });
     const toggleTodo = (id) => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
@@ -151,7 +155,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-layout style="min-height: 100vh">
+  <a-layout style="min-height: 100vh" v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
     <a-layout-sider v-model:collapsed="collapsed" :theme="theme">
       <div class="logo" :theme="theme">
         <img :src="logourl" height="30" />
@@ -297,7 +301,10 @@ export default defineComponent({
         <p></p>
         <RouterView />
       </a-layout-content>
-      <a-layout-footer :class="footertheme"> ©2024 </a-layout-footer>
+  <a-layout-footer :class="footertheme"> ©2024 </a-layout-footer>
     </a-layout>
+  </a-layout>
+  <a-layout v-else>
+    <IndexView />
   </a-layout>
 </template>
