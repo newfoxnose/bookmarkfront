@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
     "@mdi/font": "^7.4.47",
+    "@vitejs/plugin-vue": "^4.6.2",
     "@vueup/vue-quill": "^1.0.0-alpha.40",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
@@ -37,7 +38,6 @@
   "devDependencies": {
     "@rollup/plugin-inject": "^5.0.3",
     "@types/qs": "^6.9.7",
-    "@vitejs/plugin-vue": "^4.6.2",
     "eslint": "^9.14.0",
     "eslint-plugin-vue": "^9.30.0",
     "sass": "^1.80.6",
