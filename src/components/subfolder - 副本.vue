@@ -33,8 +33,7 @@ defineProps({
     type: Array,
     required: false,
   },
-  //这里的subfolderx不能使用子组件同名的名字subfolder，否则会无法显示子目录书签
-  subfolderx: {
+  subfolder: {
     type: Array,
     required: false,
   },
@@ -174,12 +173,12 @@ export default {
       >
     </div>
   </div>
-  <div v-for="item in subfolderx">
+  <div v-for="item in subfolder">
     <subfolder
       :folder_name="item.folder_name"
       :folder_id="item.id"
       :folder_bookmark="item.bookmarks"
-      :subfolderx="item.subfolder"
+      :subfolder="item.subfolder"
       :search="search"
       :editable="editable"
       :fatherMethod="fatherMethod"

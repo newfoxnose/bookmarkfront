@@ -659,7 +659,7 @@ export default defineComponent({
         :folder_id="item.id"
         :father_id="item.father_id"
         :folder_bookmark="item.bookmarks"
-        :subfolder="item.subfolder"
+        :subfolderx="item.subfolder"
         :search="''"
         :editable="editable"
         :fatherMethod="fatherMethod"
@@ -723,11 +723,12 @@ export default defineComponent({
       @editbookmark="fatherMethod"
     ></bookmarkitem>
     <div v-for="item in items.folder">
+      
       <subfolder
         :folder_name="item.folder_name"
         :folder_id="item.id"
         :folder_bookmark="item.bookmarks"
-        :subfolder="item.subfolder"
+        :subfolderx="item.subfolder"
         :search="search"
         :editable="editable"
         :fatherMethod="fatherMethod"

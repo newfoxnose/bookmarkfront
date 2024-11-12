@@ -76,9 +76,21 @@ export default defineComponent({
       } else {
         changeTheme(false);
       }
-      if ($cookies.get('token') != null && $cookies.get('token') != ''){
-      toggleTodo();
-      }
+    
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+      proxy.$http.post("/ajax/toggle_todo_ajax", params).then((res) => {
+if(res.data.code == "401"){
+  $cookies.set("token", "", "-720h");
+}
+else{
+  toggleTodo();
+}
+      });
+
+
+
     });
     const toggleTodo = (id) => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
@@ -94,6 +106,7 @@ export default defineComponent({
             todo_items.value[i].is_done = false;
           }
         }
+
       });
     };
     const createTodo = (value) => {
@@ -148,7 +161,7 @@ export default defineComponent({
       newtodosummary,
       createTodo,
       activeKey,
-      badge_type
+      badge_type,
     };
   },
 });

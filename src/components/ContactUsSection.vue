@@ -180,7 +180,7 @@ export default defineComponent({
       proxy.$http
         .post("/ajax/login_ajax/", params)
         .then((res) => {
-          //console.log(res.data)
+          console.log(res.data)
           iconLoading.value = false;
           message.info(res.data.msg);
           // obj.success ? obj.success(res) : null
