@@ -1,10 +1,9 @@
 <template>
   <v-app-bar>
-    <template #title>
+    <template #title><v-img  src="./assets/logo.png"  />
       <div class="d-inline-flex align-center text-h4 font-weight-bold my-5 text-primary">
-        <v-icon icon="$vuetify" start />
-
-        Landing Page
+        <v-img :height="50"  src="/images/logo.png"></v-img>
+        全能书签网
       </div>
     </template>
 
@@ -26,11 +25,10 @@
 
 <script setup>
   const menu = [
-    'Home',
+    '顶部',
     '功能',
-    'Testimonials',
-    'Work',
-    'Features',
+    '用户反馈',
+    '常见问题',
     '登入/注册',
   ]
 </script>

@@ -4,7 +4,7 @@
     color="accent"
   >
     <div class="text-h3 font-weight-bold mb-5 mb-12">
-      Fun Facts About Our Agency
+      日历和待办
     </div>
 
     <v-container>
@@ -36,22 +36,22 @@
     {
       icon: '/assets/agency/completed.png',
       title: '1050+',
-      description: 'Projects Completed',
+      description: '待办事项标记',
     },
     {
       icon: '/assets/agency/heart.png',
       title: '217k',
-      description: 'Happy Clients',
+      description: '设定重复任务',
     },
     {
       icon: '/assets/agency/awards.png',
       title: '1210',
-      description: 'Design Awards',
+      description: '同步手机日历',
     },
     {
       icon: '/assets/agency/anchor.png',
       title: '2137',
-      description: 'Line Of Codes',
+      description: '高效管理',
     },
   ]
 </script>

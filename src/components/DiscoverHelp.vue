@@ -10,12 +10,11 @@
           md="7"
         >
           <div class="text-h4">
-            Discover how we can help you to group your business fast
+            集成记事本
           </div>
 
           <div class="text-body-1 text-medium-emphasis my-5">
-            Venis demo enim ipsam voluptatem quia voluptas sit aspernatur netsum
-            lorem fugit, seditum netis velas matrix net nesciunt
+            随时记录灵感， 保留重要笔记， 并支持格式化文本。
           </div>
 
           <div
@@ -32,13 +31,6 @@
             {{ text }}
           </div>
 
-          <v-btn
-            color="primary"
-            flat
-            height="55"
-            rounded
-            text="Discover More"
-          />
         </v-col>
       </v-row>
     </v-container>
@@ -47,8 +39,8 @@
 
 <script setup>
   const discover = [
-    'Quias netus magni netsum eos qui ratione sequi',
-    'Venis ratione sequi netus enim quia tempor magne',
-    'Venis ratione sequi netus enim quia tempor magne',
+    '富文本编辑器',
+    '快捷键保存',
+    '多端共享',
   ]
 </script>

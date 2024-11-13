@@ -1,6 +1,6 @@
 <template>
   <v-sheet
-    id="testimonials"
+    id="2"
     class="py-16"
     color="secondary"
   >
@@ -8,12 +8,11 @@
       <v-row align="center">
         <v-col cols="12" md="6">
           <div class="text-h4 font-weight-medium">
-            What People Are Saying.
+            用户反馈与评价
           </div>
 
           <div class="text-body-1 text-medium-emphasis mt-5">
-            Quis autem velis ets reprehender net etid quiste nets voluptate. Utise
-            wisi enim minim venim, quis etsad aspernatis netsum stationes nets.
+            我们来自全球用户的真实反馈， 展现书签网的实力与效果。
           </div>
 
           <v-row class="mt-5">
@@ -44,8 +43,8 @@
 
         <v-col cols="12" md="6">
           <v-alert
-            v-for="n in 3"
-            :key="n"
+            v-for="person in feedback"
+            :key="person.name"
             border="start"
             border-color="accent"
             class="my-5 border-opacity-100"
@@ -54,11 +53,9 @@
             rounded
           >
             <div class="d-flex flex-row align-center ga-3">
-              <v-avatar image="https://vuetifyjs.b-cdn.net/images/john-smirk.png" />
-
-              <div class="font-weight-bold text-h6">
-                John Leider /
-                <span class="text-primary">Engineer - Vuetify</span>
+              <div class="font-weight-normal">
+                {{ person.feedback }}  —— 
+                <span class="text-primary">{{ person.name }}</span>
               </div>
             </div>
           </v-alert>
@@ -67,3 +64,24 @@
     </v-container>
   </v-sheet>
 </template>
+
+<script setup>
+  const feedback = [
+  {
+      name: '周强',
+      feedback:
+        '再也不用为多个浏览器的书签同步问题担心！ ',
+    },
+    {
+      name: '王芳',
+      feedback:
+        '使用记事本功能， 随时记录课堂灵感， 很赞！ ',
+    },
+   
+    {
+      name: '张伟',
+      feedback:
+        '公司和家里同时登陆，非常方便！',
+    },
+  ]
+</script>

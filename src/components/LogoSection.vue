@@ -12,9 +12,10 @@
 
 <script setup>
   const banners = [
-    '/assets/banner/csswinner.png',
-    '/assets/banner/cssawards.png',
-    '/assets/banner/fwa.png',
-    '/assets/banner/cssdesignawards.png',
+    '/assets/banner/vuejs.png',
+    '/assets/banner/codeigniter.png',
+    '/assets/banner/vuetify.png',
+    '/assets/banner/antdesign.png',
+    '/assets/banner/qiniu.png',
   ]
 </script>

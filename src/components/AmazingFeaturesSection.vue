@@ -1,11 +1,11 @@
 <template>
   <v-sheet id="features" class="text-center py-16">
     <div class="text-h4 font-weight-medium">
-      Amazing Features
+      插件扩展
     </div>
 
     <div class="text-body-1 text-medium-emphasis my-5">
-      Quis autem velis ets reprehender net etid quiste voluptate.
+      通过可启用插件支持无限功能
     </div>
 
     <v-container>
@@ -40,39 +40,39 @@
   const features = [
     {
       icon: '/assets/features/support.png',
-      title: 'Support 24/7',
+      title: 'OCR文字识别',
       description:
-        'Utise wisi enim minim veniam, quis tation ullamcorper suscipit et loboti nisl consequat nihis.',
+        '自动识别并提取图片中的文字，支持中文、英文、法语、阿拉伯语、日语、韩语等十余种语言',
     },
     {
       icon: '/assets/features/user.png',
-      title: 'User Friendly',
+      title: '计算器',
       description:
-        'Utise wisi enim minim veniam, quis tation ullamcorper suscipit et loboti nisl consequat nihis.',
+        '方便实用、功能强大的计算器',
     },
     {
       icon: '/assets/features/bell.png',
-      title: 'Notifications',
+      title: 'AI配音',
       description:
-        'Utise wisi enim minim veniam, quis tation ullamcorper suscipit et loboti nisl consequat nihis.',
+        '为文字快速生成高质量的配音，提高创作效率，支持各种语言及方言',
     },
     {
       icon: '/assets/features/accessibility.png',
-      title: 'Accessibility',
+      title: '词典大全',
       description:
-        'Utise wisi enim minim veniam, quis tation ullamcorper suscipit et loboti nisl consequat nihis.',
+        '包括新华字典、辞海、英汉词典、汉英词典、日和词典、和日词典',
     },
     {
       icon: '/assets/features/control.png',
-      title: 'Control',
+      title: '卡片记忆学习法',
       description:
-        'Utise wisi enim minim veniam, quis tation ullamcorper suscipit et loboti nisl consequat nihis.',
+        '简单高效，支持各种适合对照记忆的学习内容',
     },
     {
       icon: '/assets/features/chat.png',
-      title: 'Chat With Friends',
+      title: '更多插件在路上',
       description:
-        'Utise wisi enim minim veniam, quis tation ullamcorper suscipit et loboti nisl consequat nihis.',
+        '。。。。。。',
     },
   ]
 </script>

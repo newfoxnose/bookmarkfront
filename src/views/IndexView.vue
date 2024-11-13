@@ -11,20 +11,18 @@
 
       <DiscoverHelp />
 
+
       <CustomizeSection />
 
       <FunFactsSection />
-
-      <WhatPeopleSaySection />
-
-      <OurPortfolioSection />
 
       <MeetOurTeamSection />
 
       <AmazingFeaturesSection />
 
-      <PricingSection />
+      <WhatPeopleSaySection />
 
+  
       <FAQSection />
 
       <ContactUsSection />

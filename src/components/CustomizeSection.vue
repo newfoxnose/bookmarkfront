@@ -46,20 +46,20 @@
   const customize = [
     {
       icon: './assets/customize.png',
-      title: 'Customize your workflow',
+      title: '文件中转服务',
       subtitle:
-        'Manage any process and be ready to address any challenge with total ease.',
+        '方便上传、下载、分享文件，随时随地访问文件，支持常见格式文件的在线预览。',
     },
     {
       icon: './assets/onboarding.png',
-      title: 'Easy onboarding, fast adoption.',
+      title: 'ChatGPT集成',
       subtitle:
-        'With Square getting your team on board is as simple as sending an email.',
+        '随时问答， 提供智能化建议和辅助， 提升工作效率。',
     },
     {
       icon: './assets/retention.png',
-      title: 'Improve subscriber retention',
+      title: 'RSS阅读器',
       subtitle:
-        'Analyze customers by region, discounts and more and put a plan in place.',
+        '即时更新、自定义订阅、简洁界面，集中获取资讯， 轻松追踪喜欢的内容， 节省浏览时间。',
     },
   ]; </script>

@@ -6,11 +6,11 @@
     min-height="600"
   >
     <div class="text-h3 font-weight-medium mb-5">
-     书签网
+      全能书签网
     </div>
 
     <div class="text-h6 font-weight-light mb-5" style="max-width: 468px;">
-      书签网为您提供一个简单、 高效的在线书签管理解决方案， 帮助您轻松管理和访问网络上的所有书签。
+      一站式服务，综合书签、 记事本、 笔记、 文件中转、 ChatGPT、 RSS阅读器、 日历等功能， 全面提升你的在线体验。
     </div>
 
     <div class="d-flex ga-5 flex-1-1-auto flex-wrap justify-center px-4">
