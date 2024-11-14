@@ -142,7 +142,7 @@ else{
         collapsetheme.value = "collapse-dark-theme";
       } else {
         $cookies.set("theme", "light", "720h");
-        logourl.value = "../images/logo.png";
+        logourl.value = "../images/logo-green.png";
         contenttheme.value = "content-light-theme";
         footertheme.value = "footer-light-theme";
         collapsetheme.value = "collapse-light-theme";
