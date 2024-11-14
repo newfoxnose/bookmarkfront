@@ -59,10 +59,6 @@
   }
   
 
-  .drawer-dark-theme .ant-drawer-content-wrapper *:not(.ant-badge-status-dot){
-    background: #001529;
-    color:rgba(255, 255, 255, 0.65);
-  }
 
   .xxdrawer-light-theme .ant-drawer-content-wrapper *{
     background: #fff;
@@ -140,6 +136,17 @@
     background-color: #cccccc !important;  /*百度编辑器背景颜色不好切换，固定*/
   }
 
+
+  
+  .drawer-dark-theme .ant-drawer-content-wrapper *:not(.ant-badge-status-dot){
+    background: #001529;
+    color:rgba(255, 255, 255, 0.65);
+  }
+
+  .drawer-dark-theme .ant-modal-content *{
+    background: #001529;
+    color:rgba(255, 255, 255, 0.65);
+  }
 
   .drawer-dark-theme .ant-select-selector {
     background-color: #001529 !important;

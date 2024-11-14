@@ -32,7 +32,8 @@
               v-if="item.is_recommend == '1'"
               style="margin-left: 3px"
             />
-            <span style="margin-left: 20px">( {{ item.createtime }})</span>
+
+            <span style="margin-left: 20px" class="font-color-by-theme">( {{ item.createtime }})</span>
             <a
               style="margin-left: 20px"
               @click="showconfirmdelete(item.id,  '')"
@@ -82,7 +83,7 @@
                 v-if="item.is_recommend == '1'"
                 style="margin-left: 3px"
               />
-              <span style="margin-left: 20px">( {{ item.createtime }})</span>
+              <span style="margin-left: 20px" class="font-color-by-theme">( {{ item.createtime }})</span>
               <a
                 style="margin-left: 20px"
                 @click="
@@ -178,6 +179,7 @@
   <a-modal
     v-model:visible="visible_inputpassword"
     title="请输入密码查看私密笔记"
+    :class="drawerclass"
   >
     <a-form :model="formState_inputpassword">
       <a-form-item
