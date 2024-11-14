@@ -2,7 +2,7 @@
   <v-app-bar>
     <template #title><v-img  src="./assets/logo.png"  />
       <div class="d-inline-flex align-center text-h4 font-weight-bold my-5 text-primary">
-        <v-img :height="50"  src="/images/logo.png"></v-img>
+        <v-img :height="50" :width="150" src="/images/logo.png"></v-img>
         全能书签网
       </div>
     </template>

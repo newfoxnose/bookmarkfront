@@ -5,7 +5,7 @@
     min-height="800"
   >
     <div class="text-h4 font-weight-bold">
-      笔记
+      笔记 
     </div>
 
     <div class="text-body-1 text-medium-emphasis mt-5">

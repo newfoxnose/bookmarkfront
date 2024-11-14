@@ -3,18 +3,18 @@
     <v-container>
       <v-row>
         <v-col cols="12" md="5">
-          <v-img src="/assets/discover_bg.png" /></v-col>
+          <v-img src="/assets/discover_bg.png"  style="border-radius: 10px;" /></v-col>
 
         <v-col
           cols="12"
           md="7"
         >
           <div class="text-h4">
-            集成记事本
+            笔记
           </div>
 
           <div class="text-body-1 text-medium-emphasis my-5">
-            随时记录灵感， 保留重要笔记， 并支持格式化文本。
+            高效记录一切
           </div>
 
           <div
@@ -39,8 +39,8 @@
 
 <script setup>
   const discover = [
-    '富文本编辑器',
-    '快捷键保存',
-    '多端共享',
+    '保留源格式粘贴，自动上传图片到服务器',
+    '可设置私有笔记，查看时需要再次输入密码',
+    '自动生成博客网站（针对设置为发表的笔记）',
   ]
 </script>

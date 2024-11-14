@@ -14,15 +14,10 @@
 
       <CustomizeSection />
 
-      <FunFactsSection />
-
-      <MeetOurTeamSection />
-
       <AmazingFeaturesSection />
 
       <WhatPeopleSaySection />
 
-  
       <FAQSection />
 
       <ContactUsSection />

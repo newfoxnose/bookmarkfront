@@ -38,38 +38,38 @@
 
 <script setup>
   const features = [
+  {
+      icon: '/assets/icons/netdisk.png',
+      title: '文件中转',
+      description:
+        '方便上传、下载、分享文件，随时随地访问文件，支持常见格式文件的在线预览',
+    },
+  {
+      icon: '/assets/icons/rss.png',
+      title: 'RSS阅读器',
+      description:
+        '即时更新、自定义订阅、简洁界面，集中获取资讯， 轻松追踪喜欢的内容， 节省浏览时间',
+    },
     {
-      icon: '/assets/features/support.png',
+      icon: '/assets/icons/ocr.png',
       title: 'OCR文字识别',
       description:
         '自动识别并提取图片中的文字，支持中文、英文、法语、阿拉伯语、日语、韩语等十余种语言',
     },
     {
-      icon: '/assets/features/user.png',
-      title: '计算器',
-      description:
-        '方便实用、功能强大的计算器',
-    },
-    {
-      icon: '/assets/features/bell.png',
-      title: 'AI配音',
-      description:
-        '为文字快速生成高质量的配音，提高创作效率，支持各种语言及方言',
-    },
-    {
-      icon: '/assets/features/accessibility.png',
+      icon: '/assets/icons/dict.png',
       title: '词典大全',
       description:
         '包括新华字典、辞海、英汉词典、汉英词典、日和词典、和日词典',
     },
     {
-      icon: '/assets/features/control.png',
+      icon: '/assets/icons/cards.png',
       title: '卡片记忆学习法',
       description:
         '简单高效，支持各种适合对照记忆的学习内容',
     },
     {
-      icon: '/assets/features/chat.png',
+      icon: '/assets/icons/more.png',
       title: '更多插件在路上',
       description:
         '。。。。。。',

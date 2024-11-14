@@ -46,6 +46,7 @@
                     class="captchaimg"
                     @click="reload_captcha"
                     src="/images/noimg.png"
+                    style="cursor: pointer;"
                     width="95"
                   />
                 </v-fade-transition>

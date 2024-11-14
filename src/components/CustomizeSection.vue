@@ -20,7 +20,7 @@
               :class="{ 'bg-grey-lighten-5 elevation-5 rounded': index === 0 }"
             >
               <template #prepend>
-                <img :src="item.icon">
+                <img :src="item.icon" width="75px" height="75px">
               </template>
 
               <template #title>
@@ -35,7 +35,7 @@
         </v-col>
 
         <v-col cols="12" md="5">
-          <v-img src="/assets/customize_bg.png" />
+          <v-img src="/assets/customize_bg.png" style="border-radius: 10px;"/>
         </v-col>
       </v-row>
     </v-container>
@@ -44,22 +44,22 @@
 
 <script setup>
   const customize = [
-    {
-      icon: './assets/customize.png',
-      title: '文件中转服务',
-      subtitle:
-        '方便上传、下载、分享文件，随时随地访问文件，支持常见格式文件的在线预览。',
-    },
-    {
-      icon: './assets/onboarding.png',
+  {
+      icon: './assets/icons/chatgpt.png',
       title: 'ChatGPT集成',
       subtitle:
-        '随时问答， 提供智能化建议和辅助， 提升工作效率。',
+        '随时问答，提供智能化建议和辅助，提升工作效率。',
     },
     {
-      icon: './assets/retention.png',
-      title: 'RSS阅读器',
+      icon: './assets/icons/todo.png',
+      title: '日历和待办',
       subtitle:
-        '即时更新、自定义订阅、简洁界面，集中获取资讯， 轻松追踪喜欢的内容， 节省浏览时间。',
+        '待办事项标记，设定重复任务，高效管理时间。',
+    },
+    {
+      icon: './assets/icons/notepad.png',
+      title: '记事本',
+      subtitle:
+        '随时记录灵感，富文本编辑器，快捷键保存。',
     },
   ]; </script>

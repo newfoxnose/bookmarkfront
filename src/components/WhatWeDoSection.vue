@@ -21,7 +21,7 @@
           cols="12"
           md="4"
         >
-          <img :src="item.icon">
+          <img :src="item.icon" width="75px" height="75px">
 
           <div class="text-h6 mt-1">
             {{ item.title }}
@@ -39,19 +39,19 @@
 <script setup>
   const whatWeDo = [
     {
-      icon: './assets/what/analytics.png',
+      icon: './assets/icons/import-export.png',
       title: '导入导出',
       description:
         '支持多种浏览器的导入导出功能，还可将导出数据直接发送至邮箱',
     },
     {
-      icon: './assets/what/awareness.png',
+      icon: './assets/icons/private.png',
       title: '私密性',
       description:
         '设置私有书签，重要书签输入密码才可查看',
     },
     {
-      icon: './assets/what/design.png',
+      icon: './assets/icons/auto-check.png',
       title: '自动排查',
       description:
         '定期自动排查网址，过期链接显示提醒',

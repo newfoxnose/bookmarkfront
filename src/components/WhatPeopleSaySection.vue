@@ -12,7 +12,7 @@
           </div>
 
           <div class="text-body-1 text-medium-emphasis mt-5">
-            我们来自全球用户的真实反馈， 展现书签网的实力与效果。
+            我们来自全球用户的真实反馈， 展现全能书签网的实力与效果。
           </div>
 
           <v-row class="mt-5">
@@ -68,14 +68,14 @@
 <script setup>
   const feedback = [
   {
-      name: '周强',
+      name: '周大强',
       feedback:
         '再也不用为多个浏览器的书签同步问题担心！ ',
     },
     {
-      name: '王芳',
+      name: '王佳欣',
       feedback:
-        '使用记事本功能， 随时记录课堂灵感， 很赞！ ',
+        '使用笔记功能， 随时记录课堂灵感， 很赞！ ',
     },
    
     {
