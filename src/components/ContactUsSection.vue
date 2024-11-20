@@ -1,7 +1,7 @@
 <template>
   <v-sheet class="text-center py-16" color="primary" id="4">
     <div class="text-white text-h4 font-weight-medium">开始使用</div>
-    <div class="text-center text-body-1 mb-15">登入或注册</div>
+    <div class="text-center text-body-1 mb-15">登入或注册（测试账号：test@test.com， 密码：testtest）</div>
     <form :model="formState">
       <v-container>
         <v-row>

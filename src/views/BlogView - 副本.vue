@@ -201,17 +201,7 @@
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </template>
   </a-modal>
-  <div class="search-div">
-    <div class="search">
-      <a-input v-model:value="searchstring">
-        <template #addonAfter>
-          <close-outlined @click="clearsearch" />
-        </template>
-      </a-input>
-    </div>
-  </div>
 </template>
-
 <style lang="less">
 .full-modal {
   .ant-modal {
@@ -246,30 +236,6 @@
   margin-right: 5px;
 }
 
-
-.search-div {
-  display: flex;
-  flex-direction: column;
-}
-
-.search {
-  align-self: center;
-  position: fixed;
-  bottom: 0;
-  z-index: 2;
-  display: inline;
-  width: 200px;
-}
-
-.search-div button {
-  height: 34px !important;
-}
-
-#search {
-  border-color: #4cae4c;
-  border-width: 2px;
-}
-
 .loadingbar {
   position: fixed;
   top: 50%;
@@ -282,7 +248,6 @@
 import { message, Modal } from "ant-design-vue";
 
 import {
-  CloseOutlined,
   InboxOutlined,
   EyeInvisibleTwoTone,
   LikeTwoTone,
@@ -295,7 +260,6 @@ import { Base64 } from "js-base64";
 import { useRouter } from "vue-router";
 export default {
   components: {
-    CloseOutlined,
     InboxOutlined,
     EyeInvisibleTwoTone,
     LikeTwoTone,
@@ -583,46 +547,15 @@ export default {
       handleprivatepagechange,
     };
   },
-  data() {
-    return {
-      searchstring: ""
-    };
-  },
-  watch: {
-    // 每当 question 改变时，这个函数就会执行
-    searchstring(newstring) {
-      console.log(newstring);
-     // this.searchstring = newstring;
-    },
-  },
-  methods: {
-    clearsearch() {
-      this.searchstring = "";
-    },
-  },
   created() {
     // 更多 UEditor 配置，参考 http://fex.baidu.com/ueditor/#start-config
     this.editorConfig = {
-      ///*
+      /*
       toolbars: [
-        [
-            'fullscreen',  'undo', 'redo', '|',
-            'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', '|', 'forecolor', 'backcolor', '|', 'removeformat', '|',
-            'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
-            'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
-            'paragraph', 'fontfamily', 'fontsize', '|',
-            'directionalityltr', 'directionalityrtl', '|',
-            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|',
-            'link', 'unlink', 'anchor', '|',
-            'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
-            'simpleupload', 'insertimage', 'emotion','insertvideo',  'attachment',  '|',
-            'insertframe', 'insertcode',  'pagebreak', 'template', 'background', '|',
-            'horizontal', 'date', 'time', 'spechars', 'snapscreen', '|',
-            'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', '|',
-            'print', 'preview', 'searchreplace'
-        ]
-    ],
-      //*/
+        ['source', 'undo', 'redo'],
+        ['bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc','simpleupload']
+      ],
+      */
       UEDITOR_HOME_URL: "/UEditor/", // 访问 UEditor 静态资源的根路径，可参考常见问题1
       lang: "zh-cn",
       // 初始容器高度

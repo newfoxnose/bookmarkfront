@@ -65,6 +65,7 @@ export default defineComponent({
     const { proxy } = getCurrentInstance();
     const todo_items = ref([]);
     const newtodosummary = ref("");
+    const useremail = ref("");
     const activeKey = ref(['xx']);
     const badge_type = ref('#666');
     watch(activeKey, val => {
@@ -85,6 +86,8 @@ if(res.data.code == "401"){
   $cookies.set("token", "", "-720h");
 }
 else{
+  console.log(res.data.data.email);
+  useremail.value = res.data.data.email;
   toggleTodo();
 }
       });
@@ -162,6 +165,7 @@ else{
       createTodo,
       activeKey,
       badge_type,
+      useremail
     };
   },
 });
@@ -222,11 +226,6 @@ else{
         :theme="theme"
         v-model:openKeys="openKeys"
       >
-        <span
-          v-if="$cookies.get('token') != null && $cookies.get('token') != ''"
-        >
-          
-
           <a-menu-item key="1">
             <star-outlined />
             <RouterLink to="/home" style="padding-left: 8px">书签</RouterLink>
@@ -269,7 +268,7 @@ else{
             <a-menu-item key="8">
               <RouterLink to="/manage">管理目录</RouterLink>
             </a-menu-item>
-            <a-menu-item key="9">
+            <a-menu-item key="9" v-if="useremail != 'test@test.com'">
               <RouterLink to="/profile">个人设置</RouterLink>
             </a-menu-item>
             <a-menu-item key="10">
@@ -281,24 +280,13 @@ else{
             <a-menu-item key="12">
               <RouterLink to="/export">导出书签至本地</RouterLink>
             </a-menu-item>
-            <a-menu-item key="13">
+            <a-menu-item key="13" v-if="useremail != 'test@test.com'">
               <RouterLink to="/email">发送书签至邮箱</RouterLink>
             </a-menu-item>
             <a-menu-item key="14">
               <RouterLink to="/logout">退出</RouterLink>
             </a-menu-item>
           </a-sub-menu>
-        </span>
-        <span v-else>
-          <a-menu-item key="15">
-            <login-outlined />
-            <RouterLink to="/" style="padding-left: 8px">登入</RouterLink>
-          </a-menu-item>
-          <a-menu-item key="16">
-            <user-add-outlined />
-            <RouterLink to="/reg" style="padding-left: 8px">注册</RouterLink>
-          </a-menu-item>
-        </span>
       </a-menu>
       <div style="text-align: center; padding-top: 30px">
         <a-switch
