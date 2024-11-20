@@ -89,7 +89,6 @@ import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import * as qiniu from 'qiniu-js';
 import { Base64 } from "js-base64";
 
-
 export default {
   components: {
     InboxOutlined,
@@ -118,7 +117,7 @@ export default {
         console.log(res)
         visible.value = true;
       articletitle.value=filename
-      articlecontent.value='<pre>'+res.data+'</pre>'
+      articlecontent.value='<pre>'+ ( (res.data))+'</pre>'
         });
     }
     const onClose = () => {
@@ -142,7 +141,7 @@ export default {
       window.location.href ="/";
     }
         if (res.data.code=="200"){
-          res.data.data.documents.shift()
+          //res.data.data.documents.shift()
         qiniu_token.value = res.data.data.qiniu_token
         qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
@@ -170,7 +169,7 @@ export default {
         params.append("token", $cookies.get('token'));
         params.append("timestamp",new Date().getTime());
         proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
-          res.data.data.documents.shift()
+          //res.data.data.documents.shift()
           qiniu_token.value = res.data.data.qiniu_token
           qiniu_domain.value = res.data.data.qiniu_domain
           fileitems.value = res.data.data.documents
@@ -185,7 +184,7 @@ export default {
       params.append("timestamp",new Date().getTime());
       params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
       proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
-        res.data.data.documents.shift()
+        //res.data.data.documents.shift()
         qiniu_token.value = res.data.data.qiniu_token
         qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
