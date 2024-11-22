@@ -1,6 +1,8 @@
 <script>
 import bookmarkitem from "../components/bookmarkitem.vue";
 import subfolder from "../components/subfolder.vue";
+import CryptoJS from 'crypto-js';
+
 import {
   CloseOutlined,
   SearchOutlined,
@@ -54,6 +56,8 @@ export default defineComponent({
     const visible_inputpassword = ref(false);
     const formState_inputpassword = ref([]);
     const show_private = ref(false);
+
+
 
     const showDrawer = (drawerTitle) => {
       visible.value = true;
@@ -211,21 +215,36 @@ export default defineComponent({
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("timestamp", new Date().getTime());
       params.append("token", $cookies.get("token"));
+      var temp2 = localStorage.getItem(folder_index+'md5');
+      params.append("folder_md5", temp2);
+      //console.log("sending folder_index ",folder_index,"sending folder_md5 ",temp2);
       proxy.$http
         .post("/ajax/home_stream_ajax/0/" + folder_index, params)
         .then((res) => {
-          //console.log(folder_index);
-          //console.log(res.data);
+          let temp=res.data.data.server_folder_json;
+          //console.log(res.data.data);
+          localStorage.setItem(folder_index,temp );
+          localStorage.setItem(folder_index+'md5',CryptoJS.MD5(temp).toString() );
+         
+    var temp1 = localStorage.getItem(folder_index);
+    //console.log("recevied folder_index ",res.data.data.folder_index,"recevied local_folder_md5 ",res.data.data.local_folder_md5,"received server_folder_md5 ",res.data.data.server_folder_md5);
+    //console.log("localstorage md5 is ",localStorage.getItem(folder_index+'md5'));
           if (res.data.data.next_folder_index != -1) {
-            items.value.folder[folder_index] =
-              res.data.data.folder[folder_index];
+if (res.data.data.is_same==1){
+  items.value.folder[folder_index] = JSON.parse(temp1);
+  console.log("same folder, no need to update");
+}else{
+  items.value.folder[folder_index] = res.data.data.folder[folder_index];
+  console.log("different folder, need to update");
+}            
+
             home_stream_ajax(res.data.data.next_folder_index);
             increaseloading();
           } else {
             finishloading();
             loadingdone.value = true;
             proxy.$http.post("/ajax/update_http_code/", params).then((res) => {
-              console.log(res.data);
+              //console.log(res.data);
             });
           }
         });

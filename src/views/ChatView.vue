@@ -65,7 +65,9 @@ export default {
         }
       });
     });
-
+    localStorage.setItem("key", "value");
+    var lastname = localStorage.getItem("key");
+    console.log(lastname);
     return {
       sendquestion,
       chat_url
