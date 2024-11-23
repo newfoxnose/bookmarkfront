@@ -205,7 +205,7 @@
     <div class="search">
       <a-input v-model:value="searchstring">
         <template #addonAfter>
-          <close-outlined @click="clearsearch" />
+          <search-outlined @click="search" />
         </template>
       </a-input>
     </div>
@@ -288,6 +288,7 @@ import {
   LikeTwoTone,
   StarOutlined,
   FormOutlined,
+  SearchOutlined
 } from "@ant-design/icons-vue";
 import { onMounted, getCurrentInstance, defineComponent, ref } from "vue";
 import * as qiniu from "qiniu-js";
@@ -301,6 +302,7 @@ export default {
     LikeTwoTone,
     StarOutlined,
     FormOutlined,
+    SearchOutlined
   },
   setup() {
     $cookies.set("selectedkey", "5", "720h");
@@ -338,7 +340,7 @@ export default {
 
     const activeKey = ref(0);
     const show_private = ref(false);
-
+    const searchstring = ref("");
     const clicktab = (key) => {
       currentpage.value=1;
       if (key == -1) {
@@ -446,7 +448,7 @@ export default {
       proxy.$http.post("/ajax/list_blog_ajax/" + page, params).then((res) => {
         //console.log(res.data);
         fileitems.value = res.data.data.blog;
-        pagesize.value = res.data.data.pagesize;
+        pagesize.value = Number(res.data.data.pagesize);
         total.value = res.data.data.total;
         defaultPercent.value = 100;
         loadingdone.value = true;
@@ -551,6 +553,38 @@ export default {
           });
       }
     };
+    const search = () => {
+      iconLoading.value = true;
+      if (
+        searchstring.value == ""
+      ) {
+        message.info("搜索内容不能为空");
+        iconLoading.value = false;
+      } else {
+        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+        params.append("token", $cookies.get("token"));
+        params.append("timestamp", new Date().getTime());
+        params.append("searchstring", searchstring.value);
+        params.append("pagesize", pagesize.value);
+        proxy.$http
+          .post("/ajax/search_blog_ajax/", params)
+          .then((res) => {
+            //console.log(res.data.msg);
+            message.info(res.data.msg);
+            iconLoading.value = false;
+            fileitems.value = res.data.data.blog;
+        pagesize.value = res.data.data.pagesize;
+        total.value = res.data.data.total;
+        defaultPercent.value = 100;
+        loadingdone.value = true;
+          })
+          .catch((error) => {
+            message.info("无法正常保存");
+            iconLoading.value = false;
+            console.log(error);
+          });
+      }
+    };
     return {
       formState,
       folder_list,
@@ -581,23 +615,15 @@ export default {
       clicktab,
       show_private,
       handleprivatepagechange,
-    };
-  },
-  data() {
-    return {
-      searchstring: ""
+      search,
+      searchstring
     };
   },
   watch: {
-    // 每当 question 改变时，这个函数就会执行
-    searchstring(newstring) {
-      console.log(newstring);
-     // this.searchstring = newstring;
-    },
-  },
-  methods: {
-    clearsearch() {
-      this.searchstring = "";
+    searchstring(newQuestion) {
+      if (newQuestion==''){
+        this.handlepagechange();
+      }
     },
   },
   created() {

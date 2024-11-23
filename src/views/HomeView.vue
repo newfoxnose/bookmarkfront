@@ -51,7 +51,7 @@ export default defineComponent({
 
     const drawerclass = ref("");
 
-    const activeKey = ref(0);
+    const activeKey = ref(-2);
 
     const visible_inputpassword = ref(false);
     const formState_inputpassword = ref([]);
@@ -622,10 +622,10 @@ if (res.data.data.is_same==1){
     v-model:activeKey="activeKey"
     @tabClick="clicktab"
   >
-    <a-tab-pane :key="0" tab="根目录">
-      <div :folderid="-1">
+  <a-tab-pane :key="-2" tab="最常访问">
+      <div>
         <bookmarkitem
-          v-for="bookmarkitem in items.root_bookmarks"
+          v-for="bookmarkitem in items.popular_bookmarks"
           :id="bookmarkitem.id"
           :folder_id="bookmarkitem.folder_id"
           :url="bookmarkitem.url"
@@ -648,6 +648,28 @@ if (res.data.data.is_same==1){
       <div>
         <bookmarkitem
           v-for="bookmarkitem in items.latest_bookmarks"
+          :id="bookmarkitem.id"
+          :folder_id="bookmarkitem.folder_id"
+          :url="bookmarkitem.url"
+          :title="bookmarkitem.title"
+          :pinyin="bookmarkitem.pinyin"
+          :short_title="bookmarkitem.short_title"
+          :is_private="bookmarkitem.is_private"
+          :is_published="bookmarkitem.is_published"
+          :is_recommend="bookmarkitem.is_recommend"
+          :is_friendlink="bookmarkitem.is_friendlink"
+          :http_code="bookmarkitem.http_code"
+          :icon="bookmarkitem.icon_display"
+          :search="''"
+          :editable="editable"
+          @editbookmark="fatherMethod"
+        ></bookmarkitem>
+      </div>
+    </a-tab-pane>
+    <a-tab-pane :key="0" tab="根目录">
+      <div :folderid="-1">
+        <bookmarkitem
+          v-for="bookmarkitem in items.root_bookmarks"
           :id="bookmarkitem.id"
           :folder_id="bookmarkitem.folder_id"
           :url="bookmarkitem.url"

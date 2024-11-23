@@ -15,6 +15,11 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      go_url: this.$remoteDomain + "/go/"
+    };
+  }
 }
 </script>
 <template>
@@ -22,7 +27,7 @@ export default {
     <img v-if="editable == 'yes'" :src="icon" style="width:16px;height:16px;margin-right:3px;"
       @click="$emit('editbookmark', '编辑书签', id, url, title, folder_id, is_private, is_published,is_recommend,is_friendlink)">
     <img v-else :src="icon" style="width:16px;height:16px;">
-    <a :href="url" :title="title" target="_blank">
+    <a :href=" go_url+id" :title="title" target="_blank">
       {{ short_title }}
     </a>
     <eye-invisible-two-tone v-if="is_private == '1'" style="margin-left:3px;" />

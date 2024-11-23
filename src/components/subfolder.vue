@@ -92,6 +92,11 @@ export default {
       }
     },
   },
+  data() {
+    return {
+      go_url: this.$remoteDomain + "/go/"
+    };
+  }
 };
 </script>
 <template>
@@ -147,7 +152,7 @@ export default {
           )
         "
       />
-      <a :href="bookmarkitem.url" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
+      <a :href="go_url+bookmarkitem.id" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
         {{ bookmarkitem.short_title }}
       </a>
       <eye-invisible-two-tone
