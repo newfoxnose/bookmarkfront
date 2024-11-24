@@ -16,7 +16,7 @@
       </p>
       <p class="ant-upload-text">点击或拖放文件到此处进行上传</p>
       <p class="ant-upload-hint">
-        每次只能上传一个文件，且文件大小不能超过20M，支持如下格式pdf|xls|xlsx|doc|docx|ppt|pptx|zip|rar|7z|txt|jpg|png|gif|webp|bmp|jpeg|mp3|mp4|wav
+        每次只能上传一个文件，且文件大小不能超过20M，支持如下格式pdf|xls|xlsx|doc|docx|ppt|pptx|zip|rar|7z|txt|jpg|png|gif|webp|bmp|jpeg|mp3|mp4|wav，最多上传15个文件。
       </p>
     </a-upload-dragger>
   </div>
@@ -138,7 +138,7 @@ export default {
     }
         if (res.data.code=="200"){
         fileitems.value = res.data.data.documents
-        }
+        } 
         else{
           message.error(res.data.msg);
         }
@@ -151,20 +151,19 @@ export default {
       file_key.value = "attachment/"+file.name;
     }
     const handleChange = info => {
-      const status = info.file.status;
-      //console.log(info.file)
+      const status = info.file.status;    
+      //console.log(info.file.response)
       if (status !== 'uploading') {
         //console.log(info.file, info.fileList);
       }
       if (status === 'done') {
-        message.success(`${info.file.name} 上传成功.`);
-        let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get('token'));
-        params.append("timestamp",new Date().getTime());
-        proxy.$http.post('/ajax/list_file_ajax/', params).then(res => {
-          //res.data.data.documents.shift()
-          fileitems.value = res.data.data.documents
-        });
+        if (info.file.response.code=="200"){     //服务器返回json被储存在info.file.response中
+          message.success(`${info.file.name} 上传成功.`);
+          fileitems.value = info.file.response.data.documents;
+        }
+        else{
+          message.error(info.file.response.msg);
+        }
       } else if (status === 'error') {
         message.error(`${info.file.name} 上传失败.`);
       }
