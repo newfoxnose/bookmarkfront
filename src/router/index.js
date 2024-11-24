@@ -53,6 +53,11 @@ const router = createRouter({
       component: () => import("../views/QiniuView.vue"),
     },
     {
+      path: "/file",
+      name: "file",
+      component: () => import("../views/FileView.vue"),
+    },
+    {
       path: "/profile",
       name: "profile",
       component: () => import("../views/ProfileView.vue"),

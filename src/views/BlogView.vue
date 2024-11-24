@@ -632,7 +632,7 @@ export default {
       ///*
       toolbars: [
         [
-            'fullscreen',  'undo', 'redo', '|',
+            'fullscreen', 'source', 'undo', 'redo', '|',
             'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', '|', 'forecolor', 'backcolor', '|', 'removeformat', '|',
             'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
             'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',

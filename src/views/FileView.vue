@@ -7,40 +7,36 @@
   </div>
   <h3>文件</h3>
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
-  <div v-if="qiniu_token != ''">
+  <div>
     <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" :action=upload_url
       :data={token:aaa,timestamp:bbb,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
       @drop=" handleDrop ">
       <p class="ant-upload-drag-icon">
         <inbox-outlined></inbox-outlined>
       </p>
-      <p class="ant-upload-text">Click or drag file to this area to upload</p>
+      <p class="ant-upload-text">点击或拖放文件到此处进行上传</p>
       <p class="ant-upload-hint">
-        Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-        band files
+        每次只能上传一个文件，且文件大小不能超过20M，支持如下格式pdf|xls|xlsx|doc|docx|ppt|pptx|zip|rar|7z|txt|jpg|png|gif|webp|bmp|jpeg|mp3|mp4|wav
       </p>
     </a-upload-dragger>
-  </div>
-  <div v-else>
-    <h5>七牛云账号信息未填写或错误。</h5>
   </div>
   <br>
   <div>
     <div v-for=" item  in  fileitems " style="margin-bottom:5px;">
 
       <span class="ext">{{ lcase_ext= item.key.split('.').pop().toLowerCase() }}</span>
-      <a-image v-if="['jpg','jpeg','png','gif','bmp','webp'].indexOf(lcase_ext) !== -1" :href=" qiniu_domain + '/' + item.key " style="max-height:50px;margin-left:5px;"
-    :src=" qiniu_domain + '/' + item.key "
+      <a-image v-if="['jpg','jpeg','png','gif','bmp','webp'].indexOf(lcase_ext) !== -1" :href=" item.path  + item.key " style="max-height:50px;margin-left:5px;"
+    :src=" item.path + item.key "
   />
-      <a v-else target="_blank" :href=" qiniu_domain + '/' + item.key " style="margin-left:5px;">
+      <a v-else target="_blank" :href=" item.path + item.key " style="margin-left:5px;">
         {{ item.key.substring(11) }}
       </a>
       <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime)
         }})</span>
-        <a v-if="['xls','xlsx','doc','docx','ppt','pptx'].indexOf(lcase_ext) !== -1" target="_blank" :href="'https://view.officeapps.live.com/op/view.aspx?src='+ encodeURIComponent(qiniu_domain + '/' + item.key) " style="margin-left:5px;">
+        <a v-if="['xls','xlsx','doc','docx','ppt','pptx'].indexOf(lcase_ext) !== -1" target="_blank" :href="'https://view.officeapps.live.com/op/view.aspx?src='+ encodeURIComponent(item.path  + item.key) " style="margin-left:5px;">
        在线查看
       </a>
-      <a v-else-if="['txt'].indexOf(lcase_ext) !== -1" target="_blank" @click="readtext(item.key.substring(11),qiniu_domain + '/' + item.key) " style="margin-left:5px;">
+      <a v-else-if="['txt'].indexOf(lcase_ext) !== -1" target="_blank" @click="readtext(item.key) " style="margin-left:5px;">
        在线查看
       </a>
       <a style="margin-left:20px;" @click="deletefile(item.key)">删除</a>
@@ -86,7 +82,6 @@
 import { message } from 'ant-design-vue';
 import { InboxOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
-import * as qiniu from 'qiniu-js';
 import { Base64 } from "js-base64";
 
 export default {
@@ -100,25 +95,26 @@ export default {
     const loadingdone = ref(false);
 
     const { proxy } = getCurrentInstance()
-    const qiniu_token = ref('')
     const aaa=ref($cookies.get('token'));
     const bbb=ref();
-    const qiniu_domain = ref('')
     const file_key = ref('')
     const fileitems = ref([])
-    const upload_url = ref(proxy.$remoteDomain+"/ajax/upload_qiniu_ajax")
+    const upload_url = ref(proxy.$remoteDomain+"/ajax/upload_file_ajax")
 
     const visible = ref(false);
     const articletitle = ref('');
     const articlecontent = ref('');
 
-    const readtext = (filename,filepath) => {
-      proxy.$http.get(filepath).then(res => {
-        console.log(res)
+    const readtext = (file) => {
+      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
+      params.append("token", $cookies.get('token'));
+      params.append("timestamp",new Date().getTime());
+      params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
+      proxy.$http.post('/ajax/read_file_ajax/', params).then(res => {
         visible.value = true;
-      articletitle.value=filename
-      articlecontent.value='<pre>'+ ( (res.data))+'</pre>'
-        });
+      articletitle.value=file.replace("attachment/", "");
+      articlecontent.value='<pre>'+ ( (res.data.data))+'</pre>'
+      });
     }
     const onClose = () => {
       visible.value = false;
@@ -135,15 +131,12 @@ export default {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get('token'));
       params.append("timestamp",new Date().getTime());
-      proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
+      proxy.$http.post('/ajax/list_file_ajax/', params).then(res => {
         //console.log(res.data)
         if (res.data.code=='401'){      //不在登陆状态
       window.location.href ="/";
     }
         if (res.data.code=="200"){
-          //res.data.data.documents.shift()
-        qiniu_token.value = res.data.data.qiniu_token
-        qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
         }
         else{
@@ -168,10 +161,8 @@ export default {
         let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
         params.append("token", $cookies.get('token'));
         params.append("timestamp",new Date().getTime());
-        proxy.$http.post('/ajax/qiniu_list_ajax/', params).then(res => {
+        proxy.$http.post('/ajax/list_file_ajax/', params).then(res => {
           //res.data.data.documents.shift()
-          qiniu_token.value = res.data.data.qiniu_token
-          qiniu_domain.value = res.data.data.qiniu_domain
           fileitems.value = res.data.data.documents
         });
       } else if (status === 'error') {
@@ -185,8 +176,6 @@ export default {
       params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
       proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
         //res.data.data.documents.shift()
-        qiniu_token.value = res.data.data.qiniu_token
-        qiniu_domain.value = res.data.data.qiniu_domain
         fileitems.value = res.data.data.documents
       });
     };
@@ -194,8 +183,6 @@ export default {
       aaa,
       bbb,
       upload_url,
-      qiniu_token,
-      qiniu_domain,
       file_key,
       fileitems,
       handleBeforeUpload,

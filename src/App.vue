@@ -236,7 +236,7 @@ else{
           </a-menu-item>
           <a-menu-item key="3">
             <database-outlined />
-            <RouterLink to="/qiniu" style="padding-left: 8px">文件</RouterLink>
+            <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink>
           </a-menu-item>
           <a-menu-item key="4">
             <comment-outlined />
@@ -271,7 +271,7 @@ else{
             <a-menu-item key="9" v-if="useremail != 'test@test.com'">
               <RouterLink to="/profile">个人设置</RouterLink>
             </a-menu-item>
-            <a-menu-item key="10">
+            <a-menu-item key="10" v-if="1 == 2">
               <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
             </a-menu-item>
             <a-menu-item key="11">
