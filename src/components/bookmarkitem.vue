@@ -1,8 +1,8 @@
 <script>
-import { EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone} from '@ant-design/icons-vue';
+import { EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone, BorderOutlined} from '@ant-design/icons-vue';
 export default {
   components: {
-    EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone
+    EyeInvisibleTwoTone,AppstoreTwoTone,LikeTwoTone ,ApiTwoTone,BorderOutlined
   },
   props: ['title','pinyin', 'icon', 'id', 'url', 'short_title', 'search', 'editable', 'folder_id', 'is_private', 'http_code', 'is_published', 'is_recommend', 'is_friendlink'],
   emits: ['editbookmark'],
@@ -30,6 +30,7 @@ export default {
     <a :href=" go_url+id" :title="title" target="_blank">
       {{ short_title }}
     </a>
+    <a :href="'/frame/'+id"><border-outlined style="margin-left:3px;" /></a>
     <eye-invisible-two-tone v-if="is_private == '1'" style="margin-left:3px;" />
     <RouterLink :to="'/editpost/'+id" v-if="is_published == '1'"><appstore-two-tone style="margin-left:3px;" /></RouterLink>
     <like-two-tone  v-if="is_recommend == '1'" style="margin-left:3px;" />

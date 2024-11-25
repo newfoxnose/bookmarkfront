@@ -107,6 +107,10 @@ const router = createRouter({
       path: "/rss/:id",
       name: "rss",
       component: () => import("../views/RSSView.vue"),
+    },{
+      path: "/frame/:id",
+      name: "frame",
+      component: () => import("../views/FrameView.vue"),
     }
   ],
 });
