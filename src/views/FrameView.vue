@@ -18,7 +18,7 @@ export default {
     :src="go_url"
     title="External Content"
     width="100%"
-    height="100%"
+    height="99%"
     frameborder="0"
     allowfullscreen
   >

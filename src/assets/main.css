@@ -1,4 +1,70 @@
 
+/* 修改垂直滚动条 */
+::-webkit-scrollbar {
+  width: 10px; /* 修改宽度 */
+}
+ 
+/* 修改滚动条轨道背景色 */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+ 
+/* 修改滚动条滑块颜色 */
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+}
+ 
+/* 修改滚动条滑块悬停时的颜色 */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+/* 修改垂直滚动条 */
+::-webkit-scrollbar {
+  width: 10px; /* 修改宽度 */
+}
+ 
+/* 修改滚动条轨道背景色 */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+ 
+/* 修改滚动条滑块颜色 */
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+}
+ 
+/* 修改滚动条滑块悬停时的颜色 */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+ 
+/* 修改滚动条滑块移动时的颜色 */
+::-webkit-scrollbar-thumb:active {
+  background-color: #333;
+}
+ 
+/* 修改滚动条滑块的圆角 */
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+}
+/* 修改滚动条的宽度和颜色 */
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: #f1f1f1;
+}
+ 
+/* 修改滚动条滑块的样式 */
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 5px; /* 修改滑块圆角 */
+}
+ 
+/* 修改滚动条滑块悬停时的样式 */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+
 .logo {
     height: 32px;
     margin: 10px;
@@ -10,10 +76,11 @@
 
   .content-light-theme {
     background: #fff;
-    border-style:solid;
-    border-width:10px;
-    border-color:rgb(240 242 245);
-    padding:10px;
+    border-left-style:solid;
+    border-left-width:thin;
+    border-left-color:rgb(240 242 245);
+    padding-left:10px;
+    padding-top:0;
     color:#000;
   }
   
@@ -21,10 +88,11 @@
     
   .content-dark-theme {
     background: #001529;
-    border-style:solid;
-    border-width:10px;
-    border-color:#001529;
-    padding:10px;
+    border-left-style:solid;
+    border-left-width:thin;
+    border-left-color:#001529;
+    padding-left:10px;
+    padding-top:0;
     color:rgba(255, 255, 255, 0.65);
   }
 
@@ -210,9 +278,14 @@
     background-color: #001529;
     border:none !important;
   }
+
   .collapse-dark-theme del{
     text-decoration-style: solid;
     text-decoration-color: white;
+  }
+
+  .ant-menu-dark .ant-menu-item a{
+    color: #fff !important;
   }
 
 /*去掉顶部折叠面板的边框*/

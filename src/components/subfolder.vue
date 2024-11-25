@@ -155,7 +155,7 @@ export default {
       <a :href="go_url+bookmarkitem.id" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
         {{ bookmarkitem.short_title }}
       </a>
-      <a :href="'/frame/'+id"><border-outlined style="margin-left:3px;" /></a>
+      <a :href="'/frame/'+bookmarkitem.id"><border-outlined style="margin-left:3px;" /></a>
       <eye-invisible-two-tone
         v-if="bookmarkitem.is_private == '1'"
         style="margin-left: 3px"

@@ -46,13 +46,10 @@ export default defineComponent({
   },
   data() {
     return {
-      collapsed: ref(false),
-      selectedKeys: ref([])
+      //selectedKeys: ref([])
     };
   },
   setup() {
-    
-
     const logourl = ref("../images/logo-white.png");
     const contenttheme = ref("content-dark-theme");
     const footertheme = ref("footer-dark-theme");
@@ -61,6 +58,7 @@ export default defineComponent({
       theme: $cookies.get("theme"),
       selectedKeys: [$cookies.get("selectedkey")],
       openKeys: [$cookies.get("openkey")],
+      collapsed: Boolean($cookies.get("collapsed")==1),
     });
     const { proxy } = getCurrentInstance();
     const todo_items = ref([]);
@@ -68,8 +66,13 @@ export default defineComponent({
     const useremail = ref("");
     const activeKey = ref(['xx']);
     const badge_type = ref('#666');
-    watch(activeKey, val => {
-  console.log(val);
+    watch(state, val => {
+  if (val.collapsed==true){
+    $cookies.set('collapsed',1,"720h") 
+  }
+  else{
+    $cookies.set('collapsed',0,"720h") 
+  }
 });
     onMounted(() => {
       if (state.theme == "dark") {
@@ -173,11 +176,11 @@ else{
 
 <template>
   <a-layout style="min-height: 100vh" v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
-    <a-layout-sider v-model:collapsed="collapsed" :theme="theme">
+    <a-layout-sider v-model:collapsed="collapsed" :theme="theme" collapsible>
       <div class="logo" :theme="theme">
         <img :src="logourl" height="30" />
       </div>
-      <a-collapse v-model:activeKey="activeKey" :class="collapsetheme">
+      <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed==false">
             <a-collapse-panel key="xx" header="待办">
               <p v-for="item in todo_items">
                 <a-checkbox
@@ -228,35 +231,37 @@ else{
       >
           <a-menu-item key="1">
             <star-outlined />
+            <span>
             <RouterLink to="/home" style="padding-left: 8px">书签</RouterLink>
+          </span>
           </a-menu-item>
           <a-menu-item key="2">
-            <form-outlined />
-            <RouterLink to="/note" style="padding-left: 8px">随手记</RouterLink>
+            <form-outlined /><span>
+            <RouterLink to="/note" style="padding-left: 8px">随手记</RouterLink></span>
           </a-menu-item>
           <a-menu-item key="3">
-            <database-outlined />
-            <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink>
+            <database-outlined /><span>
+            <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink></span>
           </a-menu-item>
           <a-menu-item key="4">
-            <comment-outlined />
+            <comment-outlined /><span>
             <RouterLink to="/chat" style="padding-left: 8px"
               >CHATGPT</RouterLink
-            >
+            ></span>
           </a-menu-item>
           <a-menu-item key="5">
-            <profile-outlined />
-            <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink>
+            <profile-outlined /><span>
+            <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink></span>
           </a-menu-item>
           <a-menu-item key="6">
-            <wifi-outlined />
-            <RouterLink to="/feed" style="padding-left: 8px">RSS</RouterLink>
+            <wifi-outlined /><span>
+            <RouterLink to="/feed" style="padding-left: 8px">RSS</RouterLink></span>
           </a-menu-item>
           <a-menu-item key="17">
-            <calendar-outlined />
+            <calendar-outlined /><span>
             <RouterLink to="/calendar" style="padding-left: 8px"
               >日历</RouterLink
-            >
+            ></span>
           </a-menu-item>
           <a-sub-menu key="sub1">
             <template #title>
@@ -299,10 +304,8 @@ else{
     </a-layout-sider>
     <a-layout>
       <a-layout-content :class="contenttheme">
-        <p></p>
         <RouterView />
       </a-layout-content>
-  <a-layout-footer :class="footertheme"> ©2024 </a-layout-footer>
     </a-layout>
   </a-layout>
   <a-layout v-else>
