@@ -205,9 +205,21 @@ export default {
   text-decoration: underline;
 }
 .item {
-  margin-top: 2rem;
-  width: 50%;
+  margin-top: 0;
+    padding-top:0.4rem;
+    padding-bottom:1rem;
+  width: 100%;
   display: inline-block;
+  padding-left:0.2rem;
+}
+
+@media (min-width: 720px) {
+  .item {
+    width: 50%;
+    margin-top: 0;
+    padding-top:0.4rem;
+    padding-bottom:1rem;
+  }
 }
 
 @media (min-width: 1024px) {

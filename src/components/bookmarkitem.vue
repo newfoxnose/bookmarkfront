@@ -55,6 +55,7 @@ export default {
     padding-bottom:1rem;
   width: 100%;
   display: inline-block;
+  padding-left:0.2rem;
 }
 
 @media (min-width: 720px) {
