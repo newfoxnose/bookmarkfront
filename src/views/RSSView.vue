@@ -12,7 +12,7 @@
     />
   </div>
 
-  <h3>{{ title }}</h3>
+  <h3 class="content-title">{{ title }}</h3>
   <div>
     <div v-for=" item in feedItems" style="margin-bottom:5px;">
       <span class="green" style="margin-left:5px;cursor: pointer;"  @click="showDrawer(item.title,item.link,item.description)">

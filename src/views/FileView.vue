@@ -5,7 +5,7 @@
       '100%': '#87d068',
     }" />
   </div>
-  <h3>文件</h3>
+  <h3 class="content-title">文件</h3>
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
   <div>
     <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" :action=upload_url

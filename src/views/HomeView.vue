@@ -577,7 +577,7 @@ if (res.data.data.is_same==1){
 </script>
  
 <template>
-  <h3>书签</h3>
+  <h3 class="content-title">书签</h3>
   <div class="loadingbar" v-show="loadingdone == false">
     <a-progress
       type="circle"

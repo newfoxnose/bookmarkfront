@@ -1,8 +1,8 @@
 <template>
-  <h3>日历</h3>
+  <h3 class="content-title">日历<br><br>
   <a-button type="primary" @click="showDrawer('添加事件', selectedValue)"
     ><form-outlined />添加事件</a-button
-  >
+  ></h3>
   <a-calendar
     v-model:value="value"
     @select="onSelect"

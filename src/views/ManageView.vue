@@ -264,7 +264,7 @@ export default defineComponent({
     <p>此操作将删除所选择目录内的所有书签</p>
   </a-modal>
   
-  <h3>管理目录</h3>
+  <h3 class="content-title">管理目录</h3>
 
   <a-table :columns="columns_addnew" :data-source="data_addnew" :pagination="false">
     <template #headerCell="{ column }">

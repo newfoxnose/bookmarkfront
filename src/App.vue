@@ -176,7 +176,7 @@ else{
 
 <template>
   <a-layout style="min-height: 100vh" v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
-    <a-layout-sider v-model:collapsed="collapsed" :theme="theme" collapsible>
+    <a-layout-sider v-model:collapsed="collapsed" :theme="theme"  breakpoint="lg" collapsed-width="0">
       <div class="logo" :theme="theme">
         <img :src="logourl" height="30" />
       </div>

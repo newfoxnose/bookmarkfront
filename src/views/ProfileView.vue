@@ -69,7 +69,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div style="margin-top:15px;"></div>
+   <h3 class="content-title">个人设置</h3><br>
   <a-form :model="formState" name="basic" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }" autocomplete="off"
     @finish="onFinish" @finishFailed="onFinishFailed">
     <a-form-item label="昵称" name="name" :rules="[{ required: true, message: '昵称不能为空' }]">

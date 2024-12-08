@@ -64,6 +64,12 @@
   background-color: #555;
 }
 
+.content-title{
+  margin-top:15px;
+margin-left:30px;
+font-weight:bold;
+text-align:center;
+}
 
 .logo {
     height: 32px;
@@ -72,6 +78,14 @@
     text-align: center;
   }
 
+.ant-layout-sider-dark .ant-layout-sider-zero-width-trigger{
+  background-color: #1890ff;
+  top:0;
+}
+.ant-layout-sider-light .ant-layout-sider-zero-width-trigger{
+  background-color: #1890ff;
+  top:0;
+}
 
 
   .content-light-theme {

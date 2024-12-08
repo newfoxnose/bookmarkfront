@@ -1,5 +1,5 @@
 <template>
-  <h3>ChatGPT</h3>
+  <h3 class="content-title">ChatGPT</h3>
 <p id="chat_url" style="display:none">{{ chat_url }}</p>
   <ul id="content" class="content"></ul>
 <br>

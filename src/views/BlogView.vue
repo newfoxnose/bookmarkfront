@@ -11,9 +11,9 @@
       }"
     />
   </div>
-  <p style="margin-top: 15px">
-    <a-button type="primary" @click="showDrawer('新建笔记', 0)"><form-outlined />新建笔记</a-button>
-  </p>
+  <h3  class="content-title">笔记<br><br>
+    <a-button type="primary" @click="showDrawer('新建笔记', 0)"><form-outlined />新建</a-button>
+  </h3>
 
   <a-tabs v-model:activeKey="activeKey" @tabClick="clicktab">
     <a-tab-pane :key="0" tab="公开">
