@@ -66,6 +66,7 @@ export default defineComponent({
     const useremail = ref("");
     const activeKey = ref(['xx']);
     const badge_type = ref('#666');
+    const breakpoint_active = ref(false);
     watch(state, val => {
   if (val.collapsed==true){
     $cookies.set('collapsed',1,"720h") 
@@ -154,6 +155,16 @@ else{
         collapsetheme.value = "collapse-light-theme";
       }
     };
+    const onBreakpoint = broken => {
+      //console.log(broken);
+      breakpoint_active.value=broken;
+    };
+    const handleClick = () => {
+      console.log('ddd');
+      if (breakpoint_active.value==true){
+      state.collapsed = true;
+      }
+    };
     provide('reloadtodo', toggleTodo);   //向其他组件提供刷新方法，要在本页函数初始化之后
     return {
       ...toRefs(state),
@@ -168,7 +179,10 @@ else{
       createTodo,
       activeKey,
       badge_type,
-      useremail
+      useremail,
+      handleClick,
+      onBreakpoint,
+      breakpoint_active
     };
   },
 });
@@ -176,7 +190,7 @@ else{
 
 <template>
   <a-layout style="min-height: 100vh" v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
-    <a-layout-sider v-model:collapsed="collapsed" :theme="theme"  breakpoint="lg" collapsed-width="0">
+    <a-layout-sider v-model:collapsed="collapsed" :theme="theme"  breakpoint="lg" collapsed-width="0" @breakpoint="onBreakpoint">
       <div class="logo" :theme="theme">
         <img :src="logourl" height="30" />
       </div>
@@ -229,35 +243,35 @@ else{
         :theme="theme"
         v-model:openKeys="openKeys"
       >
-          <a-menu-item key="1">
+          <a-menu-item key="1"  @click="handleClick">
             <star-outlined />
             <span>
             <RouterLink to="/home" style="padding-left: 8px">书签</RouterLink>
           </span>
           </a-menu-item>
-          <a-menu-item key="2">
+          <a-menu-item key="2"  @click="handleClick">
             <form-outlined /><span>
             <RouterLink to="/note" style="padding-left: 8px">随手记</RouterLink></span>
           </a-menu-item>
-          <a-menu-item key="3">
+          <a-menu-item key="3"  @click="handleClick">
             <database-outlined /><span>
             <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink></span>
           </a-menu-item>
-          <a-menu-item key="4">
+          <a-menu-item key="4"  @click="handleClick">
             <comment-outlined /><span>
             <RouterLink to="/chat" style="padding-left: 8px"
               >CHATGPT</RouterLink
             ></span>
           </a-menu-item>
-          <a-menu-item key="5">
+          <a-menu-item key="5"  @click="handleClick">
             <profile-outlined /><span>
             <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink></span>
           </a-menu-item>
-          <a-menu-item key="6">
+          <a-menu-item key="6"  @click="handleClick">
             <wifi-outlined /><span>
             <RouterLink to="/feed" style="padding-left: 8px">RSS</RouterLink></span>
           </a-menu-item>
-          <a-menu-item key="17">
+          <a-menu-item key="17"  @click="handleClick">
             <calendar-outlined /><span>
             <RouterLink to="/calendar" style="padding-left: 8px"
               >日历</RouterLink
@@ -270,22 +284,22 @@ else{
                 <span>更多</span>
               </span>
             </template>
-            <a-menu-item key="8">
+            <a-menu-item key="8"  @click="handleClick">
               <RouterLink to="/manage">管理目录</RouterLink>
             </a-menu-item>
-            <a-menu-item key="9" v-if="useremail != 'test@test.com'">
+            <a-menu-item key="9" v-if="useremail != 'test@test.com'"  @click="handleClick">
               <RouterLink to="/profile">个人设置</RouterLink>
             </a-menu-item>
-            <a-menu-item key="10" v-if="1 == 2">
+            <a-menu-item key="10" v-if="1 == 2"  @click="handleClick">
               <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
             </a-menu-item>
-            <a-menu-item key="11">
+            <a-menu-item key="11"  @click="handleClick">
               <RouterLink to="/upload">导入书签</RouterLink>
             </a-menu-item>
-            <a-menu-item key="12">
+            <a-menu-item key="12"  @click="handleClick">
               <RouterLink to="/export">导出书签至本地</RouterLink>
             </a-menu-item>
-            <a-menu-item key="13" v-if="useremail != 'test@test.com'">
+            <a-menu-item key="13" v-if="useremail != 'test@test.com'"  @click="handleClick">
               <RouterLink to="/email">发送书签至邮箱</RouterLink>
             </a-menu-item>
             <a-menu-item key="14">
