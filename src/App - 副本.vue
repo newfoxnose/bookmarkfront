@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 dayjs.locale("zh-cn");
 import { RouterLink, RouterView } from "vue-router";
-import { message,Modal } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { defineComponent, ref, watch,nextTick } from "vue";
 import { onMounted, reactive, getCurrentInstance, toRefs } from "vue";
 import {
@@ -82,17 +82,6 @@ export default defineComponent({
     };
     const finishloading = () => {
       defaultPercent.value = 100;
-    };
-    const showconfirmdelete = (editId) => {
-      Modal.confirm({
-        title: "确认删除该项目吗？",
-        content: "点击OK删除且无法找回, 点击cancel取消",
-        onOk() {
-          addBookmark(editId, "删除");
-        },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel() {},
-      });
     };
     onMounted(() => {
       if (state.theme == "dark") {
@@ -240,7 +229,7 @@ if (res.data.data.is_same==1){
         state.collapsed = true;
       }
     };
-//弹出编辑书签抽屉
+//弹出新建书签抽屉
     const drawerclass = ref("");
     const url = ref(String);
     const title = ref(String);
@@ -252,18 +241,22 @@ if (res.data.data.is_same==1){
     const is_recommend = ref(false);
     const is_friendlink = ref(false);
     const folder_list = ref([]);
-    const updatedDrawerTitle = ref(String);
-    const showDrawer = (drawerTitle) => {
+    const showDrawer = () => {
       visible.value = true;
-      updatedDrawerTitle.value = drawerTitle;
       drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
+        url.value = "";
+        title.value = "";
+        is_private.value = false;
+        is_published.value = false;
+        is_recommend.value = false;
+        is_friendlink.value = false;
     };
     const onClose = () => {
       iconLoading.value = false;
       visible.value = false;
     };
     
-    const addBookmark = (id, action) => {
+    const addBookmark = () => {
       if (url.value != "" && title.value != "" && folder_id.value != "") {
         iconLoading.value = true;
         let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
@@ -292,16 +285,7 @@ if (res.data.data.is_same==1){
         }
         params.append("timestamp", new Date().getTime());
         params.append("token", $cookies.get("token"));
-        let ajax_url = "";
-        if (id != "" && action == "删除") {
-          params.append("id", id);
-          ajax_url = "/ajax/delete_bookmark_ajax";
-        } else if (id != "") {
-          params.append("id", id);
-          ajax_url = "/ajax/edit_bookmark_ajax";
-        } else {
-          ajax_url = "/ajax/add_bookmark_ajax";
-        }
+        let ajax_url = "/ajax/add_bookmark_ajax";
         const { data: res } = proxy.$http
           .post(ajax_url, params)
           .then((res) => {
@@ -312,54 +296,40 @@ if (res.data.data.is_same==1){
             if (res.data.data != null) {
               let temp_item = res.data.data;
               let folder_path = res.data.data.folder_path;
-              if (id != "" && action == "删除") {
-                console.log(
-                  "start to delete item,folder_path is " + folder_path
-                );
-                items.value = proxy.$func.insert_item(
-                  items.value,
-                  folder_path,
-                  temp_item,
-                  "delete"
-                );
-                //document.querySelector("[itemid='" + id + "']").remove();
-              } else if (id != "") {
-                let old_folder_path = res.data.data.old_folder_path;
-                items.value = proxy.$func.insert_item(
-                  items.value,
-                  old_folder_path,
-                  temp_item,
-                  "delete"
-                ); //删除旧的
                 if (is_private.value == false) {
-                  items.value = proxy.$func.insert_item(
-                    items.value,
-                    folder_path,
-                    temp_item
-                  ); //插入新的
-                }
-              } else {
-                if (is_private.value == false) {
+                //插入新书签
                   items.value = proxy.$func.insert_item(
                     items.value,
                     folder_path,
                     temp_item
                   );
                 }
-              }
               proxy.$http
                 .post("/ajax/latest_stream_ajax", params)
                 .then((res) => {
                   //console.log(folder_index);
                   items.value.latest_bookmarks = res.data.data.latest_bookmarks;
-                  items.value.popular_bookmarks = res.data.data.popular_bookmarks;
                 });
+              if (formState_inputpassword.value.password != "") {
+                params.append(
+                  "password",
+                  formState_inputpassword.value.password
+                );
+                proxy.$http
+                  .post("/ajax/private_stream_ajax", params)
+                  .then((res) => {
+                    if (res.data.code == 200) {
+                      items.value.private_bookmarks =
+                        res.data.data.private_bookmarks;
+                    }
+                  });
+              }
               onClose();
             }
           })
           .catch((error) => {
             //obj.error ? obj.error(error) : null;
-            console.log(error);
+            //console.log(error);
             message.info("出错了，请刷新");
             onClose();
           });
@@ -402,7 +372,6 @@ if (res.data.data.is_same==1){
     //搜索结果
     provide("reloadtodo", toggleTodo); //向其他组件提供刷新方法，要在本页函数初始化之后
     provide('sharedItems', items);
-    provide('folder_list', folder_list);
     return {
       ...toRefs(state),
       changeTheme,
@@ -443,9 +412,7 @@ if (res.data.data.is_same==1){
       clearQuestion,
       loadingdone,
       defaultPercent,
-      increaseloading,
-      updatedDrawerTitle,
-      showconfirmdelete
+      increaseloading
     };
   },
   
@@ -459,71 +426,6 @@ if (res.data.data.is_same==1){
   },
 
   methods: {
-    fatherMethod(
-      drawerTitle,
-      id,
-      url,
-      title,
-      folder_id,
-      is_private,
-      is_published,
-      is_recommend,
-      is_friendlink
-    ) {
-      if (drawerTitle == "编辑书签") {
-        this.showDrawer(drawerTitle);
-        this.editId = id;
-        this.url = url;
-        this.title = title;
-        if (is_private == 1) {
-          this.is_private = true;
-        } else {
-          this.is_private = false;
-        }
-        if (is_published == 1) {
-          this.is_published = true;
-        } else {
-          this.is_published = false;
-        }
-        if (is_recommend == 1) {
-          this.is_recommend = true;
-        } else {
-          this.is_recommend = false;
-        }
-        if (is_friendlink == 1) {
-          this.is_friendlink = true;
-        } else {
-          this.is_friendlink = false;
-        }
-        if (folder_id == -1) {
-          this.folder_id = this.folder_list[0].value;
-        } else {
-          this.folder_id = folder_id;
-        }
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("id", id);
-        this.$http.post("/ajax/list_urlshot_ajax/", params).then((res) => {
-          //console.log(res.data);
-          if (res.data.code == "200") {
-            if (res.data.data != null) {
-              this.urlshot_items = res.data.data.urlshot;
-            }
-          }
-        });
-      } else {
-        this.showDrawer("新建书签");
-        this.editId = "";
-        this.url = "";
-        this.title = "";
-        this.folder_id = this.folder_list[0].value;
-        this.is_private = false;
-        this.is_published = false;
-        this.is_recommend = false;
-        this.is_friendlink = false;
-      }
-    },
     getUrl() {
       let theurl = this.url.toLowerCase();
       if (theurl == "") {
@@ -768,7 +670,7 @@ if (res.data.data.is_same==1){
 <div class="bookmark-search">
   <a-input v-model:value="search" ref="inputRef">
     <template #addonBefore>
-      <star-outlined @click="fatherMethod('新建书签')" />
+      <star-outlined @click="showDrawer" />
     </template>
     <template #addonAfter>
       <close-outlined @click="clearQuestion" />
@@ -786,7 +688,7 @@ if (res.data.data.is_same==1){
 
 
   <a-drawer v-model:visible="visibleSearch" :title="`关键词${search}的搜索结果`" @ok="handleSearchOk" placement="bottom"
-    :footer="null" height="100%" @close="clearQuestion">
+    :footer="null" height="100%">
       
 
     <h3>根目录</h3>
@@ -806,7 +708,6 @@ if (res.data.data.is_same==1){
       :icon="bookmarkitem.icon_display"
       :search="search"
       :editable="editable"
-      @editbookmark="fatherMethod"
     ></bookmarkitem>
     <div v-for="item in items.folder">
       
@@ -818,7 +719,6 @@ if (res.data.data.is_same==1){
         :search="search"
         :editable="editable"
         :display_offset="item.display_offset"
-        :fatherMethod="fatherMethod"
       >
       </subfolder>
     </div>
@@ -826,7 +726,7 @@ if (res.data.data.is_same==1){
   <div class="bookmark-search">
       <a-input v-model:value="search" ref="DrawerinputRef">
         <template #addonBefore>
-          <star-outlined @click="fatherMethod('新建书签')" />
+          <star-outlined @click="showDrawer" />
         </template>
         <template #addonAfter>
           <close-outlined @click="clearQuestion" />
@@ -837,21 +737,12 @@ if (res.data.data.is_same==1){
   
   <a-drawer
     :width="500"
-    :title="updatedDrawerTitle"
+    title="添加书签"
     :class="drawerclass"
     placement="bottom"
     :visible="visible"
     @close="onClose"
   >
-  <template #extra v-if="updatedDrawerTitle == '编辑书签'">
-      <a-button
-        type="primary"
-        danger
-        @click="showconfirmdelete(editId)"
-        :loading="iconLoading"
-        >删除</a-button
-      >
-    </template>
     <p>
       <a-input v-model:value="url" placeholder="网址">
         <template #addonAfter>
@@ -898,7 +789,7 @@ if (res.data.data.is_same==1){
     <p>
       <a-button
         type="primary"
-        @click="addBookmark(editId)"
+        @click="addBookmark()"
         :loading="iconLoading"
         >提交</a-button
       >

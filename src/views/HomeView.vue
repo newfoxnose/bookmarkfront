@@ -17,6 +17,7 @@ import {
   onMounted,
 } from "vue";
 import { message, Modal } from "ant-design-vue";
+import { inject } from 'vue';
 import html2canvas from "html2canvas";
 export default defineComponent({
   components: {
@@ -39,8 +40,8 @@ export default defineComponent({
     const url = ref(String);
     const title = ref(String);
     const folder_id = ref(String);
-    const items = ref([]);
-    const folder_list = ref([]);
+    const items = inject('sharedItems');
+    const folder_list = inject('folder_list');
     const is_private = ref(false);
     const is_published = ref(false);
     const is_recommend = ref(false);
@@ -70,14 +71,7 @@ export default defineComponent({
       visible.value = false;
       visible_inputpassword.value = false;
     };
-    const defaultPercent = ref(5);
-    const increaseloading = () => {
-      const percent = defaultPercent.value + 10;
-      defaultPercent.value = percent > 95 ? 95 : percent;
-    };
-    const finishloading = () => {
-      defaultPercent.value = 100;
-    };
+
 
     const showconfirmdelete = (editId) => {
       Modal.confirm({
@@ -173,28 +167,6 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => {
-      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get("token"));
-      params.append("timestamp", new Date().getTime());
-
-      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
-        if (folder_res.data.code == "401") {
-          //不在登陆状态跳转到首页
-          window.location.href = "/";
-        }
-        folder_list.value = folder_res.data.data.data;
-        folder_id.value = folder_res.data.data.data[0].value;
-      });
-
-      proxy.$http.post("/ajax/home_stream_ajax/0/", params).then((res) => {
-        console.log(res.data);
-        items.value = res.data.data;
-        if (res.data.data.next_folder_index != -1) {
-          home_stream_ajax(0);
-        }
-      });
-    });
     const private_stream_ajax = (password) => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("timestamp", new Date().getTime());
@@ -210,41 +182,6 @@ export default defineComponent({
           message.error("密码错误");
         }
       });
-    };
-    const home_stream_ajax = (folder_index) => {
-      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("timestamp", new Date().getTime());
-      params.append("token", $cookies.get("token"));
-      params.append("folder_md5", localStorage.getItem(folder_index+'md5'));
-      proxy.$http
-        .post("/ajax/home_stream_ajax/0/" + folder_index, params)
-        .then((res) => {
-          
-         
-    //console.log("recevied folder_index ",res.data.data.folder_index,"recevied local_folder_md5 ",res.data.data.local_folder_md5,"received server_folder_md5 ",res.data.data.server_folder_md5);
-    //console.log("localstorage md5 is ",localStorage.getItem(folder_index+'md5'));
-          if (res.data.data.next_folder_index != -1) {
-if (res.data.data.is_same==1){
-  items.value.folder[folder_index] = JSON.parse(localStorage.getItem(folder_index));
-  console.log("same folder, no need to update");
-}else{
-  let temp=res.data.data.server_folder_json;
-          localStorage.setItem(folder_index,temp );
-          localStorage.setItem(folder_index+'md5',CryptoJS.MD5(temp).toString() );
-  items.value.folder[folder_index] = res.data.data.folder[folder_index];
-  console.log("different folder, need to update");
-}            
-
-            home_stream_ajax(res.data.data.next_folder_index);
-            increaseloading();
-          } else {
-            finishloading();
-            loadingdone.value = true;
-            proxy.$http.post("/ajax/update_http_code/", params).then((res) => {
-              //console.log(res.data);
-            });
-          }
-        });
     };
 
     const addBookmark = (id, action) => {
@@ -336,6 +273,7 @@ if (res.data.data.is_same==1){
                 .then((res) => {
                   //console.log(folder_index);
                   items.value.latest_bookmarks = res.data.data.latest_bookmarks;
+                  items.value.popular_bookmarks = res.data.data.popular_bookmarks;
                 });
               if (formState_inputpassword.value.password != "") {
                 params.append(
@@ -370,9 +308,6 @@ if (res.data.data.is_same==1){
       showDrawer,
       updatedDrawerTitle,
       onClose,
-      defaultPercent,
-      increaseloading,
-      finishloading,
       iconLoading,
       showconfirmdelete,
       addBookmark,
@@ -401,7 +336,6 @@ if (res.data.data.is_same==1){
   },
   data() {
     return {
-      question: "",
       search: "",
       editable: "yes",
       clicked: false,
@@ -409,12 +343,6 @@ if (res.data.data.is_same==1){
       new_folder: "",
       new_folder_clicked: false,
     };
-  },
-  watch: {
-    // 每当 question 改变时，这个函数就会执行
-    question(newQuestion, oldQuestion) {
-      this.search = newQuestion;
-    },
   },
   methods: {
     fatherMethod(
@@ -481,10 +409,6 @@ if (res.data.data.is_same==1){
         this.is_recommend = false;
         this.is_friendlink = false;
       }
-    },
-    clearQuestion() {
-      this.question = "";
-      this.search = "";
     },
     getUrl() {
       let theurl = this.url.toLowerCase();
@@ -578,18 +502,7 @@ if (res.data.data.is_same==1){
  
 <template>
   <h3 class="content-title">书签</h3>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress
-      type="circle"
-      :percent="defaultPercent"
-      status="active"
-      :show-info="false"
-      :stroke-color="{
-        '0%': '#108ee9',
-        '100%': '#87d068',
-      }"
-    />
-  </div>
+
 
   <a-modal
     v-model:visible="visible_inputpassword"
@@ -731,65 +644,6 @@ if (res.data.data.is_same==1){
     </a-tab-pane>
   </a-tabs>
 
-  <div v-if="search !== ''">
-    关键词<span
-      style="
-        color: red;
-        padding-left: 3px;
-        padding-right: 3px;
-        font-weight: bold;
-      "
-      >{{ search }}</span
-    >的搜索结果：
-    <hr />
-    <h3>根目录</h3>
-    <bookmarkitem
-      v-for="bookmarkitem in items.root_bookmarks"
-      :id="bookmarkitem.id"
-      :folder_id="bookmarkitem.folder_id"
-      :url="bookmarkitem.url"
-      :title="bookmarkitem.title"
-      :pinyin="bookmarkitem.pinyin"
-      :short_title="bookmarkitem.short_title"
-      :is_private="bookmarkitem.is_private"
-      :is_published="bookmarkitem.is_published"
-      :is_recommend="bookmarkitem.is_recommend"
-      :is_friendlink="bookmarkitem.is_friendlink"
-      :http_code="bookmarkitem.http_code"
-      :icon="bookmarkitem.icon_display"
-      :search="search"
-      :editable="editable"
-      @editbookmark="fatherMethod"
-    ></bookmarkitem>
-    <div v-for="item in items.folder">
-      
-      <subfolder
-        :folder_name="item.folder_name"
-        :folder_id="item.id"
-        :folder_bookmark="item.bookmarks"
-        :subfolderx="item.subfolder"
-        :search="search"
-        :editable="editable"
-        :fatherMethod="fatherMethod"
-        :display_offset="item.display_offset"
-      >
-      </subfolder>
-    </div>
-  </div>
-  <div style="margin-bottom: 20px">&nbsp;</div>
-
-  <div class="search-div">
-    <div class="search">
-      <a-input v-model:value="question">
-        <template #addonBefore>
-          <star-outlined @click="fatherMethod('新建书签')" />
-        </template>
-        <template #addonAfter>
-          <close-outlined @click="clearQuestion" />
-        </template>
-      </a-input>
-    </div>
-  </div>
 
   <a-drawer
     :width="500"
@@ -933,29 +787,6 @@ if (res.data.data.is_same==1){
   .folder-name:last-of-type:after {
     display: none;
   }
-}
-
-.search-div {
-  display: flex;
-  flex-direction: column;
-}
-
-.search {
-  align-self: center;
-  position: fixed;
-  bottom: 0;
-  z-index: 2;
-  display: inline;
-  width: 200px;
-}
-
-.search-div button {
-  height: 34px !important;
-}
-
-#search {
-  border-color: #4cae4c;
-  border-width: 2px;
 }
 
 .loadingbar {

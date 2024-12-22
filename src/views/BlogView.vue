@@ -201,15 +201,6 @@
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </template>
   </a-modal>
-  <div class="search-div">
-    <div class="search">
-      <a-input v-model:value="searchstring">
-        <template #addonAfter>
-          <search-outlined @click="search" />
-        </template>
-      </a-input>
-    </div>
-  </div>
 </template>
 
 <style lang="less">
@@ -247,28 +238,6 @@
 }
 
 
-.search-div {
-  display: flex;
-  flex-direction: column;
-}
-
-.search {
-  align-self: center;
-  position: fixed;
-  bottom: 0;
-  z-index: 2;
-  display: inline;
-  width: 200px;
-}
-
-.search-div button {
-  height: 34px !important;
-}
-
-#search {
-  border-color: #4cae4c;
-  border-width: 2px;
-}
 
 .loadingbar {
   position: fixed;

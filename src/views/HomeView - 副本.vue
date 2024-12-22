@@ -1,80 +1,75 @@
 <script>
-import IndexView from "./views/IndexView.vue";
-
-import bookmarkitem from "./components/bookmarkitem.vue";
-import subfolder from "./components/subfolder.vue";
+import bookmarkitem from "../components/bookmarkitem.vue";
+import subfolder from "../components/subfolder.vue";
 import CryptoJS from 'crypto-js';
 
-import dayjs from "dayjs";
-import "dayjs/locale/zh-cn";
-dayjs.locale("zh-cn");
-import { RouterLink, RouterView } from "vue-router";
-import { message,Modal } from "ant-design-vue";
-import { defineComponent, ref, watch,nextTick } from "vue";
-import { onMounted, reactive, getCurrentInstance, toRefs } from "vue";
 import {
-  SearchOutlined,
   CloseOutlined,
+  SearchOutlined,
   StarOutlined,
-  FormOutlined,
-  DatabaseOutlined,
-  CommentOutlined,
-  ProfileOutlined,
-  WifiOutlined,
-  MoreOutlined,
-  UserAddOutlined,
-  LoginOutlined,
-  CalendarOutlined,
   PlusOutlined,
 } from "@ant-design/icons-vue";
-import create from "@ant-design/icons-vue/lib/components/IconFont";
-// 在 App.vue 或父组件中提供刷新方法
-import { provide } from "vue";
-
+import {
+  defineComponent,
+  ref,
+  reactive,
+  getCurrentInstance,
+  onMounted,
+} from "vue";
+import { message, Modal } from "ant-design-vue";
+import html2canvas from "html2canvas";
 export default defineComponent({
   components: {
-    IndexView,
-    StarOutlined,
-    FormOutlined,
-    DatabaseOutlined,
-    CommentOutlined,
-    ProfileOutlined,
-    WifiOutlined,
-    MoreOutlined,
-    UserAddOutlined,
-    LoginOutlined,
-    CalendarOutlined,
-    PlusOutlined,
+    bookmarkitem,
+    subfolder,
     CloseOutlined,
+    StarOutlined,
     SearchOutlined,
+    PlusOutlined,
   },
   setup() {
-    const items = ref([]);    // 书签列表
-    const loadingdone = ref(false);   //书签列表加载完成
-    const logourl = ref("../images/logo-white.png");
-    const contenttheme = ref("content-dark-theme");
-    const footertheme = ref("footer-dark-theme");
-    const collapsetheme = ref("collapse-dark-theme");
-    const state = reactive({
-      theme: $cookies.get("theme"),
-      selectedKeys: [$cookies.get("selectedkey")],
-      openKeys: [$cookies.get("openkey")],
-      collapsed: Boolean($cookies.get("collapsed") == 1),
-    });
+    $cookies.set("selectedkey", "1", "720h");
+    $cookies.set("openkey", "");
+    const iconLoading = ref(false);
+    const visible = ref(false);
+    const updatedDrawerTitle = ref(String);
+
+    const screenshot = ref(null);
+
+    const url = ref(String);
+    const title = ref(String);
+    const folder_id = ref(String);
+    const items = ref([]);
+    const folder_list = ref([]);
+    const is_private = ref(false);
+    const is_published = ref(false);
+    const is_recommend = ref(false);
+    const is_friendlink = ref(false);
+    const loadingdone = ref(false);
+    const urlshot_items = ref([]);
     const { proxy } = getCurrentInstance();
-    const todo_items = ref([]);
-    const newtodosummary = ref("");
-    const useremail = ref("");
-    const activeKey = ref(["xx"]);
-    const badge_type = ref("#666");
-    const breakpoint_active = ref(false);
-    watch(state, (val) => {
-      if (val.collapsed == true) {
-        $cookies.set("collapsed", 1, "720h");
-      } else {
-        $cookies.set("collapsed", 0, "720h");
-      }
-    });
+
+    const drawerclass = ref("");
+
+    const activeKey = ref(-2);
+
+    const visible_inputpassword = ref(false);
+    const formState_inputpassword = ref([]);
+    const show_private = ref(false);
+
+
+
+    const showDrawer = (drawerTitle) => {
+      visible.value = true;
+      updatedDrawerTitle.value = drawerTitle;
+      urlshot_items.value = null;
+      drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
+    };
+    const onClose = () => {
+      iconLoading.value = false;
+      visible.value = false;
+      visible_inputpassword.value = false;
+    };
     const defaultPercent = ref(5);
     const increaseloading = () => {
       const percent = defaultPercent.value + 10;
@@ -83,6 +78,7 @@ export default defineComponent({
     const finishloading = () => {
       defaultPercent.value = 100;
     };
+
     const showconfirmdelete = (editId) => {
       Modal.confirm({
         title: "确认删除该项目吗？",
@@ -94,32 +90,95 @@ export default defineComponent({
         onCancel() {},
       });
     };
-    onMounted(() => {
-      if (state.theme == "dark") {
-        changeTheme(true);
-      } else {
-        changeTheme(false);
-      }
 
+    const clicktab = (key) => {
+      console.log(key);
+      if (key == -1) {
+        visible_inputpassword.value = true;
+      } else {
+        show_private.value = false;
+        visible_inputpassword.value = false;
+        formState_inputpassword.value.password = "";
+      }
+    };
+
+    async function takeUrlshot(id, url) {
+      console.log(id);
+      console.log(url);
+      try {
+        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+        //params.append("url", formState.value.feed_url);
+        params.append("token", $cookies.get("token"));
+        params.append("timestamp", new Date().getTime());
+        params.append("url", url);
+        const { data: res } = proxy.$http
+          .post("/ajax/fetch_pure_ajax", params)
+          .then((res) => {
+            console.log(res.data);
+            // obj.success ? obj.success(res) : null
+            if (res.data.data != "") {
+              //console.log(res.data.data);
+              message.info("成功获取网页内容");
+              takeScreenshot(id, res.data.data);
+            } else {
+              message.info("未获取到网页内容");
+            }
+          })
+          .catch((error) => {
+            // obj.error ? obj.error(error) : null;
+            console.log(error);
+          });
+        iconLoading.value = false;
+      } catch (error) {
+        console.error("生成快照失败:", error);
+      }
+    }
+
+    async function takeScreenshot(id, content) {
+      try {
+        let tempNode = document.createElement("div");
+        //tempNode.innerHTML ='<div><h1>哈哈哈</h1></div>';
+        tempNode.innerHTML = content;
+        document.body.after(tempNode); //这句一定要有
+
+        //const node = document.documentElement;
+        const canvas = await html2canvas(tempNode, {
+          scale: 1,
+          useCORS: true, // 如果图片跨域，设置为true
+        });
+        screenshot.value = canvas.toDataURL("image/png");
+        tempNode.innerHTML = "";
+        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+        params.append("token", $cookies.get("token"));
+        params.append("timestamp", new Date().getTime());
+        params.append("base64", screenshot.value);
+        params.append("id", id);
+        proxy.$http
+          .post("/ajax/upload_base64file_ajax/", params, {
+            headers: {
+              //"Content-Type": "multipart/form-data",    //因为是base64上传，所以不使用multipart
+            },
+          })
+          .then((res) => {
+            //console.log(res.data);
+            if (res.data.code == "401") {
+              //不在登陆状态
+              window.location.href = "/";
+            }
+            defaultPercent.value = 100;
+            loadingdone.value = true;
+          });
+      } catch (error) {
+        console.error("生成截图失败:", error);
+      }
+    }
+
+    onMounted(() => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
 
-      proxy.$http.post("/ajax/toggle_todo_ajax", params).then((res) => {
-        if (res.data.code == "401") {
-          $cookies.set("token", "", "-720h");
-        } else {
-          console.log(res.data.data.email);
-          useremail.value = res.data.data.email;
-          toggleTodo();
-        }
-      });
-
-     
-
-      if ($cookies.get('token') != null && $cookies.get('token') != ''){
-
-        proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
+      proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
         if (folder_res.data.code == "401") {
           //不在登陆状态跳转到首页
           window.location.href = "/";
@@ -128,16 +187,30 @@ export default defineComponent({
         folder_id.value = folder_res.data.data.data[0].value;
       });
 
-
-        proxy.$http.post("/ajax/home_stream_ajax/0/", params).then((res) => {
+      proxy.$http.post("/ajax/home_stream_ajax/0/", params).then((res) => {
+        console.log(res.data);
         items.value = res.data.data;
         if (res.data.data.next_folder_index != -1) {
           home_stream_ajax(0);
         }
       });
-      }
     });
-
+    const private_stream_ajax = (password) => {
+      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+      params.append("timestamp", new Date().getTime());
+      params.append("token", $cookies.get("token"));
+      params.append("password", password);
+      proxy.$http.post("/ajax/private_stream_ajax", params).then((res) => {
+        if (res.data.code == 200) {
+          console.log(res.data.data);
+          items.value.private_bookmarks = res.data.data.private_bookmarks;
+          visible_inputpassword.value = false;
+          show_private.value = true;
+        } else {
+          message.error("密码错误");
+        }
+      });
+    };
     const home_stream_ajax = (folder_index) => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("timestamp", new Date().getTime());
@@ -174,95 +247,6 @@ if (res.data.data.is_same==1){
         });
     };
 
-
-    const toggleTodo = (id) => {
-      let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get("token"));
-      params.append("timestamp", new Date().getTime());
-      params.append("id", id);
-      proxy.$http.post("/ajax/toggle_todo_ajax", params).then((res) => {
-        todo_items.value = res.data.data.todo;
-        for (let i = 0; i < todo_items.value.length; i++) {
-          if (todo_items.value[i].is_done == "1") {
-            todo_items.value[i].is_done = true;
-          } else {
-            todo_items.value[i].is_done = false;
-          }
-        }
-      });
-    };
-    const createTodo = (value) => {
-      if (value != "") {
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("newtodosummary", value);
-        params.append("badge_type", badge_type.value);
-        proxy.$http.post("/ajax/create_todo_ajax", params).then((res) => {
-          console.log(res.data.data.todo);
-          todo_items.value = res.data.data.todo;
-          for (let i = 0; i < todo_items.value.length; i++) {
-            if (todo_items.value[i].is_done == "1") {
-              todo_items.value[i].is_done = true;
-            } else {
-              todo_items.value[i].is_done = false;
-            }
-          }
-        });
-        newtodosummary.value = "";
-      } else {
-        message.info("内容不能为空");
-      }
-    };
-    const changeTheme = (checked) => {
-      state.theme = checked ? "dark" : "light";
-      if (state.theme == "dark") {
-        $cookies.set("theme", "dark", "720h");
-        logourl.value = "../images/logo-white.png";
-        contenttheme.value = "content-dark-theme";
-        footertheme.value = "footer-dark-theme";
-        collapsetheme.value = "collapse-dark-theme";
-      } else {
-        $cookies.set("theme", "light", "720h");
-        logourl.value = "../images/logo.png";
-        contenttheme.value = "content-light-theme";
-        footertheme.value = "footer-light-theme";
-        collapsetheme.value = "collapse-light-theme";
-      }
-    };
-    const onBreakpoint = (broken) => {
-      //console.log(broken);
-      breakpoint_active.value = broken;
-    };
-    const handleClick = () => {
-      console.log("ddd");
-      if (breakpoint_active.value == true) {
-        state.collapsed = true;
-      }
-    };
-//弹出编辑书签抽屉
-    const drawerclass = ref("");
-    const url = ref(String);
-    const title = ref(String);
-    const folder_id = ref(String);
-    const iconLoading = ref(false);
-    const visible = ref(false);
-    const is_private = ref(false);
-    const is_published = ref(false);
-    const is_recommend = ref(false);
-    const is_friendlink = ref(false);
-    const folder_list = ref([]);
-    const updatedDrawerTitle = ref(String);
-    const showDrawer = (drawerTitle) => {
-      visible.value = true;
-      updatedDrawerTitle.value = drawerTitle;
-      drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
-    };
-    const onClose = () => {
-      iconLoading.value = false;
-      visible.value = false;
-    };
-    
     const addBookmark = (id, action) => {
       if (url.value != "" && title.value != "" && folder_id.value != "") {
         iconLoading.value = true;
@@ -352,14 +336,27 @@ if (res.data.data.is_same==1){
                 .then((res) => {
                   //console.log(folder_index);
                   items.value.latest_bookmarks = res.data.data.latest_bookmarks;
-                  items.value.popular_bookmarks = res.data.data.popular_bookmarks;
                 });
+              if (formState_inputpassword.value.password != "") {
+                params.append(
+                  "password",
+                  formState_inputpassword.value.password
+                );
+                proxy.$http
+                  .post("/ajax/private_stream_ajax", params)
+                  .then((res) => {
+                    if (res.data.code == 200) {
+                      items.value.private_bookmarks =
+                        res.data.data.private_bookmarks;
+                    }
+                  });
+              }
               onClose();
             }
           })
           .catch((error) => {
             //obj.error ? obj.error(error) : null;
-            console.log(error);
+            //console.log(error);
             message.info("出错了，请刷新");
             onClose();
           });
@@ -367,97 +364,58 @@ if (res.data.data.is_same==1){
         message.info("请填写必要项目");
       }
     };
-    //弹出新建书签抽屉
 
-    //搜索结果
-    const search = ref("");
-    const inputRef = ref(null);
-    const DrawerinputRef = ref(null);
-    const visibleSearch = ref(false);
-    
-    const clearQuestion = () => {
-      search.value = "";
-      visibleSearch.value = false;
-    };
-    const handleSearchOk = e => {
-      console.log(e);
-      visibleSearch.value = false;
-    };
-    watch(search, (newVal) => {
-      if (newVal) {
-        visibleSearch.value = true;
-        nextTick(() => {
-          setTimeout(() => {
-        DrawerinputRef.value.focus();
-    }, 30); // 延迟
-                 });
-      }
-      else{
-        visibleSearch.value = false;
-        nextTick(() => {
-          inputRef.value.focus();
-        });
-      }
-    });
-    //搜索结果
-    provide("reloadtodo", toggleTodo); //向其他组件提供刷新方法，要在本页函数初始化之后
-    provide('sharedItems', items);
-    provide('folder_list', folder_list);
     return {
-      ...toRefs(state),
-      changeTheme,
-      logourl,
-      contenttheme,
-      footertheme,
-      collapsetheme,
-      todo_items,
-      toggleTodo,
-      newtodosummary,
-      createTodo,
-      activeKey,
-      badge_type,
-      useremail,
-      handleClick,
-      onBreakpoint,
-      breakpoint_active,
-      showDrawer,
       visible,
+      showDrawer,
+      updatedDrawerTitle,
+      onClose,
+      defaultPercent,
+      increaseloading,
+      finishloading,
+      iconLoading,
+      showconfirmdelete,
+      addBookmark,
       url,
       title,
       folder_id,
-      onClose,
-      iconLoading,
-      drawerclass,
+      items,
       is_private,
       is_published,
       is_recommend,
       is_friendlink,
       folder_list,
-      addBookmark,
-      visibleSearch,
-      handleSearchOk,
-      items,
-      DrawerinputRef,
-      inputRef,
-      search,
-      clearQuestion,
       loadingdone,
-      defaultPercent,
-      increaseloading,
-      updatedDrawerTitle,
-      showconfirmdelete
+      takeUrlshot,
+      takeScreenshot,
+      screenshot,
+      urlshot_items,
+      drawerclass,
+      activeKey,
+      clicktab,
+      visible_inputpassword,
+      formState_inputpassword,
+      show_private,
+      private_stream_ajax,
     };
   },
-  
   data() {
     return {
+      question: "",
+      search: "",
       editable: "yes",
       clicked: false,
+      editId: "",
       new_folder: "",
       new_folder_clicked: false,
     };
   },
-
+  watch: {
+    // 每当 question 改变时，这个函数就会执行
+    question(newQuestion, oldQuestion) {
+      this.search = newQuestion;
+    },
+  },
   methods: {
     fatherMethod(
       drawerTitle,
@@ -523,6 +481,10 @@ if (res.data.data.is_same==1){
         this.is_recommend = false;
         this.is_friendlink = false;
       }
+    },
+    clearQuestion() {
+      this.question = "";
+      this.search = "";
     },
     getUrl() {
       let theurl = this.url.toLowerCase();
@@ -613,9 +575,10 @@ if (res.data.data.is_same==1){
   },
 });
 </script>
-
+ 
 <template>
-    <div class="loadingbar" v-show="loadingdone == false">
+  <h3 class="content-title">书签</h3>
+  <div class="loadingbar" v-show="loadingdone == false">
     <a-progress
       type="circle"
       :percent="defaultPercent"
@@ -627,168 +590,158 @@ if (res.data.data.is_same==1){
       }"
     />
   </div>
-    <a-layout style="min-height: 100vh"
-  v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
-    <a-layout-content  :class="contenttheme">
-      <a-layout>
-        
-  <a-layout-sider v-model:collapsed="collapsed" :theme="theme"  breakpoint="lg" collapsed-width="0" @breakpoint="onBreakpoint">
-      <div class="logo" :theme="theme">
-        <img :src="logourl" height="30" />
-      </div>
-      <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed==false">
-            <a-collapse-panel key="xx" header="待办">
-              <p v-for="item in todo_items">
-                <a-checkbox
-                  v-if="item.is_done == 0"
-                  @change="toggleTodo(item.id)"
-                  v-model:checked="item.is_done"
-                  ><span :style="{color:item.badge_type}">{{ item.summary }}</span></a-checkbox
-                >
-                <a-checkbox
-                  v-else
-                  @change="toggleTodo(item.id)"
-                  v-model:checked="item.is_done"
-                  ><a-typography-text delete @change="toggleTodo(item.id)">
-                    <span :style="{color:item.badge_type}">{{item.summary }}</span>
-                 </a-typography-text></a-checkbox
-                >
-              </p>
-              <div class="search">
-                <a-input v-model:value="newtodosummary">
 
-                  <template #addonBefore>
-                    <a-select :showArrow=false
-      ref="select"
-      v-model:value="badge_type"
-      style="width: 32px"
-    >
-      <a-select-option value="#666"><a-badge color="#666"  class="big-dot" /></a-select-option>
-      <a-select-option value="red"><a-badge color="red"  class="big-dot" /></a-select-option>
-      <a-select-option value="orange"><a-badge color="orange"  class="big-dot" /></a-select-option>
-      <a-select-option value="green"><a-badge color="green"  class="big-dot" /></a-select-option>
-      <a-select-option value="blue"><a-badge color="blue"  class="big-dot" /></a-select-option>
-      <a-select-option value="purple"><a-badge color="purple"  class="big-dot" /></a-select-option>
-    </a-select>
-</template>
-                  <template #addonAfter>
-                    <plus-outlined @click="createTodo(newtodosummary)" />
-                  </template>
-                </a-input>
-              </div>
-            </a-collapse-panel>
-            
-          </a-collapse>
-      <a-menu
-        v-model:selectedKeys="selectedKeys"
-        mode="inline"
-        :theme="theme"
-        v-model:openKeys="openKeys"
+  <a-modal
+    v-model:visible="visible_inputpassword"
+    title="请输入密码查看私有书签"
+    :class="drawerclass"
+  >
+    <a-form :model="formState_inputpassword">
+      <a-form-item
+        label="密码"
+        name="password2"
+        :rules="[{ required: true, message: '请输入至少6位密码' }]"
       >
-          <a-menu-item key="1"  @click="handleClick">
-            <star-outlined />
-            <span>
-            <RouterLink to="/home" style="padding-left: 8px">书签</RouterLink>
-          </span>
-          </a-menu-item>
-          <a-menu-item key="2"  @click="handleClick">
-            <form-outlined /><span>
-            <RouterLink to="/note" style="padding-left: 8px">随手记</RouterLink></span>
-          </a-menu-item>
-          <a-menu-item key="3"  @click="handleClick">
-            <database-outlined /><span>
-            <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink></span>
-          </a-menu-item>
-          <a-menu-item key="4"  @click="handleClick">
-            <comment-outlined /><span>
-            <RouterLink to="/chat" style="padding-left: 8px"
-              >CHATGPT</RouterLink
-            ></span>
-          </a-menu-item>
-          <a-menu-item key="5"  @click="handleClick">
-            <profile-outlined /><span>
-            <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink></span>
-          </a-menu-item>
-          <a-menu-item key="6"  @click="handleClick">
-            <wifi-outlined /><span>
-            <RouterLink to="/feed" style="padding-left: 8px">RSS</RouterLink></span>
-          </a-menu-item>
-          <a-menu-item key="17"  @click="handleClick">
-            <calendar-outlined /><span>
-            <RouterLink to="/calendar" style="padding-left: 8px"
-              >日历</RouterLink
-            ></span>
-          </a-menu-item>
-          <a-sub-menu key="sub1">
-            <template #title>
-              <span>
-                <more-outlined />
-                <span>更多</span>
-              </span>
-            </template>
-            <a-menu-item key="8"  @click="handleClick">
-              <RouterLink to="/manage">管理目录</RouterLink>
-            </a-menu-item>
-            <a-menu-item key="9" v-if="useremail != 'test@test.com'"  @click="handleClick">
-              <RouterLink to="/profile">个人设置</RouterLink>
-            </a-menu-item>
-            <a-menu-item key="10" v-if="1 == 2"  @click="handleClick">
-              <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
-            </a-menu-item>
-            <a-menu-item key="11"  @click="handleClick">
-              <RouterLink to="/upload">导入书签</RouterLink>
-            </a-menu-item>
-            <a-menu-item key="12"  @click="handleClick">
-              <RouterLink to="/export">导出书签至本地</RouterLink>
-            </a-menu-item>
-            <a-menu-item key="13" v-if="useremail != 'test@test.com'"  @click="handleClick">
-              <RouterLink to="/email">发送书签至邮箱</RouterLink>
-            </a-menu-item>
-            <a-menu-item key="14">
-              <RouterLink to="/logout">退出</RouterLink>
-            </a-menu-item>
-          </a-sub-menu>
-      </a-menu>
-      <div style="text-align: center; padding-top: 30px">
-        <a-switch
-          :checked="theme == 'dark'"
-          checked-children="Dark"
-          un-checked-children="Light"
-          @change="changeTheme"
-        />
+        <a-input-password v-model:value="formState_inputpassword.password" />
+      </a-form-item>
+    </a-form>
+    <template #footer>
+      <a-button
+        type="primary"
+        @click="private_stream_ajax(formState_inputpassword.password)"
+        :loading="iconLoading"
+        >提交</a-button
+      >
+      &nbsp;
+      <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
+    </template>
+  </a-modal>
+
+  <a-tabs
+    v-if="search == ''"
+    v-model:activeKey="activeKey"
+    @tabClick="clicktab"
+  >
+  <a-tab-pane :key="-2" tab="最常访问">
+      <div>
+        <bookmarkitem
+          v-for="bookmarkitem in items.popular_bookmarks"
+          :id="bookmarkitem.id"
+          :folder_id="bookmarkitem.folder_id"
+          :url="bookmarkitem.url"
+          :title="bookmarkitem.title"
+          :pinyin="bookmarkitem.pinyin"
+          :short_title="bookmarkitem.short_title"
+          :is_private="bookmarkitem.is_private"
+          :is_published="bookmarkitem.is_published"
+          :is_recommend="bookmarkitem.is_recommend"
+          :is_friendlink="bookmarkitem.is_friendlink"
+          :http_code="bookmarkitem.http_code"
+          :icon="bookmarkitem.icon_display"
+          :search="''"
+          :editable="editable"
+          @editbookmark="fatherMethod"
+        ></bookmarkitem>
       </div>
-    </a-layout-sider>
-    <a-layout-content :class="contenttheme">
-        <RouterView />
-      </a-layout-content>
-      </a-layout>
-    </a-layout-content>
-    <a-layout-footer style="text-align: center" :class="contenttheme">
-        <div class="search-div" v-if="search == ''">
-<div class="bookmark-search">
-  <a-input v-model:value="search" ref="inputRef">
-    <template #addonBefore>
-      <star-outlined @click="fatherMethod('新建书签')" />
-    </template>
-    <template #addonAfter>
-      <close-outlined @click="clearQuestion" />
-    </template>
-  </a-input>
-</div>
-</div>
-  </a-layout-footer>
-  </a-layout>
-  <a-layout v-else>
-    <IndexView />
-  </a-layout>
+    </a-tab-pane>
+    <a-tab-pane :key="1" tab="最近收藏">
+      <div>
+        <bookmarkitem
+          v-for="bookmarkitem in items.latest_bookmarks"
+          :id="bookmarkitem.id"
+          :folder_id="bookmarkitem.folder_id"
+          :url="bookmarkitem.url"
+          :title="bookmarkitem.title"
+          :pinyin="bookmarkitem.pinyin"
+          :short_title="bookmarkitem.short_title"
+          :is_private="bookmarkitem.is_private"
+          :is_published="bookmarkitem.is_published"
+          :is_recommend="bookmarkitem.is_recommend"
+          :is_friendlink="bookmarkitem.is_friendlink"
+          :http_code="bookmarkitem.http_code"
+          :icon="bookmarkitem.icon_display"
+          :search="''"
+          :editable="editable"
+          @editbookmark="fatherMethod"
+        ></bookmarkitem>
+      </div>
+    </a-tab-pane>
+    <a-tab-pane :key="0" tab="根目录">
+      <div :folderid="-1">
+        <bookmarkitem
+          v-for="bookmarkitem in items.root_bookmarks"
+          :id="bookmarkitem.id"
+          :folder_id="bookmarkitem.folder_id"
+          :url="bookmarkitem.url"
+          :title="bookmarkitem.title"
+          :pinyin="bookmarkitem.pinyin"
+          :short_title="bookmarkitem.short_title"
+          :is_private="bookmarkitem.is_private"
+          :is_published="bookmarkitem.is_published"
+          :is_recommend="bookmarkitem.is_recommend"
+          :is_friendlink="bookmarkitem.is_friendlink"
+          :http_code="bookmarkitem.http_code"
+          :icon="bookmarkitem.icon_display"
+          :search="''"
+          :editable="editable"
+          @editbookmark="fatherMethod"
+        ></bookmarkitem>
+      </div>
+    </a-tab-pane>
+    <a-tab-pane
+      v-for="item in items.folder"
+      :key="item.id"
+      :tab="`${item.folder_name}`"
+    >
+      <subfolder
+        :folder_name="item.folder_name"
+        :folder_id="item.id"
+        :father_id="item.father_id"
+        :folder_bookmark="item.bookmarks"
+        :subfolderx="item.subfolder"
+        :search="''"
+        :editable="editable"
+        :fatherMethod="fatherMethod"
+        :display_offset="item.display_offset"
+      >
+      </subfolder>
+    </a-tab-pane>
 
+    <a-tab-pane :key="-1" tab="私有">
+      <div v-if="show_private == true">
+        <bookmarkitem
+          v-for="bookmarkitem in items.private_bookmarks"
+          :id="bookmarkitem.id"
+          :folder_id="bookmarkitem.folder_id"
+          :url="bookmarkitem.url"
+          :title="bookmarkitem.title"
+          :pinyin="bookmarkitem.pinyin"
+          :short_title="bookmarkitem.short_title"
+          :is_private="bookmarkitem.is_private"
+          :is_published="bookmarkitem.is_published"
+          :is_recommend="bookmarkitem.is_recommend"
+          :is_friendlink="bookmarkitem.is_friendlink"
+          :http_code="bookmarkitem.http_code"
+          :icon="bookmarkitem.icon_display"
+          :search="''"
+          :editable="editable"
+          @editbookmark="fatherMethod"
+        ></bookmarkitem>
+      </div>
+    </a-tab-pane>
+  </a-tabs>
 
-
-
-  <a-drawer v-model:visible="visibleSearch" :title="`关键词${search}的搜索结果`" @ok="handleSearchOk" placement="bottom"
-    :footer="null" height="100%" @close="clearQuestion">
-      
-
+  <div v-if="search !== ''">
+    关键词<span
+      style="
+        color: red;
+        padding-left: 3px;
+        padding-right: 3px;
+        font-weight: bold;
+      "
+      >{{ search }}</span
+    >的搜索结果：
+    <hr />
     <h3>根目录</h3>
     <bookmarkitem
       v-for="bookmarkitem in items.root_bookmarks"
@@ -817,14 +770,17 @@ if (res.data.data.is_same==1){
         :subfolderx="item.subfolder"
         :search="search"
         :editable="editable"
-        :display_offset="item.display_offset"
         :fatherMethod="fatherMethod"
+        :display_offset="item.display_offset"
       >
       </subfolder>
     </div>
-  <div class="search-div" v-if="search != ''">
-  <div class="bookmark-search">
-      <a-input v-model:value="search" ref="DrawerinputRef">
+  </div>
+  <div style="margin-bottom: 20px">&nbsp;</div>
+
+  <div class="search-div">
+    <div class="search">
+      <a-input v-model:value="question">
         <template #addonBefore>
           <star-outlined @click="fatherMethod('新建书签')" />
         </template>
@@ -832,9 +788,9 @@ if (res.data.data.is_same==1){
           <close-outlined @click="clearQuestion" />
         </template>
       </a-input>
-    </div></div>
-    </a-drawer>
-  
+    </div>
+  </div>
+
   <a-drawer
     :width="500"
     :title="updatedDrawerTitle"
@@ -843,7 +799,7 @@ if (res.data.data.is_same==1){
     :visible="visible"
     @close="onClose"
   >
-  <template #extra v-if="updatedDrawerTitle == '编辑书签'">
+    <template #extra v-if="updatedDrawerTitle == '编辑书签'">
       <a-button
         type="primary"
         danger
@@ -852,6 +808,18 @@ if (res.data.data.is_same==1){
         >删除</a-button
       >
     </template>
+    <p style="display: none">
+      <span v-if="urlshot_items">已有快照：</span>
+      <span v-for="item in urlshot_items">
+        <a :href="item.key" target="_blank">{{ item.date }}</a>
+      </span>
+      <a-button
+        type="primary"
+        @click="takeUrlshot(editId, url)"
+        :loading="iconLoading"
+        >生成快照</a-button
+      >
+    </p>
     <p>
       <a-input v-model:value="url" placeholder="网址">
         <template #addonAfter>
@@ -906,19 +874,73 @@ if (res.data.data.is_same==1){
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </p>
   </a-drawer>
-
-
-
 </template>
 
 <style scoped>
+.folder-name {
+  margin-top: 2rem;
+  display: flex;
+}
+
+.folder-name i {
+  display: flex;
+  place-items: center;
+  place-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-text);
+}
+
+@media (min-width: 1024px) {
+  .folder-name {
+    margin-top: 0;
+    padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
+  }
+
+  .folder-name i {
+    top: calc(50% - 25px);
+    left: -26px;
+    position: absolute;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    border-radius: 8px;
+    width: 80px;
+    height: 50px;
+  }
+
+  .folder-name:before {
+    content: " ";
+    border-left: 1px solid var(--color-border);
+    position: absolute;
+    left: 0;
+    bottom: calc(50% + 25px);
+    height: calc(50% - 25px);
+  }
+
+  .folder-name:after {
+    content: " ";
+    border-left: 1px solid var(--color-border);
+    position: absolute;
+    left: 0;
+    top: calc(50% + 25px);
+    height: calc(50% - 25px);
+  }
+
+  .folder-name:first-of-type:before {
+    display: none;
+  }
+
+  .folder-name:last-of-type:after {
+    display: none;
+  }
+}
 
 .search-div {
   display: flex;
   flex-direction: column;
 }
 
-.bookmark-search {
+.search {
   align-self: center;
   position: fixed;
   bottom: 0;
@@ -934,5 +956,13 @@ if (res.data.data.is_same==1){
 #search {
   border-color: #4cae4c;
   border-width: 2px;
+}
+
+.loadingbar {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
 }
 </style>
