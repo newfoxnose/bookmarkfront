@@ -152,7 +152,7 @@ export default {
           )
         "
       />
-      <a :href="go_url+bookmarkitem.id" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
+      <a :href="go_url+bookmarkitem.id+'/'+bookmarkitem.url" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
         {{ bookmarkitem.short_title }}
       </a>
       <a :href="'/frame/'+bookmarkitem.id"><border-outlined style="margin-left:3px;" /></a>
