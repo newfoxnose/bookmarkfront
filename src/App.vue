@@ -615,7 +615,10 @@ if (res.data.data.is_same==1){
 </script>
 
 <template>
-    <div class="loadingbar" v-show="loadingdone == false">
+
+    <a-layout style="min-height: 100vh"
+  v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
+  <div class="loadingbar" v-show="loadingdone == false">
     <a-progress
       type="circle"
       :percent="defaultPercent"
@@ -627,8 +630,6 @@ if (res.data.data.is_same==1){
       }"
     />
   </div>
-    <a-layout style="min-height: 100vh"
-  v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
     <a-layout-content  :class="contenttheme">
       <a-layout>
         
