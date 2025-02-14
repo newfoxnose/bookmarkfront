@@ -21,7 +21,7 @@
         <a-image-preview-group>
           <div v-for="(item, index) in fileitems" style="margin-bottom: 5px">
             <span class="ext">{{ index + 1 }}</span>
-            <a @click="showDrawer(item.title, item.id)">
+            <a :href=" go_url+item.id" target="_blank">
               {{ item.title }}
             </a>
             <eye-invisible-two-tone
@@ -34,6 +34,12 @@
             />
 
             <span style="margin-left: 20px" class="font-color-by-theme">( {{ item.createtime }})</span>
+            <a
+              style="margin-left: 20px"
+              @click="showDrawer(item.title, item.id)"
+              >编辑</a
+            >
+
             <a
               style="margin-left: 20px"
               @click="showconfirmdelete(item.id,  '')"
@@ -64,17 +70,9 @@
           <a-image-preview-group>
             <div v-for="(item, index) in fileitems" style="margin-bottom: 5px">
               <span class="ext">{{ index + 1 }}</span>
-              <a
-                @click="
-                  showDrawer(
-                    item.title,
-                    item.id,
-                    formState_inputpassword.password
-                  )
-                "
-              >
+           
                 {{ item.title }}
-              </a>
+             
               <eye-invisible-two-tone
                 v-if="item.is_private == '1'"
                 style="margin-left: 3px"
@@ -84,6 +82,17 @@
                 style="margin-left: 3px"
               />
               <span style="margin-left: 20px" class="font-color-by-theme">( {{ item.createtime }})</span>
+              <a
+              style="margin-left: 20px"
+              @click="
+                  showDrawer(
+                    item.title,
+                    item.id,
+                    formState_inputpassword.password
+                  )
+                "
+              >编辑</a
+            >
               <a
                 style="margin-left: 20px"
                 @click="
@@ -630,5 +639,10 @@ export default {
         new Date().getTime(), // 服务端接口
     };
   },
+  data() {
+    return {
+      go_url: this.$remoteDomain + "/post/"
+    };
+  }
 };
 </script>
