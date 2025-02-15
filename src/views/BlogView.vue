@@ -21,9 +21,11 @@
         <a-image-preview-group>
           <div v-for="(item, index) in fileitems" style="margin-bottom: 5px">
             <span class="ext">{{ index + 1 }}</span>
-            <a :href=" go_url+item.id" target="_blank">
-              {{ item.title }}
-            </a>
+            <a
+              style="margin-left: 20px"
+              @click="showDrawer(item.title, item.id)"
+              > {{ item.title }}</a
+            >
             <eye-invisible-two-tone
               v-if="item.is_private == '1'"
               style="margin-left: 3px"
@@ -34,11 +36,7 @@
             />
 
             <span style="margin-left: 20px" class="font-color-by-theme">( {{ item.createtime }})</span>
-            <a
-              style="margin-left: 20px"
-              @click="showDrawer(item.title, item.id)"
-              >编辑</a
-            >
+          
 
             <a
               style="margin-left: 20px"
@@ -71,7 +69,17 @@
             <div v-for="(item, index) in fileitems" style="margin-bottom: 5px">
               <span class="ext">{{ index + 1 }}</span>
            
-                {{ item.title }}
+              <a
+              style="margin-left: 20px"
+              @click="
+                  showDrawer(
+                    item.title,
+                    item.id,
+                    formState_inputpassword.password
+                  )
+                "
+              > {{ item.title }}</a
+            >
              
               <eye-invisible-two-tone
                 v-if="item.is_private == '1'"
@@ -82,17 +90,7 @@
                 style="margin-left: 3px"
               />
               <span style="margin-left: 20px" class="font-color-by-theme">( {{ item.createtime }})</span>
-              <a
-              style="margin-left: 20px"
-              @click="
-                  showDrawer(
-                    item.title,
-                    item.id,
-                    formState_inputpassword.password
-                  )
-                "
-              >编辑</a
-            >
+             
               <a
                 style="margin-left: 20px"
                 @click="
@@ -301,6 +299,7 @@ export default {
     const currentpage = ref(1);
     const pagesize = ref(10);
     const total = ref(1);
+    const uid = ref('');
 
     const { proxy } = getCurrentInstance();
 
@@ -428,6 +427,7 @@ export default {
         fileitems.value = res.data.data.blog;
         pagesize.value = Number(res.data.data.pagesize);
         total.value = res.data.data.total;
+        uid.value = res.data.data.uid;
         defaultPercent.value = 100;
         loadingdone.value = true;
       });
@@ -594,7 +594,8 @@ export default {
       show_private,
       handleprivatepagechange,
       search,
-      searchstring
+      searchstring,
+      uid
     };
   },
   watch: {
@@ -641,7 +642,7 @@ export default {
   },
   data() {
     return {
-      go_url: this.$remoteDomain + "/post/"
+      go_url: this.$remoteDomain  + "/"+ "/post/"
     };
   }
 };
