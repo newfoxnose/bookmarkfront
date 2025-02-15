@@ -642,7 +642,7 @@ export default {
   },
   data() {
     return {
-      go_url: this.$remoteDomain  + "/"+ "/post/"
+      go_url: this.$remoteDomain  +  "/post/"
     };
   }
 };
