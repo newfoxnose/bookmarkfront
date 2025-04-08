@@ -374,8 +374,6 @@ if (res.data.data.is_same==1){
     const inputRef = ref(null);
     const DrawerinputRef = ref(null);
     const visibleSearch = ref(false);
-    const activeTabKey = ref('1');
-    const searchBlogResults = ref([]); // 添加笔记搜索结果变量
     
     const clearQuestion = () => {
       search.value = "";
@@ -390,25 +388,9 @@ if (res.data.data.is_same==1){
         visibleSearch.value = true;
         nextTick(() => {
           setTimeout(() => {
-            DrawerinputRef.value.focus();
-            console.log("search is ",newVal);
-            // 发起笔记搜索请求
-            if (newVal.length > 2) {
-              let params = new URLSearchParams();
-              params.append("token", $cookies.get("token"));
-              params.append("timestamp", new Date().getTime());
-              params.append("searchstring", newVal);
-              proxy.$http.post("/ajax/search_blog_ajax", params).then((res) => {
-                console.log("search blog ajax res is ",res.data);
-                if (res.data.code == "200") {
-                  searchBlogResults.value = res.data.data.blog;
-                }
-              });
-            } else {
-              searchBlogResults.value = []; // 清空搜索结果
-            }
-          }, 30);
-        });
+        DrawerinputRef.value.focus();
+    }, 30); // 延迟
+                 });
       }
       else{
         visibleSearch.value = false;
@@ -463,9 +445,7 @@ if (res.data.data.is_same==1){
       defaultPercent,
       increaseloading,
       updatedDrawerTitle,
-      showconfirmdelete,
-      activeTabKey,
-      searchBlogResults, // 返回笔记搜索结果变量
+      showconfirmdelete
     };
   },
   
@@ -630,34 +610,6 @@ if (res.data.data.is_same==1){
         }
       }
     },
-    highlightKeyword(text, keyword) {
-      if (!text || !keyword) return text;
-      const reg = new RegExp(keyword, 'gi');
-      return text.replace(reg, match => `<span style="color: red">${match}</span>`);
-    },
-    getContextWithHighlight(content, keyword) {
-      if (!content || !keyword) return '';
-      
-      // 找到关键词的位置
-      const index = content.toLowerCase().indexOf(keyword.toLowerCase());
-      if (index === -1) return '';
-      
-      // 计算截取的起始和结束位置
-      let start = Math.max(0, index - 20);
-      let end = Math.min(content.length, index + keyword.length + 20);
-      
-      // 如果不是从开头截取，加上省略号
-      let result = start > 0 ? '...' : '';
-      
-      // 获取上下文
-      result += content.substring(start, end);
-      
-      // 如果不是截取到结尾，加上省略号
-      result += end < content.length ? '...' : '';
-      
-      // 高亮关键词
-      return this.highlightKeyword(result, keyword);
-    }
   },
 });
 </script>
@@ -844,73 +796,53 @@ if (res.data.data.is_same==1){
 
   <a-drawer v-model:visible="visibleSearch" :title="`关键词${search}的搜索结果`" @ok="handleSearchOk" placement="bottom"
     :footer="null" height="100%" @close="clearQuestion">
-    <a-tabs v-model:activeKey="activeTabKey">
-      <a-tab-pane key="1" tab="书签">
-        <h3>根目录</h3>
-        <bookmarkitem
-          v-for="bookmarkitem in items.root_bookmarks"
-          :id="bookmarkitem.id"
-          :folder_id="bookmarkitem.folder_id"
-          :url="bookmarkitem.url"
-          :title="bookmarkitem.title"
-          :pinyin="bookmarkitem.pinyin"
-          :short_title="bookmarkitem.short_title"
-          :is_private="bookmarkitem.is_private"
-          :is_published="bookmarkitem.is_published"
-          :is_recommend="bookmarkitem.is_recommend"
-          :is_friendlink="bookmarkitem.is_friendlink"
-          :http_code="bookmarkitem.http_code"
-          :icon="bookmarkitem.icon_display"
-          :search="search"
-          :editable="editable"
-          @editbookmark="fatherMethod"
-        ></bookmarkitem>
-        <div v-for="item in items.folder">
-          <subfolder
-            :folder_name="item.folder_name"
-            :folder_id="item.id"
-            :folder_bookmark="item.bookmarks"
-            :subfolderx="item.subfolder"
-            :search="search"
-            :editable="editable"
-            :display_offset="item.display_offset"
-            :fatherMethod="fatherMethod"
-          >
-          </subfolder>
-        </div>
-      </a-tab-pane>
-      <a-tab-pane key="2" tab="笔记">
-        <div v-if="searchBlogResults && searchBlogResults.length > 0">
-          <div v-for="blog in searchBlogResults" :key="blog.id" style="margin-bottom: 20px;">
-            <h3>
-              <RouterLink :to="'/editpost/' + blog.id" v-html="highlightKeyword(blog.title, search)"></RouterLink>
-              <template v-if="blog.content">
-                <span style="font-size: 14px; font-weight: normal; margin-left: 10px; color: #666;" v-html="getContextWithHighlight(blog.content, search)"></span>
-              </template>
-            </h3>
-            <div style="color: #999; font-size: 12px; margin-top: 5px;">
-              {{ blog.created_at }}
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <a-empty description="暂无匹配的笔记" />
-        </div>
-      </a-tab-pane>
-    </a-tabs>
-    <div class="search-div" v-if="search != ''">
-      <div class="bookmark-search">
-        <a-input v-model:value="search" ref="DrawerinputRef">
-          <template #addonBefore>
-            <star-outlined @click="fatherMethod('新建书签')" />
-          </template>
-          <template #addonAfter>
-            <close-outlined @click="clearQuestion" />
-          </template>
-        </a-input>
-      </div>
+      
+
+    <h3>根目录</h3>
+    <bookmarkitem
+      v-for="bookmarkitem in items.root_bookmarks"
+      :id="bookmarkitem.id"
+      :folder_id="bookmarkitem.folder_id"
+      :url="bookmarkitem.url"
+      :title="bookmarkitem.title"
+      :pinyin="bookmarkitem.pinyin"
+      :short_title="bookmarkitem.short_title"
+      :is_private="bookmarkitem.is_private"
+      :is_published="bookmarkitem.is_published"
+      :is_recommend="bookmarkitem.is_recommend"
+      :is_friendlink="bookmarkitem.is_friendlink"
+      :http_code="bookmarkitem.http_code"
+      :icon="bookmarkitem.icon_display"
+      :search="search"
+      :editable="editable"
+      @editbookmark="fatherMethod"
+    ></bookmarkitem>
+    <div v-for="item in items.folder">
+      
+      <subfolder
+        :folder_name="item.folder_name"
+        :folder_id="item.id"
+        :folder_bookmark="item.bookmarks"
+        :subfolderx="item.subfolder"
+        :search="search"
+        :editable="editable"
+        :display_offset="item.display_offset"
+        :fatherMethod="fatherMethod"
+      >
+      </subfolder>
     </div>
-  </a-drawer>
+  <div class="search-div" v-if="search != ''">
+  <div class="bookmark-search">
+      <a-input v-model:value="search" ref="DrawerinputRef">
+        <template #addonBefore>
+          <star-outlined @click="fatherMethod('新建书签')" />
+        </template>
+        <template #addonAfter>
+          <close-outlined @click="clearQuestion" />
+        </template>
+      </a-input>
+    </div></div>
+    </a-drawer>
   
   <a-drawer
     :width="500"

@@ -26,7 +26,7 @@
         bearer
       </a-col>
       <a-col :span="14">
-        <a-textarea v-model:value="newBearer" placeholder='bearer' :rows="3" />
+        <a-textarea v-model:value="newBearer" placeholder='bearer值，不包含bearer字样以及空格' :rows="3" />
       </a-col>
       <a-col :span="6">
       </a-col>
@@ -128,7 +128,7 @@
 }
 </style>
 <script>
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
 
 import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref, h } from 'vue';
@@ -369,27 +369,34 @@ export default {
     };
 
     const deleteFetchUrl = (record) => {
-      iconLoading.value = true;
-      let params = new URLSearchParams();
-      params.append("token", $cookies.get('token'));
-      params.append("timestamp", new Date().getTime());
-      params.append("id", record.id);
+      Modal.confirm({
+        title: "确认删除该项目吗？",
+        content: "点击确定删除且无法找回，点击取消则放弃删除",
+        onOk() {
+          iconLoading.value = true;
+          let params = new URLSearchParams();
+          params.append("token", $cookies.get('token'));
+          params.append("timestamp", new Date().getTime());
+          params.append("id", record.id);
 
-      proxy.$http.post('/ajax/delete_fetch_url_ajax/', params)
-        .then(res => {
-          if (res.data.msg) {
-            message.success(res.data.msg);
-            // 从本地数据中移除该记录
-            fileitems.value = fileitems.value.filter(item => item.id !== record.id);
-          }
-        })
-        .catch(error => {
-          message.error('删除失败，请重试');
-          console.error(error);
-        })
-        .finally(() => {
-          iconLoading.value = false;
-        });
+          proxy.$http.post('/ajax/delete_fetch_url_ajax/', params)
+            .then(res => {
+              if (res.data.msg) {
+                message.success(res.data.msg);
+                // 从本地数据中移除该记录
+                fileitems.value = fileitems.value.filter(item => item.id !== record.id);
+              }
+            })
+            .catch(error => {
+              message.error('删除失败，请重试');
+              console.error(error);
+            })
+            .finally(() => {
+              iconLoading.value = false;
+            });
+        },
+        onCancel() {},
+      });
     };
 
     const updateFetchUrl = (record) => {

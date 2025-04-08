@@ -91,27 +91,6 @@ export default {
         }
       }
     },
-    hasMatchingBookmarks: function(folder) {
-      // 检查当前目录下的书签
-      if (folder.bookmarks && folder.bookmarks.length > 0) {
-        for (let bookmark of folder.bookmarks) {
-          if (this.isShow(bookmark.title, bookmark.pinyin, bookmark.url)) {
-            return true;
-          }
-        }
-      }
-      
-      // 检查子目录
-      if (folder.subfolder && folder.subfolder.length > 0) {
-        for (let subfolder of folder.subfolder) {
-          if (this.hasMatchingBookmarks(subfolder)) {
-            return true;
-          }
-        }
-      }
-      
-      return false;
-    }
   },
   data() {
     return {
@@ -123,7 +102,7 @@ export default {
 <template>
   <div
     ref="subFolderRefs"
-    v-show="hasMatchingBookmarks({bookmarks: folder_bookmark, subfolder: subfolderx})"
+    v-show="showTitle(subFolderRefs)"
     :folderid="folder_id"
     :display_offset="display_offset"
     :style="{ 'margin-left': display_offset * 20 + 'px' }"

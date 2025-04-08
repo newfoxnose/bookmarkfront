@@ -54,7 +54,7 @@
 }
 </style>
 <script>
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
 
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
@@ -263,27 +263,34 @@ export default {
     };
 
     const deleteMonitoringUrl = (record) => {
-      iconLoading.value = true;
-      let params = new URLSearchParams();
-      params.append("token", $cookies.get('token'));
-      params.append("timestamp", new Date().getTime());
-      params.append("id", record.id);
-      
-      proxy.$http.post('/ajax/delete_monitoring_url_ajax/', params)
-        .then(res => {
-          if (res.data.msg) {
-            message.success(res.data.msg);
-            // 从本地数据中移除该记录
-            fileitems.value = fileitems.value.filter(item => item.id !== record.id);
-          }
-        })
-        .catch(error => {
-          message.error('删除失败，请重试');
-          console.error(error);
-        })
-        .finally(() => {
-          iconLoading.value = false;
-        });
+      Modal.confirm({
+        title: "确认删除该项目吗？",
+        content: "点击确定删除且无法找回，点击取消则放弃删除",
+        onOk() {
+          iconLoading.value = true;
+          let params = new URLSearchParams();
+          params.append("token", $cookies.get('token'));
+          params.append("timestamp", new Date().getTime());
+          params.append("id", record.id);
+          
+          proxy.$http.post('/ajax/delete_monitoring_url_ajax/', params)
+            .then(res => {
+              if (res.data.msg) {
+                message.success(res.data.msg);
+                // 从本地数据中移除该记录
+                fileitems.value = fileitems.value.filter(item => item.id !== record.id);
+              }
+            })
+            .catch(error => {
+              message.error('删除失败，请重试');
+              console.error(error);
+            })
+            .finally(() => {
+              iconLoading.value = false;
+            });
+        },
+        onCancel() {},
+      });
     };
 
     const updateMonitoringUrl = (record) => {
