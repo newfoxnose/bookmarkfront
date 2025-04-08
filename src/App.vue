@@ -393,7 +393,19 @@ if (res.data.data.is_same==1){
             DrawerinputRef.value.focus();
             console.log("search is ",newVal);
             // 发起笔记搜索请求
-            if (newVal.length > 2) {
+            const getStringLength = (str) => {
+              let length = 0;
+              for (let i = 0; i < str.length; i++) {
+                if (/[\u4e00-\u9fa5]/.test(str[i])) {
+                  length += 2; // 中文字符长度计为2
+                } else {
+                  length += 1; // 其他字符长度计为1
+                }
+              }
+              return length;
+            };
+            
+            if (getStringLength(newVal) >= 4) {
               let params = new URLSearchParams();
               params.append("token", $cookies.get("token"));
               params.append("timestamp", new Date().getTime());
