@@ -111,6 +111,14 @@ const router = createRouter({
       path: "/frame/:id",
       name: "frame",
       component: () => import("../views/FrameView.vue"),
+    },{
+      path: "/monitoring",
+      name: "monitoring",
+      component: () => import("../views/MonitoringView.vue"),
+    },{
+      path: "/fetch",
+      name: "fetch",
+      component: () => import("../views/FetchView.vue"),
     }
   ],
 });

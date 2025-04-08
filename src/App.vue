@@ -25,7 +25,7 @@ import {
   UserAddOutlined,
   LoginOutlined,
   CalendarOutlined,
-  PlusOutlined,
+  PlusOutlined,GlobalOutlined,ApiOutlined
 } from "@ant-design/icons-vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
@@ -46,7 +46,7 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined,
+    SearchOutlined,GlobalOutlined,ApiOutlined
   },
   setup() {
     const items = ref([]);    // 书签列表
@@ -710,7 +710,22 @@ if (res.data.data.is_same==1){
             <profile-outlined /><span>
             <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink></span>
           </a-menu-item>
-          <a-menu-item key="6"  @click="handleClick">
+          <a-menu-item key="15"  @click="handleClick">
+            <global-outlined /><span>
+              <RouterLink to="/monitoring" style="padding-left: 8px">监控网站状态</RouterLink></span>
+            </a-menu-item>
+            <a-menu-item key="16"  @click="handleClick">
+            <api-outlined /><span>
+              <RouterLink to="/fetch" style="padding-left: 8px">数据抓取</RouterLink></span>
+            </a-menu-item>
+          <a-sub-menu key="sub1">
+            <template #title>
+              <span>
+                <more-outlined />
+                <span>更多</span>
+              </span>
+            </template>
+            <a-menu-item key="6"  @click="handleClick">
             <wifi-outlined /><span>
             <RouterLink to="/feed" style="padding-left: 8px">RSS</RouterLink></span>
           </a-menu-item>
@@ -720,13 +735,6 @@ if (res.data.data.is_same==1){
               >日历</RouterLink
             ></span>
           </a-menu-item>
-          <a-sub-menu key="sub1">
-            <template #title>
-              <span>
-                <more-outlined />
-                <span>更多</span>
-              </span>
-            </template>
             <a-menu-item key="8"  @click="handleClick">
               <RouterLink to="/manage">管理目录</RouterLink>
             </a-menu-item>
