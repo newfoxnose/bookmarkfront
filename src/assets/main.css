@@ -84,19 +84,7 @@
 .content-dark-theme .ant-input {
   background-color: #0A203C !important;
   color: #E8E8E8;
-  border-color: #1890ff;
-}
-/* 深色主题下的输入框附加按钮样式 */
-.ant-menu-dark .ant-input-group-addon,
-.content-dark-theme .ant-input-group-addon,
-.drawer-dark-theme .ant-input-group-addon {
-  background-color: #1890ff !important;
-  border-color: #1890ff !important;
-  color: #E8E8E8 !important;
-}
-
-.content-dark-theme .ant-collapse-content-box{
-  background-color: #333f4a !important;
+  border-color: #12243C;
 }
 
 /* 页脚主题样式 */
@@ -147,7 +135,7 @@
 .content-dark-theme .ant-picker-calendar-header,
 .content-dark-theme .ant-picker-calendar,
 .content-dark-theme .ant-picker-content {
-  background-color: #606d7e !important;
+  background-color: #0A203C !important;
   color: #E8E8E8 !important;
 }
 
@@ -162,31 +150,25 @@
   width: 12px;
 }
 
-/* wangeditor编辑器深色主题 */
+/* 编辑器深色主题 */
 .content-dark-theme .wanteditortoolbar * {
   color: #E8E8E8 !important;
   background-color: #0A203C !important;
   border-color: #12243C !important;
 }
-/* wangeditor编辑器深色主题，内容区域 */
+
 .content-dark-theme {
-  --w-e-textarea-bg-color: #606d7e;
+  --w-e-textarea-bg-color: #0A203C;
 }
 
-/* 百度编辑器内容区域样式，只能通过iframe来设置 */
+/* iframe样式 */
 iframe {
-  background-color: #606d7e !important;
+  background-color: #0A203C !important;
 }
 
 /* 抽屉组件主题样式 */
 .drawer-dark-theme .ant-drawer-content-wrapper *:not(.ant-badge-status-dot) {
   background: #001529;
-  color: #E8E8E8;
-}
-
-/* 抽屉组件主题样式 */
-.drawer-dark-theme .ant-drawer-content-wrapper .anticon {
-  background: #1890ff !important;
   color: #E8E8E8;
 }
 
@@ -257,7 +239,13 @@ iframe {
   background: #001529;
 }
 
-
+.ant-menu-dark .ant-input-group-addon,
+.content-dark-theme .ant-input-group-addon,
+.drawer-dark-theme .ant-input-group-addon {
+  background-color: #0c4998 !important;
+  border-color: #223855 !important;
+  color: #E8E8E8 !important;
+}
 
 /* 折叠面板边框样式 */
 .ant-collapse,

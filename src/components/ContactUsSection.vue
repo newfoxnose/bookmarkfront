@@ -72,7 +72,7 @@
 
         <v-btn
           class="text-body-2"
-          color="accent"
+          color="#FF6B6B"
           flat
           height="55"
           rounded
