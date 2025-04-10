@@ -5,8 +5,6 @@
  */
 
 // Plugins
-import vuetify from './vuetify'
-
 export function registerPlugins (app) {
-  app.use(vuetify)
+  // 暂时不需要注册任何插件
 }

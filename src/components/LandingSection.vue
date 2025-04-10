@@ -15,7 +15,7 @@
 
     <div class="d-flex ga-5 flex-1-1-auto flex-wrap justify-center px-4">
       <v-btn
-        :block="$vuetify.display.mdAndDown"
+        :block="false"
         color="accent"
         :href="`#4`"
         flat

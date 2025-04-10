@@ -1,3 +1,4 @@
+/* 加载动画样式 */
 .loadingbar {
   position: fixed;
   top: 50%;
@@ -6,319 +7,267 @@
   z-index: 10;
 }
 
-
-/* 修改垂直滚动条 */
-::-webkit-scrollbar {
-  width: 10px; /* 修改宽度 */
-}
- 
-/* 修改滚动条轨道背景色 */
-::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
-}
- 
-/* 修改滚动条滑块颜色 */
-::-webkit-scrollbar-thumb {
-  background-color: #888;
-}
- 
-/* 修改滚动条滑块悬停时的颜色 */
-::-webkit-scrollbar-thumb:hover {
-  background-color: #555;
-}
-/* 修改垂直滚动条 */
-::-webkit-scrollbar {
-  width: 10px; /* 修改宽度 */
-}
- 
-/* 修改滚动条轨道背景色 */
-::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
-}
- 
-/* 修改滚动条滑块颜色 */
-::-webkit-scrollbar-thumb {
-  background-color: #888;
-}
- 
-/* 修改滚动条滑块悬停时的颜色 */
-::-webkit-scrollbar-thumb:hover {
-  background-color: #555;
-}
- 
-/* 修改滚动条滑块移动时的颜色 */
-::-webkit-scrollbar-thumb:active {
-  background-color: #333;
-}
- 
-/* 修改滚动条滑块的圆角 */
-::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-}
-/* 修改滚动条的宽度和颜色 */
+/* 滚动条样式 */
 ::-webkit-scrollbar {
   width: 10px;
-  background-color: #f1f1f1;
+  background-color: #0A1929;
 }
- 
-/* 修改滚动条滑块的样式 */
+::-webkit-scrollbar-track {
+  background-color: #0A1929;
+}
 ::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 5px; /* 修改滑块圆角 */
+  background-color: #64748B;
+  border-radius: 5px;
 }
- 
-/* 修改滚动条滑块悬停时的样式 */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #555;
+  background-color: #A0AEC0;
+}
+::-webkit-scrollbar-thumb:active {
+  background-color: #E8E8E8;
 }
 
-.content-title{
-  margin-top:15px;
-margin-left:30px;
-font-weight:bold;
-text-align:center;
+/* 通用布局样式 */
+.content-title {
+  margin-top: 15px;
+  margin-left: 30px;
+  font-weight: bold;
+  text-align: center;
 }
 
 .logo {
-    height: 32px;
-    margin: 10px;
-    padding:5px;
-    text-align: center;
-  }
-
-.ant-layout-sider-dark .ant-layout-sider-zero-width-trigger{
-  background-color: #1890ff;
-  top:0;
-}
-.ant-layout-sider-light .ant-layout-sider-zero-width-trigger{
-  background-color: #1890ff;
-  top:0;
+  height: 32px;
+  margin: 10px;
+  padding: 5px;
+  text-align: center;
 }
 
+/* 侧边栏样式 */
+.ant-layout-sider-dark .ant-layout-sider-zero-width-trigger {
+  background-color: #1890FF;
+  top: 0;
+}
 
-  .content-light-theme {
-    background: #fff;
-    border-left-style:solid;
-    border-left-width:thin;
-    border-left-color:rgb(240 242 245);
-    padding-left:10px;
-    padding-top:0;
-    color:#000;
-  }
-  
+/* 内容区域主题样式，这个不能删除 */
+.content-light-theme {
+  background: #fff;
+  border-left-style: solid;
+  border-left-width: thin;
+  border-left-color: rgb(240 242 245);
+  padding-left: 10px;
+  padding-top: 0;
+  color: #000;
+}
 
-    
-  .content-dark-theme {
-    background: #001529;
-    border-left-style:solid;
-    border-left-width:thin;
-    border-left-color:#001529;
-    padding-left:10px;
-    padding-top:0;
-    color:rgba(255, 255, 255, 0.65);
-  }
+.content-dark-theme {
+  background: #001529;
+  border-left-style: solid;
+  border-left-width: thin;
+  border-left-color: #0A1929;
+  padding-left: 10px;
+  padding-top: 0;
+  color: #E8E8E8;
+}
 
-  
-  .content-dark-theme .ant-result-title ,  .content-dark-theme .ant-result-subtitle{
-    color:rgba(255, 255, 255, 0.65);
-  }
+/* 深色主题下的文本颜色 */
+.content-dark-theme .ant-result-title,
+.content-dark-theme .ant-result-subtitle,
+.content-dark-theme .font-color-by-theme,
+.content-dark-theme h3 {
+  color: #FFFFFF;
+}
+
+.content-dark-theme label {
+  color: #A0AEC0 !important;
+}
+
+/* 深色主题下的输入框样式 */
+.content-dark-theme .ant-input {
+  background-color: #0A203C !important;
+  color: #E8E8E8;
+  border-color: #1890ff;
+}
+/* 深色主题下的输入框附加按钮样式 */
+.ant-menu-dark .ant-input-group-addon,
+.content-dark-theme .ant-input-group-addon,
+.drawer-dark-theme .ant-input-group-addon {
+  background-color: #1890ff !important;
+  border-color: #1890ff !important;
+  color: #E8E8E8 !important;
+}
+
+.content-dark-theme .ant-collapse-content-box{
+  background-color: #333f4a !important;
+}
+
+/* 页脚主题样式 */
+.footer-dark-theme {
+  background: #001529;
+  text-align: center;
+  color: #E8E8E8;
+}
+
+/* 深色主题下的表格样式 */
+.content-dark-theme {
+  --ad-primary-color: #0A203C;
+  --ad-text-color: #E8E8E8;
+  --ad-border-color: #12243C;
+  --ad-background-color: #001529;
+}
+
+.content-dark-theme .ant-table {
+  color: var(--ad-text-color);
+  background-color: var(--ad-background-color);
+}
+
+.content-dark-theme .ant-table-thead > tr > th {
+  color: #FFFFFF;
+  background-color: var(--ad-primary-color);
+  border-color: var(--ad-border-color);
+}
+
+.content-dark-theme .ant-table-tbody > tr > td {
+  border-color: var(--ad-border-color);
+}
+
+.content-dark-theme pre {
+  color: #E8E8E8 !important;
+}
+
+.content-dark-theme .ant-table-cell {
+  background-color: #0A203C !important;
+  color: #E8E8E8 !important;
+}
+
+.content-dark-theme .ant-table-cell-row-hover {
+  background-color: #12243C !important;
+  color: #FFFFFF !important;
+}
+
+/* 日历组件深色主题 */
+.content-dark-theme .ant-picker-calendar-header,
+.content-dark-theme .ant-picker-calendar,
+.content-dark-theme .ant-picker-content {
+  background-color: #606d7e !important;
+  color: #E8E8E8 !important;
+}
+
+.content-dark-theme .ant-picker-date-panel .ant-picker-body,
+.content-dark-theme .ant-picker-month-panel .ant-picker-body {
+  padding: 0;
+}
+
+/* 徽章样式 */
+.ant-form-item-control-input-content .ant-badge-status-dot {
+  height: 12px;
+  width: 12px;
+}
+
+/* wangeditor编辑器深色主题 */
+.content-dark-theme .wanteditortoolbar * {
+  color: #E8E8E8 !important;
+  background-color: #0A203C !important;
+  border-color: #12243C !important;
+}
+/* wangeditor编辑器深色主题，内容区域 */
+.content-dark-theme {
+  --w-e-textarea-bg-color: #606d7e;
+}
+
+/* 百度编辑器内容区域样式，只能通过iframe来设置 */
+iframe {
+  background-color: #606d7e !important;
+}
+
+/* 抽屉组件主题样式 */
+.drawer-dark-theme .ant-drawer-content-wrapper *:not(.ant-badge-status-dot) {
+  background: #001529;
+  color: #E8E8E8;
+}
+
+/* 抽屉组件主题样式 */
+.drawer-dark-theme .ant-drawer-content-wrapper .anticon {
+  background: #1890ff !important;
+  color: #E8E8E8;
+}
+
+.drawer-dark-theme .ant-modal-content * {
+  background: #001529;
+  color: #E8E8E8;
+}
+
+/* 选择器主题样式 */
+.drawer-dark-theme .ant-select-selector {
+  background-color: #0A203C !important;
+  border-color: #12243C !important;
+}
+
+.drawer-dark-theme .ant-select-dropdown {
+  background-color: #0A203C !important;
+  padding: 0;
+}
+
+.drawer-dark-theme.ant-select-item {
+  background-color: #0A203C !important;
+  color: #E8E8E8 !important;
+}
+
+.drawer-dark-theme.ant-select-item .ant-select-item-option-content {
+  color: #E8E8E8 !important;
+}
+
+.drawer-dark-theme.ant-select-item-option-selected {
+  background-color: #12243C !important;
+  color: #FFFFFF !important;
+}
+
+.drawer-dark-theme.ant-select-item-option-active {
+  background-color: #12243C !important;
+  color: #FFFFFF !important;
+}
+
+/* 标签页深色主题 */
+.content-dark-theme .ant-tabs-tab-btn[aria-selected=false] {
+  color: #A0AEC0;
+}
+
+/* 折叠面板深色主题 */
+.collapse-dark-theme .ant-collapse-header {
+  background-color: #0A203C;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #E8E8E8 !important;
+}
+
+.collapse-dark-theme .ant-collapse-content {
+  background-color: #001529;
+  border: none !important;
+}
+
+.collapse-dark-theme del {
+  text-decoration-style: solid;
+  text-decoration-color: #E8E8E8;
+}
+
+/* 菜单样式 */
+.ant-menu-dark .ant-menu-item a {
+  color: #E8E8E8 !important;
+}
+
+.ant-menu-dark .ant-menu-inline.ant-menu-sub {
+  background: #001529;
+}
 
 
-  .content-dark-theme .font-color-by-theme{
-    color:rgba(255, 255, 255, 0.65);
-  }
 
-  
-  .footer-dark-theme {
-    background: #001529;
-    text-align: center;
-    color:rgba(255, 255, 255, 0.65);
-  }
-  .footer-light-theme {
-    background: #fff;
-    text-align: center;
-  }
-  
-.content-dark-theme h3{
-    color:rgba(255, 255, 255, 0.65) !important;
-  }
-  
-  
-  .content-dark-theme label{
-    color:#999 !important;
-  }
-  
+/* 折叠面板边框样式 */
+.ant-collapse,
+.ant-collapse-item {
+  border: none !important;
+}
 
+/* 菜单项间距 */
+.ant-menu-item {
+  margin-top: 0 !important;
+}
 
-  .xxdrawer-light-theme .ant-drawer-content-wrapper *{
-    background: #fff;
-    color:#000;
-  }
-
-
-   .content-dark-theme {
-    --ad-primary-color: #262626; /* 主题色 */
-    --ad-text-color: #ffffff; /* 文本色 */
-    --ad-border-color: #303030; /* 边框色 */
-    --ad-background-color: #141414; /* 背景色 */
-  }
-   
-  /* 确保覆盖所有相关的样式 */
-   .content-dark-theme .ant-table {
-    color: var(--ad-text-color);
-    background-color: var(--ad-background-color);
-  }
-   
-   .content-dark-theme .ant-table-thead >tr > th {
-    color: var(--ad-text-color);
-    background-color: var(--ad-primary-color);
-    border-color: var(--ad-border-color);
-  }
-   
-   .content-dark-theme .ant-table-tbody  >tr > td {
-    border-color: var(--ad-border-color);
-  }
-   
-   .content-dark-theme .ant-table-cell-row-hover {
-    background-color: #666666 !important; /* 悬停行的背景色 */
-    color:#fff !important;
-  }
-
-
-  .content-dark-theme .ant-picker-calendar-header{
-    background-color: #cccccc !important;
-    color:#fff !important;
-  }
-
-  .content-dark-theme .ant-picker-calendar{
-    background-color: #cccccc !important;
-    color:#fff !important;
-  }
-  .content-dark-theme .ant-picker-content{
-    background-color: #cccccc !important;
-    color:#fff !important;
-  }
-
-  .content-dark-theme  .ant-picker-date-panel .ant-picker-body{
-    padding:0;
-  }
-  .content-dark-theme  .ant-picker-month-panel .ant-picker-body{
-    padding:0;
-  }
-
-  .ant-form-item-control-input-content .ant-badge-status-dot{
-    height:12px;
-    width:12px;
-  }
-
-
-  .content-dark-theme .wanteditortoolbar *{
-    color: var(--ad-text-color) !important;
-    background-color: var(--ad-primary-color) !important;
-    border-color: var(--ad-border-color) !important;
-  }
-  .content-dark-theme  {
-    --w-e-textarea-bg-color: #cccccc;   /*wanteditor深色模式*/
-  }
-
-      
- iframe {
-    background-color: #cccccc !important;  /*百度编辑器背景颜色不好切换，固定*/
-  }
-
-
-  
-  .drawer-dark-theme .ant-drawer-content-wrapper *:not(.ant-badge-status-dot){
-    background: #001529;
-    color:rgba(255, 255, 255, 0.65);
-  }
-
-  .drawer-dark-theme .ant-modal-content *{
-    background: #001529;
-    color:rgba(255, 255, 255, 0.65);
-  }
-
-  .drawer-dark-theme .ant-select-selector {
-    background-color: #001529 !important;
-  }
-  .drawer-light-theme .ant-select-selector {
-    background-color: transparent;
-  }
-  
-.drawer-dark-theme .ant-select-dropdown  {
-    background-color: #001529 !important;
-    padding:0;
-  }
- .drawer-light-theme .ant-select-dropdown {
-    background-color: transparent;
-  }
-
-  .drawer-dark-theme.ant-select-item  {
-    background-color: #001529 !important;
-    color: var(--ad-text-color) !important;
-  }
- .drawer-light-theme.ant-select-item  {
-    background-color: transparent;
-  }
-
-  .drawer-dark-theme.ant-select-item  .ant-select-item-option-content{
-    color: #fff !important;
-  }
-
-
-  .drawer-dark-theme.ant-select-item-option-selected  {
-    background-color: #eee !important;
-    color: #fff !important;
-  }
- .drawer-light-theme.ant-select-item-option-selected  {
-    background-color: transparent;
-  }
-
-
-  .drawer-dark-theme.ant-select-item-option-active  {
-    background-color: #ddd !important;
-    color: #000 !important;
-  }
- .drawer-light-theme.ant-select-item-option-active  {
-    background-color: #eee;
-  }
-
-
-  .content-dark-theme .ant-tabs-tab-btn[aria-selected=false] {
-    color: rgba(255, 255, 255, 0.65);
-  }
-
-/*顶部折叠面板的深色模式*/
-  .collapse-dark-theme .ant-collapse-header{
-    background-color: #666;
-    border:none !important;
-    border-radius:0 !important;
-    color:rgba(255, 255, 255, 0.65) !important;
-  }
-
-  .collapse-dark-theme .ant-collapse-content{
-    background-color: #001529;
-    border:none !important;
-  }
-
-  .collapse-dark-theme del{
-    text-decoration-style: solid;
-    text-decoration-color: white;
-  }
-
-  .ant-menu-dark .ant-menu-item a{
-    color: #fff !important;
-  }
-
-/*去掉顶部折叠面板的边框*/
-  .ant-collapse {
-    border:none !important;
-  }
-  .ant-collapse-item{
-    border:none !important;
-  }
-
-/*去掉左侧导航菜单与顶部折叠面板的间距*/
-  .ant-menu-item{
-    margin-top:0 !important;
-  }
+/*深色模式的主背景色为#001529*/
