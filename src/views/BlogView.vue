@@ -43,12 +43,12 @@
               @click="showconfirmdelete(item.id,  '')"
               >删除</a
             >
-            <br /><a-image
+            <div style="margin-left: 50px"><a-image
               v-for="img in item.img_arr"
               :key="img.label"
               :width="200"
               :src="img"
-            />
+            /></div>
           </div>
         </a-image-preview-group>
       </div>

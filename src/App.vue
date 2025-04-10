@@ -247,6 +247,7 @@ if (res.data.data.is_same==1){
     const folder_id = ref(String);
     const iconLoading = ref(false);
     const visible = ref(false);
+    const drawer2visible = ref(false);
     const is_private = ref(false);
     const is_published = ref(false);
     const is_recommend = ref(false);
@@ -254,13 +255,18 @@ if (res.data.data.is_same==1){
     const folder_list = ref([]);
     const updatedDrawerTitle = ref(String);
     const showDrawer = (drawerTitle) => {
+      drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
       visible.value = true;
       updatedDrawerTitle.value = drawerTitle;
-      drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
     };
     const onClose = () => {
       iconLoading.value = false;
       visible.value = false;
+    };
+
+    const onClose2 = () => {
+      iconLoading.value = false;
+      drawer2visible.value = false;
     };
     
     const addBookmark = (id, action) => {
@@ -376,7 +382,23 @@ if (res.data.data.is_same==1){
     const visibleSearch = ref(false);
     const activeTabKey = ref('1');
     const searchBlogResults = ref([]); // 添加笔记搜索结果变量
+    const blog_id = ref(""); // 添加博客ID
+    const valueHtml = ref(""); // 添加HTML内容
+    const formState = ref({ // 添加表单状态
+      title: "",
+      folder_id: -1,
+      is_private: false,
+      is_recommend: false
+    });
     
+    // 修改为笔记专用的变量名
+    const blogFormState = ref({
+      blog_title: "",
+      blog_folder_id: -1,
+      blog_is_private: false,
+      blog_is_recommend: false
+    });
+
     const clearQuestion = () => {
       search.value = "";
       visibleSearch.value = false;
@@ -387,6 +409,7 @@ if (res.data.data.is_same==1){
     };
     watch(search, (newVal) => {
       if (newVal) {
+        drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
         visibleSearch.value = true;
         nextTick(() => {
           setTimeout(() => {
@@ -429,6 +452,92 @@ if (res.data.data.is_same==1){
         });
       }
     });
+
+    
+    const showDrawer2 = (drawerTitle, id) => {
+      drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
+      updatedDrawerTitle.value = drawerTitle;
+      if (id != 0) {
+        blog_id.value = id;
+        let params = new URLSearchParams();
+        params.append("token", $cookies.get("token"));
+        params.append("timestamp", new Date().getTime());
+        params.append("blog_id", blog_id.value);
+        proxy.$http.post("/ajax/get_blog_ajax/", params).then((res) => {
+          console.log(res.data);
+          if (res.data.code == "201") {
+            message.error("密码错误");
+          } else {
+            drawer2visible.value = true;
+            valueHtml.value = res.data.data.blog.content;
+            defaultPercent.value = 100;
+            loadingdone.value = true;
+            blogFormState.value.blog_title = res.data.data.blog.title;
+            blogFormState.value.blog_folder_id = res.data.data.blog.folder_id;
+            if (res.data.data.blog.is_private == 1) {
+              blogFormState.value.blog_is_private = true;
+            } else {
+              blogFormState.value.blog_is_private = false;
+            }
+            if (res.data.data.blog.is_recommend == 1) {
+              blogFormState.value.blog_is_recommend = true;
+            } else {
+              blogFormState.value.blog_is_recommend = false;
+            }
+          }
+        });
+      } else {
+        drawer2visible.value = true;
+        blogFormState.value.blog_title = "无标题";
+        blogFormState.value.blog_folder_id = -1;
+        blogFormState.value.blog_is_private = false;
+        blogFormState.value.blog_is_recommend = false;
+        valueHtml.value = "<p>写点什么呢？</p>";
+      }
+    };
+    const save = () => {
+      iconLoading.value = true;
+      if (
+        proxy.$func.getVarType(blogFormState.value.blog_title) == "undefined" ||
+        blogFormState.value.blog_title == ""
+      ) {
+        message.info("标题不能为空");
+        iconLoading.value = false;
+      } else {
+        let params = new URLSearchParams();
+        params.append("token", $cookies.get("token"));
+        params.append("timestamp", new Date().getTime());
+        params.append("content", valueHtml.value);
+        params.append("title", blogFormState.value.blog_title);
+        params.append("folder_id", blogFormState.value.blog_folder_id);
+        if (blog_id.value != 0) {
+          params.append("post_id", blog_id.value);
+        }
+        if (blogFormState.value.blog_is_private == true) {
+          params.append("is_private", 1);
+        } else {
+          params.append("is_private", 0);
+        }
+        if (blogFormState.value.blog_is_recommend == true) {
+          params.append("is_recommend", 1);
+        } else {
+          params.append("is_recommend", 0);
+        }
+        proxy.$http
+          .post("/ajax/save_blog_ajax/", params)
+          .then((res) => {
+            message.info(res.data.msg);
+            iconLoading.value = false;
+            onClose2();
+          })
+          .catch((error) => {
+            message.info("无法正常保存");
+            iconLoading.value = false;
+            console.log(error);
+          });
+      }
+    };
+
     //搜索结果
     provide("reloadtodo", toggleTodo); //向其他组件提供刷新方法，要在本页函数初始化之后
     provide('sharedItems', items);
@@ -451,11 +560,14 @@ if (res.data.data.is_same==1){
       onBreakpoint,
       breakpoint_active,
       showDrawer,
+      showDrawer2,
       visible,
+      drawer2visible,
       url,
       title,
       folder_id,
       onClose,
+      onClose2,
       iconLoading,
       drawerclass,
       is_private,
@@ -477,7 +589,11 @@ if (res.data.data.is_same==1){
       updatedDrawerTitle,
       showconfirmdelete,
       activeTabKey,
-      searchBlogResults, // 返回笔记搜索结果变量
+      searchBlogResults,
+      blog_id,
+      valueHtml,
+      blogFormState,
+      save
     };
   },
   
@@ -490,6 +606,41 @@ if (res.data.data.is_same==1){
     };
   },
 
+  created() {
+    // 更多 UEditor 配置，参考 http://fex.baidu.com/ueditor/#start-config
+    this.editorConfig = {
+      ///*
+      toolbars: [
+        [
+            'fullscreen', 'undo', 'redo', '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', '|', 'forecolor', 'backcolor', '|', 'removeformat', '|',
+            'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
+            'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
+            'paragraph', 'fontfamily', 'fontsize', '|',
+            'directionalityltr', 'directionalityrtl', '|',
+            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|',
+            'link', 'unlink', 'anchor', '|',
+            'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
+            'simpleupload', 'insertimage', 'emotion','insertvideo',  'attachment',  '|',
+            'insertframe', 'insertcode',  'pagebreak', 'template', 'background', '|',
+            'horizontal', 'date', 'time', 'spechars', 'snapscreen', '|',
+            'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', '|',
+            'print', 'preview', 'searchreplace'
+        ]
+    ],
+      //*/
+      UEDITOR_HOME_URL: "/UEditor/", // 访问 UEditor 静态资源的根路径，可参考常见问题1
+      lang: "zh-cn",
+      // 初始容器高度
+      initialFrameHeight: 300,
+      serverUrl:
+        this.$remoteDomain +
+        "/ueditor/controller.php?token=" +
+        $cookies.get("token") +
+        "&timestamp=" +
+        new Date().getTime(), // 服务端接口
+    };
+  },
   methods: {
     fatherMethod(
       drawerTitle,
@@ -645,7 +796,7 @@ if (res.data.data.is_same==1){
     highlightKeyword(text, keyword) {
       if (!text || !keyword) return text;
       const reg = new RegExp(keyword, 'gi');
-      return text.replace(reg, match => `<span style="color: red">${match}</span>`);
+      return text.replace(reg, match => `<span style="color: #1890FF; font-weight: bold;">${match}</span>`);
     },
     getContextWithHighlight(content, keyword) {
       if (!content || !keyword) return '';
@@ -854,8 +1005,7 @@ if (res.data.data.is_same==1){
 
 
 
-  <a-drawer v-model:visible="visibleSearch" :title="`关键词${search}的搜索结果`" @ok="handleSearchOk" placement="bottom"
-    :footer="null" height="100%" @close="clearQuestion">
+  <a-drawer v-model:visible="visibleSearch" :title="`关键词${search}的搜索结果`" @ok="handleSearchOk" placement="bottom" :class="drawerclass" :footer="null" height="100%" @close="clearQuestion">
     <a-tabs v-model:activeKey="activeTabKey">
       <a-tab-pane key="1" tab="书签">
         <h3>根目录</h3>
@@ -895,7 +1045,11 @@ if (res.data.data.is_same==1){
         <div v-if="searchBlogResults && searchBlogResults.length > 0">
           <div v-for="blog in searchBlogResults" :key="blog.id" style="margin-bottom: 20px;">
             <h3>
-              <RouterLink :to="'/editpost/' + blog.id" v-html="highlightKeyword(blog.title, search)"></RouterLink>
+              <a
+              style="margin-left: 20px"
+              @click="showDrawer2(blog.title, blog.id)"
+              ><span v-html="highlightKeyword(blog.title, search)"></span></a
+            >
               <template v-if="blog.content">
                 <span style="font-size: 14px; font-weight: normal; margin-left: 10px; color: #666;" v-html="getContextWithHighlight(blog.content, search)"></span>
               </template>
@@ -997,6 +1151,68 @@ if (res.data.data.is_same==1){
   </a-drawer>
 
 
+  <a-modal
+    v-model:visible="drawer2visible"
+    :title="updatedDrawerTitle"
+    width="100%"
+    wrap-class-name="full-modal"
+    :class="drawerclass"
+    :footer="null"
+    @close="onClose2"
+  >
+    <a-form :model="blogFormState">
+      <a-row>
+        <a-col :span="8">
+          <p>
+            <a-input
+              v-model:value="blogFormState.blog_title"
+              placeholder="请输入标题"
+            /></p
+        ></a-col>
+        <a-col :span="8">
+          <p style="padding-left: 20px">
+            <a-select
+              style="width: 100%"
+              v-model:value="blogFormState.blog_folder_id"
+              v-if="folder_list"
+            >
+              <a-select-option
+                v-for="item in folder_list"
+                :value="item.value"
+                :lv="item.lv"
+                :class="drawerclass"
+              >
+                {{ item.name }}</a-select-option
+              >
+            </a-select>
+          </p></a-col
+        >
+        <a-col :span="4">
+          <p style="padding-left: 20px; white-space: nowrap">
+            <a-checkbox v-model:checked="blogFormState.blog_is_recommend"
+              >置顶</a-checkbox
+            >
+            <a-checkbox v-model:checked="blogFormState.blog_is_private">私密</a-checkbox>
+          </p></a-col
+        >
+        <a-col :span="4" align="right">
+          <a-button
+        type="primary"
+        @click="save()"
+        :loading="iconLoading"
+        >保存</a-button
+      >
+      &nbsp;
+      <a-button style="margin-right: 8px" @click="onClose2">取消</a-button></a-col
+        >
+      </a-row>
+    </a-form>
+    <vue-ueditor-wrap
+      v-model="valueHtml"
+      :config="editorConfig"
+      editor-id="editor-demo-02"
+    ></vue-ueditor-wrap>
+  </a-modal>
 
 </template>
 

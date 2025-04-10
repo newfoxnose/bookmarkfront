@@ -84,7 +84,7 @@
 .content-dark-theme .ant-input {
   background-color: #0A203C !important;
   color: #E8E8E8;
-  border-color: #12243C;
+  border-color: #223855;
 }
 
 /* 页脚主题样式 */
@@ -150,20 +150,20 @@
   width: 12px;
 }
 
-/* 编辑器深色主题 */
+/* wangeditor编辑器深色主题工具栏 */
 .content-dark-theme .wanteditortoolbar * {
   color: #E8E8E8 !important;
   background-color: #0A203C !important;
   border-color: #12243C !important;
 }
-
+/* wangeditor编辑器深色主题内容 */
 .content-dark-theme {
-  --w-e-textarea-bg-color: #0A203C;
+  --w-e-textarea-bg-color: #e8e8e8;
 }
 
-/* iframe样式 */
+/* 百度编辑器，只能设置iframe样式 */
 iframe {
-  background-color: #0A203C !important;
+  background-color: #e8e8e8 !important;
 }
 
 /* 抽屉组件主题样式 */
