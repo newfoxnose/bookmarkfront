@@ -7,53 +7,27 @@
   </div>
   <h3 class="content-title">数据抓取</h3>
 
-  <div style="padding: 15px">
-    <a-row type="flex" justify="center" align="middle">
-      <a-col :span="4">
-        新增抓取网址
-      </a-col>
-      <a-col :span="14">
+  <div class="input-section">
+    <a-form layout="vertical">
+      <a-form-item label="新增抓取网址">
         <a-input v-model:value="newUrl" placeholder="请输入要抓取数据的网址" />
-      </a-col>
-      <a-col :span="2">
-      </a-col>
-      <a-col :span="4">
-        <a-button type="primary" @click="insertFetchUrl" :loading="iconLoading">提交</a-button>
-      </a-col>
-    </a-row>
-    <a-row type="flex" justify="center" align="middle" style="margin-top: 10px">
-      <a-col :span="4">
-        bearer
-      </a-col>
-      <a-col :span="14">
+      </a-form-item>
+      <a-form-item label="Bearer">
         <a-textarea v-model:value="newBearer" placeholder='bearer值，不包含bearer字样以及空格' :rows="3" />
-      </a-col>
-      <a-col :span="6">
-      </a-col>
-    </a-row>  
-    <a-row type="flex" justify="center" align="middle" style="margin-top: 10px">
-      <a-col :span="4">
-        表单数据
-      </a-col>
-      <a-col :span="14">
+      </a-form-item>
+      <a-form-item label="表单数据">
         <a-textarea v-model:value="newPostData" placeholder='表单数据' :rows="3" />
-      </a-col>
-      <a-col :span="6">
-      </a-col>
-    </a-row>    
-    <a-row type="flex" justify="center" align="middle" style="margin-top: 10px">
-      <a-col :span="4">
-        格式化显示规则
-      </a-col>
-      <a-col :span="14">
+      </a-form-item>
+      <a-form-item label="格式化显示规则">
         <a-textarea v-model:value="newFormatting" placeholder='格式如下:{ "pairs": {     "显示名称1": "数据路径1","显示名称2": "数据路径2"}, "tables":["表格1数据路径","表格2数据路径"]}' :rows="3" />
-      </a-col>
-      <a-col :span="6">
-      </a-col>
-    </a-row>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="insertFetchUrl" :loading="iconLoading" block>提交</a-button>
+      </a-form-item>
+    </a-form>
   </div>
 
-  <a-table :columns="columns" :data-source="fileitems" :pagination="false" rowKey="id" v-model:expandedRowKeys="expandedRowKeys">
+  <a-table :columns="columns" :data-source="fileitems" :pagination="false" rowKey="id" v-model:expandedRowKeys="expandedRowKeys" :scroll="{ x: true }">
     <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'url'">
         <a-input v-model:value="record.url" @change="handleUrlChange(record)" />
@@ -125,6 +99,32 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
+}
+
+.input-section {
+  padding: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.content-title {
+  text-align: center;
+  margin: 20px 0;
+}
+
+@media screen and (max-width: 768px) {
+  .input-section {
+    padding: 10px;
+  }
+  
+  :deep(.ant-table) {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  :deep(.ant-table-cell) {
+    white-space: nowrap;
+  }
 }
 </style>
 <script>

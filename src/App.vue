@@ -25,7 +25,7 @@ import {
   UserAddOutlined,
   LoginOutlined,
   CalendarOutlined,
-  PlusOutlined,GlobalOutlined,ApiOutlined
+  PlusOutlined,GlobalOutlined,ApiOutlined,KeyOutlined
 } from "@ant-design/icons-vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
@@ -46,7 +46,7 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined,GlobalOutlined,ApiOutlined
+    SearchOutlined,GlobalOutlined,ApiOutlined,KeyOutlined
   },
   setup() {
     const items = ref([]);    // 书签列表
@@ -911,12 +911,7 @@ if (res.data.data.is_same==1){
             <database-outlined /><span>
             <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink></span>
           </a-menu-item>
-          <a-menu-item key="4"  @click="handleClick">
-            <comment-outlined /><span>
-            <RouterLink to="/chat" style="padding-left: 8px"
-              >CHATGPT</RouterLink
-            ></span>
-          </a-menu-item>
+
           <a-menu-item key="5"  @click="handleClick">
             <profile-outlined /><span>
             <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink></span>
@@ -929,6 +924,10 @@ if (res.data.data.is_same==1){
             <api-outlined /><span>
               <RouterLink to="/fetch" style="padding-left: 8px">数据抓取</RouterLink></span>
             </a-menu-item>
+            <a-menu-item key="17"  @click="handleClick">
+            <key-outlined /><span>
+              <RouterLink to="/pwdmemo" style="padding-left: 8px">密码管理</RouterLink></span>
+            </a-menu-item>
           <a-sub-menu key="sub1">
             <template #title>
               <span>
@@ -936,9 +935,15 @@ if (res.data.data.is_same==1){
                 <span>更多</span>
               </span>
             </template>
+            <a-menu-item key="4"  @click="handleClick">
+            <comment-outlined /><span>
+            <RouterLink to="/chat" style="padding-left: 8px"
+              >CHATGPT</RouterLink
+            ></span>
+          </a-menu-item>
             <a-menu-item key="6"  @click="handleClick">
             <wifi-outlined /><span>
-            <RouterLink to="/feed" style="padding-left: 8px">RSS</RouterLink></span>
+            <RouterLink to="/feed" style="padding-left: 8px">RSS阅读器</RouterLink></span>
           </a-menu-item>
           <a-menu-item key="17"  @click="handleClick">
             <calendar-outlined /><span>

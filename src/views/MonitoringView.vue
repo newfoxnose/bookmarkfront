@@ -7,50 +7,99 @@
  </div>
   <h3 class="content-title">监控网站状态</h3>
 
-  <div style="padding: 15px">
-    <a-row :gutter="16">
-      <a-col :span="4">
-        新增监控网址
+  <div class="url-input-container">
+    <a-row :gutter="[16, 16]">
+      <a-col :xs="24" :sm="24" :md="4">
+        <div class="input-label">新增监控网址</div>
       </a-col>
-      <a-col :span="16">
+      <a-col :xs="24" :sm="24" :md="16">
         <a-input v-model:value="newUrl" placeholder="请输入要监控的网址" />
       </a-col>
-      <a-col :span="4">
-        <a-button type="primary" @click="insertMonitoringUrl" :loading="iconLoading">提交</a-button>
+      <a-col :xs="24" :sm="24" :md="4">
+        <a-button type="primary" @click="insertMonitoringUrl" :loading="iconLoading" block>提交</a-button>
       </a-col>
     </a-row>
   </div>
 
-  <a-table :columns="columns" :data-source="fileitems" :pagination="false">
-    <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'url'">
-        <a-input v-model:value="record.url" @change="handleUrlChange(record)" />
+  <div class="table-container">
+    <a-table 
+      :columns="columns" 
+      :data-source="fileitems" 
+      :pagination="false"
+      :scroll="{ x: true }"
+    >
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'url'">
+          <a-input v-model:value="record.url" @change="handleUrlChange(record)" />
+        </template>
+        <template v-if="column.key === 'action'">
+          <a-space>
+            <a-button type="primary" @click="updateMonitoringUrl(record)" :loading="iconLoading">
+              <template #icon><edit-outlined /></template>
+              修改
+            </a-button>
+            <a-button type="primary" danger @click="deleteMonitoringUrl(record)" :loading="iconLoading">
+              <template #icon><delete-outlined /></template>
+              删除
+            </a-button>
+          </a-space>
+        </template>
       </template>
-      <template v-if="column.key === 'action'">
-        <a-space>
-          <a-button type="primary"  @click="updateMonitoringUrl(record)" :loading="iconLoading">
-            <template #icon><edit-outlined /></template>
-            修改
-          </a-button>
-          <a-button type="primary" danger  @click="deleteMonitoringUrl(record)" :loading="iconLoading">
-            <template #icon><delete-outlined /></template>
-            删除
-          </a-button>
-        </a-space>
-      </template>
-    </template>
-  </a-table>
+    </a-table>
+  </div>
 
 </template>
 <style scoped>
-
-
 .loadingbar {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
+}
+
+.content-title {
+  margin: 16px;
+  text-align: center;
+}
+
+.url-input-container {
+  padding: 15px;
+  background: #fff;
+  margin: 16px;
+  border-radius: 4px;
+}
+
+.input-label {
+  line-height: 32px;
+  text-align: center;
+}
+
+.table-container {
+  margin: 16px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+@media screen and (max-width: 768px) {
+  .url-input-container {
+    margin: 8px;
+  }
+  
+  .table-container {
+    margin: 8px;
+    padding: 8px;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-btn {
+    padding: 0 8px;
+    font-size: 12px;
+  }
 }
 </style>
 <script>
