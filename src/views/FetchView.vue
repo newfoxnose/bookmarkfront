@@ -140,7 +140,7 @@ export default {
     DownloadOutlined
   },
   setup() {
-    $cookies.set('selectedkey', '16', "720h")
+    $cookies.set('selectedkey', '17', "720h")
     $cookies.set('openkey', '')
     const defaultPercent = ref(10);
     const loadingdone = ref(false);

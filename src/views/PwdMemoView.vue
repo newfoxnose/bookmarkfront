@@ -129,7 +129,7 @@ export default {
     EyeOutlined
   },
   setup() {
-    $cookies.set('selectedkey', '15', "720h")
+    $cookies.set('selectedkey', '18', "720h")
     $cookies.set('openkey', '')
     const defaultPercent = ref(10);
     const loadingdone = ref(false);

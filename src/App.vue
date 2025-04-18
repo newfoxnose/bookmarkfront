@@ -920,11 +920,11 @@ if (res.data.data.is_same==1){
             <global-outlined /><span>
               <RouterLink to="/monitoring" style="padding-left: 8px">监控网站状态</RouterLink></span>
             </a-menu-item>
-            <a-menu-item key="16"  @click="handleClick">
+            <a-menu-item key="17"  @click="handleClick">
             <api-outlined /><span>
               <RouterLink to="/fetch" style="padding-left: 8px">数据抓取</RouterLink></span>
             </a-menu-item>
-            <a-menu-item key="17"  @click="handleClick">
+            <a-menu-item key="18"  @click="handleClick">
             <key-outlined /><span>
               <RouterLink to="/pwdmemo" style="padding-left: 8px">密码管理</RouterLink></span>
             </a-menu-item>
@@ -945,7 +945,7 @@ if (res.data.data.is_same==1){
             <wifi-outlined /><span>
             <RouterLink to="/feed" style="padding-left: 8px">RSS阅读器</RouterLink></span>
           </a-menu-item>
-          <a-menu-item key="17"  @click="handleClick">
+          <a-menu-item key="16"  @click="handleClick">
             <calendar-outlined /><span>
             <RouterLink to="/calendar" style="padding-left: 8px"
               >日历</RouterLink
