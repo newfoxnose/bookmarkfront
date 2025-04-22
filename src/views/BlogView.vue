@@ -256,7 +256,7 @@
 </style>
 <script>
 import { message, Modal } from "ant-design-vue";
-
+import md5 from 'js-md5';
 import {
   CloseOutlined,
   InboxOutlined,
@@ -339,7 +339,7 @@ export default {
         params.append("token", $cookies.get("token"));
         params.append("timestamp", new Date().getTime());
         params.append("blog_id", blog_id.value);
-        params.append("password", password);
+        params.append("password", md5(password));
         proxy.$http.post("/ajax/get_blog_ajax/", params).then((res) => {
           console.log(res.data);
           if (res.data.code == "201") {
@@ -446,7 +446,7 @@ export default {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
-      params.append("password", password);
+      params.append("password", md5(password));
       params.append("pagesize", pagesize.value);
       proxy.$http
         .post("/ajax/list_private_blog_ajax/" + currentpage.value, params)
@@ -469,7 +469,7 @@ export default {
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
       params.append("id_b64", proxy.$func.urlsafe_b64encode(Base64.encode(id)));
-      params.append("password", password);
+      params.append("password", md5(password));
       params.append("page", currentpage.value);
       params.append("pagesize", pagesize.value);
       //params.append("is_private", 0);   //博客都为公开
@@ -497,7 +497,7 @@ export default {
         params.append("content", valueHtml.value);
         params.append("title", formState.value.title);
         params.append("folder_id", formState.value.folder_id);
-        params.append("password", password);
+        params.append("password", md5(password));
         if (blog_id.value != 0) {
           params.append("post_id", blog_id.value);
         }

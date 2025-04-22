@@ -2,6 +2,7 @@
 import bookmarkitem from "../components/bookmarkitem.vue";
 import subfolder from "../components/subfolder.vue";
 import CryptoJS from 'crypto-js';
+import md5 from 'js-md5';
 
 import {
   CloseOutlined,
@@ -171,7 +172,7 @@ export default defineComponent({
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("timestamp", new Date().getTime());
       params.append("token", $cookies.get("token"));
-      params.append("password", password);
+      params.append("password", md5(password));
       proxy.$http.post("/ajax/private_stream_ajax", params).then((res) => {
         if (res.data.code == 200) {
           console.log(res.data.data);
@@ -278,7 +279,7 @@ export default defineComponent({
               if (formState_inputpassword.value.password != "") {
                 params.append(
                   "password",
-                  formState_inputpassword.value.password
+                  md5(formState_inputpassword.value.password)
                 );
                 proxy.$http
                   .post("/ajax/private_stream_ajax", params)
