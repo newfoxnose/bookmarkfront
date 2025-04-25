@@ -75,7 +75,6 @@
   >
     <template #title>
       <span>{{ rssTitle }}</span>
-      <a-spin v-if="rssLoading" size="small" style="margin-left: 8px" />
     </template>
     <div v-for="item in rssItems" style="margin-bottom:5px;">
       <span class="green" style="margin-left:5px;cursor: pointer;" @click="showRSSContent(item.title,item.link,item.description)">
@@ -143,7 +142,6 @@ export default {
     const rssContentTitle = ref('');
     const rssContent = ref('');
     const rssContentDrawerClass = ref('');
-    const rssLoading = ref(false);
 
     const showDrawer = (feed_name,feed_url,feed_id,is_private) => {
       drawer.value.feed_id=feed_id;
@@ -265,7 +263,16 @@ export default {
       // 清空之前的内容
       rssItems.value = [];
       rssTitle.value = '';
+
+      defaultPercent.value = 0;
       loadingdone.value = false
+      const interval=setInterval(() => {
+        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
+        defaultPercent.value = percent > 95 ? 95 : percent;
+        if (defaultPercent.value>90){
+          clearInterval(interval);
+        }
+      }, 100)
       
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
@@ -278,6 +285,7 @@ export default {
         }
         rssTitle.value = res.data.data.title;
         rssItems.value = res.data.data.xml_json;
+        defaultPercent.value = 100;
         loadingdone.value = true
       });
     };
@@ -321,7 +329,6 @@ export default {
       rssContentTitle,
       rssContent,
       rssContentDrawerClass,
-      rssLoading,
       showRSSDrawer,
       onRSSClose,
       showRSSContent,

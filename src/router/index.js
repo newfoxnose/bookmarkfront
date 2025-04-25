@@ -4,16 +4,14 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: "/",
+      redirect: "/home"
+    },
+    {
       path: "/home",
       name: "home",
       component: () => import("../views/HomeView.vue"),
     },
-    {
-      path: "/",
-      name: "home2",
-      component: () => import("../views/HomeView.vue"),
-    },
-
     {
       path: "/logout",
       name: "logout",
@@ -122,7 +120,19 @@ const router = createRouter({
 //这里是为了避免出现Failed to fetch dynamically imported module错误打不开网页
 router.onError((error, to) => {
   if (error.message.includes("Failed to fetch dynamically imported module")) {
-    //window.location = to.fullPath
+    window.location.reload();
+  }
+});
+
+// 添加路由守卫以确保页面正确加载
+router.beforeEach((to, from, next) => {
+  // 确保页面完全加载
+  if (document.readyState === 'complete') {
+    next();
+  } else {
+    window.addEventListener('load', () => {
+      next();
+    });
   }
 });
 
