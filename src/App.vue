@@ -943,7 +943,7 @@ if (res.data.data.is_same==1){
           </a-menu-item>
             <a-menu-item key="6"  @click="handleClick">
             <wifi-outlined /><span>
-            <RouterLink to="/feed" style="padding-left: 8px">RSS阅读器</RouterLink></span>
+            <RouterLink to="/rss" style="padding-left: 8px">RSS阅读器</RouterLink></span>
           </a-menu-item>
           <a-menu-item key="16"  @click="handleClick">
             <calendar-outlined /><span>

@@ -86,13 +86,11 @@
 
 .form-container {
   padding: 15px;
-  background: #fff;
   border-radius: 4px;
   margin-bottom: 20px;
 }
 
 .table-container {
-  background: #fff;
   padding: 15px;
   border-radius: 4px;
 }
@@ -266,6 +264,10 @@ export default {
             newUrl.value = '';
             pwd.value = '';
             encrypt_key.value = '';
+            // 强制清空密码输入框的DOM值
+            document.querySelectorAll('input[type="password"]').forEach(input => {
+              input.value = '';
+            });
           } else {
             message.error(res.data.msg);
           }

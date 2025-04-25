@@ -96,15 +96,7 @@ const router = createRouter({
       name: "calendar",
       component: () => import("../views/CalendarView.vue"),
     },{
-      path: "/calendar",
-      name: "calendar",
-      component: () => import("../views/CalendarView.vue"),
-    },{
-      path: "/feed",
-      name: "feed",
-      component: () => import("../views/FeedView.vue"),
-    },{
-      path: "/rss/:id",
+      path: "/rss",
       name: "rss",
       component: () => import("../views/RSSView.vue"),
     },{

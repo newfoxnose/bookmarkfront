@@ -87,6 +87,23 @@
   border-color: #223855;
 }
 
+
+.content-dark-theme .ant-input-password{
+  background-color: #0A203C !important;
+}
+
+.ant-input-suffix{
+  margin:1px;
+  padding:3px;
+  border-radius: 5px;
+}
+
+
+.content-dark-theme .ant-input-suffix{
+  background-color: #fff !important;
+  color: #fff !important;
+}
+
 /* 页脚主题样式 */
 .footer-dark-theme {
   background: #001529;
@@ -259,3 +276,12 @@ iframe {
 }
 
 /*深色模式的主背景色为#001529*/
+
+
+.ant-btn-primary{
+  color: #fff !important;
+}
+
+.ant-form{
+  color:unset;
+}

@@ -339,7 +339,7 @@ export default {
         params.append("token", $cookies.get("token"));
         params.append("timestamp", new Date().getTime());
         params.append("blog_id", blog_id.value);
-        params.append("password", md5(password));
+        params.append("password", password ? md5(password) : '');
         proxy.$http.post("/ajax/get_blog_ajax/", params).then((res) => {
           console.log(res.data);
           if (res.data.code == "201") {
@@ -497,7 +497,7 @@ export default {
         params.append("content", valueHtml.value);
         params.append("title", formState.value.title);
         params.append("folder_id", formState.value.folder_id);
-        params.append("password", md5(password));
+        params.append("password", password ? md5(password) : '');
         if (blog_id.value != 0) {
           params.append("post_id", blog_id.value);
         }

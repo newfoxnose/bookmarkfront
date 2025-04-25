@@ -7,7 +7,7 @@
  </div>
   <h3 class="content-title">监控网站状态</h3>
 
-  <div class="url-input-container">
+  <div class="input-section">
     <a-row :gutter="[16, 16]">
       <a-col :xs="24" :sm="24" :md="4">
         <div class="input-label">新增监控网址</div>
@@ -21,7 +21,7 @@
     </a-row>
   </div>
 
-  <div class="table-container">
+
     <a-table 
       :columns="columns" 
       :data-source="fileitems" 
@@ -34,6 +34,10 @@
         </template>
         <template v-if="column.key === 'action'">
           <a-space>
+            <a-button type="primary" @click="openUrl(record.url)">
+              <template #icon><link-outlined /></template>
+              访问
+            </a-button>
             <a-button type="primary" @click="updateMonitoringUrl(record)" :loading="iconLoading">
               <template #icon><edit-outlined /></template>
               修改
@@ -46,7 +50,7 @@
         </template>
       </template>
     </a-table>
-  </div>
+
 
 </template>
 <style scoped>
@@ -63,11 +67,11 @@
   text-align: center;
 }
 
-.url-input-container {
+
+.input-section {
   padding: 15px;
-  background: #fff;
-  margin: 16px;
-  border-radius: 4px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .input-label {
@@ -75,23 +79,13 @@
   text-align: center;
 }
 
-.table-container {
-  margin: 16px;
-  background: #fff;
-  padding: 16px;
-  border-radius: 4px;
-}
+
 
 @media screen and (max-width: 768px) {
-  .url-input-container {
-    margin: 8px;
+  .input-section {
+    padding: 10px;
   }
-  
-  .table-container {
-    margin: 8px;
-    padding: 8px;
-  }
-  
+
   .ant-table {
     font-size: 12px;
   }
@@ -105,13 +99,14 @@
 <script>
 import { message, Modal } from 'ant-design-vue';
 
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import { EditOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 
 export default {
   components: {
     EditOutlined,
-    DeleteOutlined
+    DeleteOutlined,
+    LinkOutlined
   },
   setup() {
     $cookies.set('selectedkey', '15', "720h")
@@ -370,6 +365,10 @@ export default {
         });
     };
 
+    const openUrl = (url) => {
+      window.open(url, '_blank');
+    };
+
     return {
       fileitems,
       visible,
@@ -381,7 +380,8 @@ export default {
       updateMonitoringUrl,
       deleteMonitoringUrl,
       newUrl,
-      insertMonitoringUrl
+      insertMonitoringUrl,
+      openUrl
     };
   },
 }
