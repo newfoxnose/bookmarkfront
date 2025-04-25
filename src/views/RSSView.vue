@@ -73,6 +73,10 @@
     :visible="rssVisible"
     @close="onRSSClose"
   >
+    <template #title>
+      <span>{{ rssTitle }}</span>
+      <a-spin v-if="rssLoading" size="small" style="margin-left: 8px" />
+    </template>
     <div v-for="item in rssItems" style="margin-bottom:5px;">
       <span class="green" style="margin-left:5px;cursor: pointer;" @click="showRSSContent(item.title,item.link,item.description)">
         {{ item.title }}
@@ -139,6 +143,7 @@ export default {
     const rssContentTitle = ref('');
     const rssContent = ref('');
     const rssContentDrawerClass = ref('');
+    const rssLoading = ref(false);
 
     const showDrawer = (feed_name,feed_url,feed_id,is_private) => {
       drawer.value.feed_id=feed_id;
@@ -257,6 +262,11 @@ export default {
       rssVisible.value = true;
       rssDrawerClass.value = "drawer-"+$cookies.get('theme')+"-theme";
       
+      // 清空之前的内容
+      rssItems.value = [];
+      rssTitle.value = '';
+      rssLoading.value = true;
+      
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
       params.append("timestamp", new Date().getTime());
@@ -268,6 +278,7 @@ export default {
         }
         rssTitle.value = res.data.data.title;
         rssItems.value = res.data.data.xml_json;
+        rssLoading.value = false;
       });
     };
 
@@ -310,6 +321,7 @@ export default {
       rssContentTitle,
       rssContent,
       rssContentDrawerClass,
+      rssLoading,
       showRSSDrawer,
       onRSSClose,
       showRSSContent,
