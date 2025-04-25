@@ -265,7 +265,7 @@ export default {
       // 清空之前的内容
       rssItems.value = [];
       rssTitle.value = '';
-      rssLoading.value = true;
+      loadingdone.value = false
       
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
@@ -278,7 +278,7 @@ export default {
         }
         rssTitle.value = res.data.data.title;
         rssItems.value = res.data.data.xml_json;
-        rssLoading.value = false;
+        loadingdone.value = true
       });
     };
 
