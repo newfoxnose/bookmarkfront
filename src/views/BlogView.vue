@@ -139,7 +139,7 @@
               placeholder="请输入标题"
             /></p
         ></a-col>
-        <a-col :span="8">
+        <a-col :span="6">
           <p style="padding-left: 20px">
             <a-select
               style="width: 100%"
@@ -165,14 +165,14 @@
             <a-checkbox v-model:checked="formState.is_private">私密</a-checkbox>
           </p></a-col
         >
-        <a-col :span="4" align="right">
+        <a-col :span="6" align="right">
           <a-button
         type="primary"
         @click="save(formState_inputpassword.password)"
         :loading="iconLoading"
         >保存</a-button
       >
-      &nbsp;
+      （或者使用快捷键Ctrl+S）&nbsp;
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button></a-col
         >
       </a-row>
@@ -243,8 +243,6 @@
   margin: 3px;
   margin-right: 5px;
 }
-
-
 
 .loadingbar {
   position: fixed;
@@ -405,7 +403,15 @@ export default {
         formState.value.folder_id = res.data.data.data[0].value;
       });
       handlepagechange(1);
+      window.addEventListener("keydown", handleEvent); //监听按键事件
     });
+    const handleEvent = (event) => {
+        if (event.ctrlKey && (event.key === 's' || event.keyCode === 83)) {
+          event.preventDefault();
+          event.returnValue = false;
+          save();
+        }
+    };
     const handlepagechange = (page) => {
       const interval = setInterval(() => {
         const percent =

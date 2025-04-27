@@ -10,27 +10,32 @@
   <div class="form-container" style="margin: 10px;">
     <a-form layout="vertical">
       <a-row :gutter="[16, 16]">
-        <a-col :xs="24" :sm="24" :md="24" :lg="3" style="display: flex; align-items: center;">
+        <a-col :xs="24" :sm="24" :md="24" :lg="2" style="display: flex; align-items: center;">
           新增密码
         </a-col>
         <a-col :xs="24" :sm="12" :md="12" :lg="4">
-          <a-form-item label="名称">
+          <a-form-item label="名称*">
             <a-input v-model:value="newName" placeholder="名称（必填）" />
           </a-form-item>
         </a-col>
-        <a-col :xs="24" :sm="12" :md="12" :lg="8">
+        <a-col :xs="24" :sm="12" :md="12" :lg="5">
           <a-form-item label="网址">
             <a-input v-model:value="newUrl" placeholder="网址（非必填）" />
           </a-form-item>
         </a-col>
-        <a-col :xs="24" :sm="12" :md="12" :lg="3">
-          <a-form-item label="密码">
-            <a-input-password v-model:value="pwd" placeholder="密码" />
+        <a-col :xs="24" :sm="12" :md="12" :lg="4">
+          <a-form-item label="登录名">
+            <a-input v-model:value="newUsername" placeholder="登录名（非必填）" />
           </a-form-item>
         </a-col>
         <a-col :xs="24" :sm="12" :md="12" :lg="3">
-          <a-form-item label="密钥">
-            <a-input-password v-model:value="encrypt_key" placeholder="密钥" />
+          <a-form-item label="密码*">
+            <a-input-password v-model:value="pwd" placeholder="密码（必填）" />
+          </a-form-item>
+        </a-col>
+        <a-col :xs="24" :sm="12" :md="12" :lg="3">
+          <a-form-item label="密钥*">
+            <a-input-password v-model:value="encrypt_key" placeholder="密钥（必填）" />
           </a-form-item>
         </a-col>
         <a-col :xs="24" :sm="24" :md="24" :lg="3">
@@ -50,14 +55,18 @@
       :scroll="{ x: 'max-content' }"
     >
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'url'">
-          <a-input v-model:value="record.url" @change="handleUrlChange(record)" />
+        <template v-if="column.key === 'site_name'">
+          <template v-if="record.site_url && /^https?:\/\/.+/.test(record.site_url)">
+            <a :href="record.site_url" target="_blank">{{ record.site_name }}</a>
+          </template>
+          <template v-else>
+            {{ record.site_name }}
+          </template>
         </template>
         <template v-if="column.key === 'decrypt'">
-          <a-space direction="vertical" style="width: 100%">
-            <a-input-password v-model:value="record.decrypt_key" placeholder="输入密钥" style="width: 100%" />
-            <a-button type="primary" @click="decryptPassword(record)" :loading="iconLoading" block>
-              <template #icon><eye-outlined /></template>
+          <a-space>
+            <a-input-password v-model:value="record.decrypt_key" placeholder="输入密钥" style="width: 100px" />
+            <a-button type="primary" @click="decryptPassword(record)" :loading="iconLoading">
               查看密码
             </a-button>
           </a-space>
@@ -65,7 +74,6 @@
         <template v-if="column.key === 'action'">
           <a-space>
             <a-button type="primary" danger  @click="deleteMonitoringUrl(record)" :loading="iconLoading">
-              <template #icon><delete-outlined /></template>
               删除
             </a-button>
           </a-space>
@@ -138,6 +146,7 @@ export default {
     const fileitems = ref([])
     const newUrl = ref('')
     const newName = ref('');
+    const newUsername = ref('');
     const pwd = ref('');
     const encrypt_key = ref('');
 
@@ -152,31 +161,41 @@ export default {
         title: ' 名称',
         dataIndex: 'site_name',
         key: 'site_name',
-        width: 150,
+        width: 200,
       },
       {
-        title: '网址',
-        dataIndex: 'site_url',
-        key: 'site_url',
-        width: 300,
+        title: '用户名',
+        dataIndex: 'username',
+        key: 'username',
+        width: 200,
       },
       {
         title: '加密密码',
         dataIndex: 'encrypted_string',
         key: 'encrypted_string',
-        width: 100,
+        width: 300,
+        ellipsis: true,
+        customRender: ({ text }) => {
+          return {
+            props: {
+              style: { wordBreak: 'break-all', whiteSpace: 'normal' }
+            },
+            children: text
+          }
+        }
       },
       {
         title: '解密',
         key: 'decrypt',
         fixed: 'right',
-        width: 150,
+        align: 'center',
+        width: 100,
       },
       {
         title: '操作',
         key: 'action',
         fixed: 'right',
-        width: 150,
+        align: 'center'
       }
     ]);
 
@@ -252,6 +271,7 @@ export default {
       params.append("token", $cookies.get('token'));
       params.append("timestamp", new Date().getTime());
       params.append("site_name", newName.value);
+      params.append("username", newUsername.value);
       params.append("site_url", newUrl.value);
       params.append("encrypted_string", encrypted);
       
@@ -261,6 +281,7 @@ export default {
             message.success(res.data.msg);
             // 清空输入框
             newName.value = '';
+            newUsername.value = '';
             newUrl.value = '';
             pwd.value = '';
             encrypt_key.value = '';
@@ -357,6 +378,7 @@ export default {
       deleteMonitoringUrl,
       newUrl,
       newName,
+      newUsername,
       pwd,
       encrypt_key,
       decryptPassword,

@@ -9,18 +9,40 @@
 
   <div class="input-section">
     <a-form layout="vertical">
-      <a-form-item label="新增抓取网址">
-        <a-input v-model:value="newUrl" placeholder="请输入要抓取数据的网址" />
-      </a-form-item>
-      <a-form-item label="Bearer">
-        <a-textarea v-model:value="newBearer" placeholder='bearer值，不包含bearer字样以及空格' :rows="3" />
-      </a-form-item>
-      <a-form-item label="表单数据">
-        <a-textarea v-model:value="newPostData" placeholder='表单数据' :rows="3" />
-      </a-form-item>
-      <a-form-item label="格式化显示规则">
-        <a-textarea v-model:value="newFormatting" placeholder='格式如下:{ "pairs": {     "显示名称1": "数据路径1","显示名称2": "数据路径2"}, "tables":["表格1数据路径","表格2数据路径"]}' :rows="3" />
-      </a-form-item>
+      <a-row :gutter="16">
+        <a-col :span="12">
+          <a-form-item label="新增抓取网址">
+            <a-input v-model:value="newUrl" placeholder="请输入要抓取数据的网址" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="请求类型">
+            <a-radio-group v-model:value="newIsPost">
+              <a-radio :value="1">POST</a-radio>
+              <a-radio :value="0">GET</a-radio>
+            </a-radio-group>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="16">
+        <a-col :span="12">
+          <a-form-item label="Bearer">
+            <a-textarea v-model:value="newBearer" placeholder='bearer值，不包含bearer字样以及空格' :rows="3" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="表单数据">
+            <a-textarea v-model:value="newPostData" placeholder='表单数据' :rows="3" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24">
+          <a-form-item label="格式化显示规则">
+            <a-textarea v-model:value="newFormatting" placeholder='格式如下:{ "pairs": {     "显示名称1": "数据路径1","显示名称2": "数据路径2"}, "tables":["表格1数据路径","表格2数据路径"]}' :rows="3" />
+          </a-form-item>
+        </a-col>
+      </a-row>
       <a-form-item>
         <a-button type="primary" @click="insertFetchUrl" :loading="iconLoading" block>提交</a-button>
       </a-form-item>
@@ -40,6 +62,12 @@
       </template>
       <template v-if="column.key === 'post_data'">
         <a-textarea v-model:value="record.post_data" @change="handlePostDataChange(record)" :rows="3" />
+      </template>
+      <template v-if="column.key === 'is_post'">
+        <a-select v-model:value="record.is_post" style="width: 100%" @change="handleIsPostChange(record)">
+          <a-select-option value="1">POST</a-select-option>
+          <a-select-option value="0">GET</a-select-option>
+        </a-select>
       </template>
       <template v-if="column.key === 'action'">
         <a-space direction="vertical" align="center" style="width: 100%">
@@ -153,6 +181,7 @@ export default {
     const newFormatting = ref('')
     const newPostData = ref('')
     const newBearer = ref('')
+    const newIsPost = ref(1);
 
     const columns = ref([
       {
@@ -178,6 +207,16 @@ export default {
         dataIndex: 'post_data',
         key: 'post_data',
         width: 300,
+      },
+      {
+        title: '请求类型',
+        dataIndex: 'is_post',
+        key: 'is_post',
+        width: 120,
+        customRender: ({ text }) => {
+          console.log('is_post value:', text, 'type:', typeof text);
+          return text === '1' ? 'POST' : 'GET';
+        }
       },
       {
         title: '格式化显示规则',
@@ -287,7 +326,7 @@ export default {
 
     const insertFetchUrl = () => {
       if (!newUrl.value) {
-        message.warning('请输入要监控的网址');
+        message.warning('请输入要抓取的网址');
         return;
       }
 
@@ -299,6 +338,7 @@ export default {
       params.append("formatting", newFormatting.value);
       params.append("post_data", newPostData.value);
       params.append("bearer", newBearer.value);
+      params.append("is_post", newIsPost.value);
 
       proxy.$http.post('/ajax/insert_fetch_url_ajax/', params)
         .then(res => {
@@ -331,10 +371,11 @@ export default {
         if (res.data.code == '401') {
           window.location.href = "/";
         }
-        // 确保每条记录都有fetch_data字段
+        // 确保每条记录都有fetch_data字段，并处理is_post字段
         fileitems.value = res.data.data.history.map(item => ({
           ...item,
-          fetch_data: item.fetch_data || null
+          fetch_data: item.fetch_data || null,
+          is_post: String(item.is_post || '0') // 确保is_post是字符串类型
         }));
       });
     };
@@ -366,6 +407,10 @@ export default {
 
     const handleBearerChange = (record) => {
       console.log('Bearer changed:', record);
+    };
+
+    const handleIsPostChange = (record) => {
+      console.log('Request type changed:', record);
     };
 
     const deleteFetchUrl = (record) => {
@@ -409,6 +454,7 @@ export default {
       params.append("formatting", record.formatting);
       params.append("post_data", record.post_data);
       params.append("bearer", record.bearer);
+      params.append("is_post", record.is_post);
 
       proxy.$http.post('/ajax/update_fetch_url_ajax/', params)
         .then(res => {
@@ -422,6 +468,7 @@ export default {
                 url: record.url, 
                 formatting: record.formatting,
                 post_data: record.post_data,
+                is_post: record.is_post,
                 bearer: record.bearer
               };
             }
@@ -452,10 +499,10 @@ export default {
         };
       }
       
-      if (record.post_data) {
-        // 如果有post_data，使用POST请求
+      if (record.is_post === '1') {
+        // 如果是POST请求
         try {
-          const postData = JSON.parse(record.post_data);
+          const postData = record.post_data ? JSON.parse(record.post_data) : {};
           requestPromise = proxy.$http.post(record.url, postData, config);
         } catch (e) {
           message.error('表单数据格式错误，请检查JSON格式');
@@ -463,7 +510,7 @@ export default {
           return;
         }
       } else {
-        // 如果没有post_data，使用GET请求
+        // 如果是GET请求
         requestPromise = proxy.$http.get(record.url, config);
       }
       
@@ -516,6 +563,9 @@ export default {
               expandedRowKeys.value = [record.id.toString()];
             }
             message.success('抓取成功');
+            
+            // 自动更新记录
+            updateFetchUrl(record);
           }
         })
         .catch(error => {
@@ -577,12 +627,14 @@ export default {
       handleFormattingChange,
       handlePostDataChange,
       handleBearerChange,
+      handleIsPostChange,
       updateFetchUrl,
       deleteFetchUrl,
       newUrl,
       newFormatting,
       newPostData,
       newBearer,
+      newIsPost,
       insertFetchUrl,
       expandedRowKeys,
       fetchUrlContent,
