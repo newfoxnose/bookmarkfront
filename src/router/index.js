@@ -109,11 +109,15 @@ const router = createRouter({
       path: "/fetch",
       name: "fetch",
       component: () => import("../views/FetchView.vue"),
-    },{
-      path: "/pwdmemo",
-      name: "pwdmemo",
-      component: () => import("../views/PwdMemoView.vue"),
-    }
+      },{
+        path: "/pwdmemo",
+        name: "pwdmemo",
+        component: () => import("../views/PwdMemoView.vue"),
+      },{
+        path: "/pond",
+        name: "pond",
+        component: () => import("../views/PondView.vue"),
+      }
   ],
 });
 

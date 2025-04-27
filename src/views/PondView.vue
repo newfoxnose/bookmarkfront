@@ -5,101 +5,37 @@
       '100%': '#87d068',
     }" />
  </div>
-  <h3 class="content-title">RSS订阅源</h3>
-  <a-form :model="formState" name="add" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }" autocomplete="off"
-    @finish="onFinish" @finishFailed="onFinishFailed">
-    <a-form-item label="地址" name="feed_url" :rules="[{ required:true, message: '地址不能为空' }]">
-      <a-input v-model:value="formState.feed_url">
-      <template #addonAfter>
-          <search-outlined @click="getUrl" v-if="!iconLoading" />
-          <a-spin size="small" v-if="iconLoading" />
-        </template>
-      </a-input>
-    </a-form-item>
-    <a-form-item label="名称" name="feed_name" :rules="[{ required:true, message: '名称不能为空' }]">
-      <a-input v-model:value="formState.feed_name"  />
-    </a-form-item> 
-    <a-form-item label="私有" name="is_private">
-      <a-checkbox v-model:checked="formState.is_private"></a-checkbox>
-    </a-form-item>
-    <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
-      <a-button type="primary" html-type="submit" :loading="iconLoading">添加</a-button>
-    </a-form-item>
-  </a-form>
-
-  <div>
-    <div v-for=" item  in  fileitems " style="margin-bottom:5px;">
-      <a style="margin-left:20px;" @click="showDrawer(item.feed_name,item.feed_url,item.id,item.is_private)"><form-outlined /></a>
-      <a style="margin-left:10px; cursor: pointer;" @click="showRSSDrawer(item.id)">
-        {{ item.feed_name }}
-      </a>
-      <span style="margin-left:10px;">
-        {{ item.feed_url }}
-      </span>
+  
+  <div class="hot-list-container">
+    <h3 class="content-title">热门榜单</h3>
+    
+    <div class="platform-grid">
+      <div v-for="platform in platforms" :key="platform.key" class="platform-card">
+        <div class="platform-header">
+          <div class="header-left">
+            <span class="platform-icon" :class="platform.key">{{ getPlatformIcon(platform.key) }}</span>
+            <h4>{{ platform.name }}</h4>
+            <span class="update-time" v-if="platform.items.length">（{{ Math.floor(Math.random() * 60) }}分钟前）</span>
+          </div>
+          <a-button type="link" class="refresh-btn" @click="refreshPlatform(platform.key)" :loading="platform.loading">
+            <template #icon><sync-outlined /></template>
+          </a-button>
+        </div>
+        <div class="hot-list">
+          <div v-for="(item, index) in platform.items" :key="index" class="hot-item">
+            <div class="rank" :class="{ 'top-rank': index < 3 }">{{ index + 1 }}</div>
+            <div class="content">
+              <a :href="item.url" target="_blank" class="title">{{ item.title }}</a>
+              <span class="heat" v-if="item.heat">{{ item.heat }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  
-  <a-drawer :model="drawer" :width="500" title="编辑RSS源" placement="bottom" :visible="visible" @close="onClose">
-    <template #extra >
-      <a-button type="primary" danger @click="deletefeed(drawer.feed_id)" :loading="iconLoading">删除</a-button>
-    </template>
-    <a-form :model="drawer" name="edit" :label-col="{ span: 3 }" :wrapper-col="{ span: 21 }" autocomplete="off"
-    @finish="onFinish" @finishFailed="onFinishFailed">
-    <a-form-item name="feed_id" style="display:none">
-      <a-input v-model:value="drawer.feed_id"  />
-    </a-form-item>
-    <a-form-item label="名称" name="feed_name" :rules="[{ required:true, message: '名称不能为空' }]">
-      <a-input v-model:value="drawer.feed_name"  />
-    </a-form-item> 
-    <a-form-item label="地址" name="feed_url" :rules="[{ required:true, message: '地址不能为空' }]">
-      <a-input v-model:value="drawer.feed_url" />
-    </a-form-item>
-    <a-form-item label="私有" name="is_private">
-      <a-checkbox v-model:checked="drawer.is_private"></a-checkbox>
-    </a-form-item>
-    <a-form-item :wrapper-col="{ offset: 3, span: 21 }">
-      <a-button type="primary" html-type="submit" :loading="iconLoading">提交</a-button>
-      &nbsp;
-      <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
-    </a-form-item>
-  </a-form>
-  </a-drawer>
-
-  <a-drawer
-    :width="500"
-    :class="rssDrawerClass"
-    :title="rssTitle"
-    placement="right"
-    :visible="rssVisible"
-    @close="onRSSClose"
-  >
-    <template #title>
-      <span>{{ rssTitle }}</span>
-    </template>
-    <div v-for="item in rssItems" style="margin-bottom:5px;">
-      <span class="green" style="margin-left:5px;cursor: pointer;" @click="showRSSContent(item.title,item.link,item.description)">
-        {{ item.title }}
-      </span>
-      <a :href="item.link" style="margin-left:5px;" target="_blank">
-        <link-outlined />
-      </a>
-    </div>
-  </a-drawer>
-
-  <a-drawer
-    :width="500"
-    :class="rssContentDrawerClass"
-    :title="rssContentTitle"
-    placement="right"
-    :visible="rssContentVisible"
-    @close="onRSSContentClose"
-  >
-    <div v-html="rssContent"></div>
-  </a-drawer>
 </template>
+
 <style scoped>
-
-
 .loadingbar {
   position: fixed;
   top: 50%;
@@ -107,232 +43,737 @@
   transform: translate(-50%, -50%);
   z-index: 10;
 }
+
+.hot-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.content-title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.platform-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(18, 18, 18, 0.1);
+  overflow: hidden;
+  transition: all 0.3s;
+  position: relative;
+  min-width: 0;
+  max-width: 360px;
+  margin: 0 auto;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    .platform-header .refresh-btn {
+      opacity: 1;
+    }
+  }
+}
+
+.platform-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+
+  .refresh-btn {
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.platform-icon {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+
+  &.zhihu {
+    background: #056de8;
+  }
+  &.bilibili {
+    background: #fb7299;
+  }
+  &.weibo {
+    background: #ff8200;
+  }
+  &.douyin {
+    background: #000000;
+  }
+  &.baidu {
+    background: #4e6ef2;
+  }
+  &.toutiao {
+    background: #ff2442;
+  }
+  &.tencent {
+    background: #2c2c2c;
+  }
+  &.sougou {
+    background: #f94d1b;
+  }
+  &.juejin {
+    background: #1e80ff;
+  }
+  &.hupu {
+    background: #c01d2f;
+  }
+  &.csdn {
+    background: #fc5531;
+  }
+}
+
+.platform-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #121212;
+  font-weight: 600;
+}
+
+.update-time {
+  color: #8590a6;
+  font-size: 12px;
+}
+
+.hot-list {
+  padding: 2px 0;
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  /* 隐藏默认滚动条（Chrome/Safari） */
+  &::-webkit-scrollbar {
+    width: 4px;
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  /* 鼠标悬停时显示滚动条 */
+  &:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+.hot-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #f7f8fa;
+  }
+}
+
+.rank {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8590a6;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.top-rank {
+  color: #ff5a5a;
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.title {
+  color: #121212;
+  font-size: 14px;
+  text-decoration: none;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.5;
+  flex: 1;
+
+  &:hover {
+    color: #175199;
+  }
+}
+
+.heat {
+  color: #8590a6;
+  font-size: 12px;
+  white-space: nowrap;
+}
 </style>
+
 <script>
 import { message } from 'ant-design-vue';
-import { FormOutlined, SearchOutlined, LinkOutlined } from '@ant-design/icons-vue';
+import { SyncOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 
 export default {
   components: {
-    FormOutlined, SearchOutlined, LinkOutlined
+    SyncOutlined,
   },
   setup() {
-    $cookies.set('selectedkey','6',"720h") 
+    $cookies.set('selectedkey','19',"720h") 
     $cookies.set('openkey','') 
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
-    const iconLoading = ref(false);
 
     const { proxy } = getCurrentInstance()
 
-    const file_key = ref('')
-    const fileitems = ref([])
+    const platforms = ref([
+      { 
+        key: 'weibo', 
+        name: '微博热搜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'zhihu', 
+        name: '知乎热榜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'bilibili', 
+        name: 'B站热榜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'toutiao', 
+        name: '头条热榜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'tencent', 
+        name: '腾讯新闻',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'sougou', 
+        name: '搜狗热榜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'juejin', 
+        name: '掘金热榜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'hupu', 
+        name: '虎扑步行街',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'douyin', 
+        name: '抖音热榜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'csdn', 
+        name: 'CSDN热榜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'baidu', 
+        name: '百度热搜',
+        items: [],
+        loading: false
+      }
+    ]);
 
-    const formState = ref([])
-    const drawer = ref([])
-
-    const visible = ref(false);
-    const rssVisible = ref(false);
-    const rssTitle = ref('');
-    const rssItems = ref([]);
-    const rssDrawerClass = ref('');
-    
-    const rssContentVisible = ref(false);
-    const rssContentTitle = ref('');
-    const rssContent = ref('');
-    const rssContentDrawerClass = ref('');
-
-    const showDrawer = (feed_name,feed_url,feed_id,is_private) => {
-      drawer.value.feed_id=feed_id;
-      drawer.value.feed_name=feed_name;
-      drawer.value.feed_url=feed_url;
-      if (is_private == 1) {
-        drawer.value.is_private = true;
+    const fetchBilibiliData = async () => {
+      const platform = platforms.value.find(p => p.key === 'bilibili');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/bilibili_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.short_link_v2 || `https://www.bilibili.com/video/${item.bvid}`,
+            author: item.owner.name,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取B站热榜数据失败');
         }
-        else {
-          drawer.value.is_private = false;
+      } catch (error) {
+        console.error('获取B站数据异常:', error);
+        message.error('获取B站热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchZhihuData = async () => {
+      const platform = platforms.value.find(p => p.key === 'zhihu');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/zhihu_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            author: item.author,
+            excerpt: item.excerpt,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取知乎热榜数据失败');
         }
-      console.log(drawer.value)
-      visible.value = true;
+      } catch (error) {
+        console.error('获取知乎数据异常:', error);
+        message.error('获取知乎热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
     };
-    const onClose = () => {
-      iconLoading.value = false;
-      visible.value = false;
-    };
-    const getUrl = () => {
-      if (proxy.$func.isValidUrl(formState.value.feed_url)==true){
-        iconLoading.value = true;
-      message.info('自动获取网页标题中，请稍等');
-          let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-          params.append("url", formState.value.feed_url);
+
+    const fetchWeiboData = async () => {
+      const platform = platforms.value.find(p => p.key === 'weibo');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
           params.append("token", $cookies.get('token'));
-          params.append("timestamp",new Date().getTime());
-          const { data: res } = proxy.$http.post('/ajax/url_title', params)
-            .then(res => {
-              console.log(res.data);
-              // obj.success ? obj.success(res) : null
-              if (res.data.msg == "请求成功") {
-                message.info("成功获取源名称");
-                formState.value.feed_name = res.data.data.title
-              }
-              else {
-                message.info("未获取到源名称，请手动输入");
-              }
-            })
-            .catch(error => {
-              // obj.error ? obj.error(error) : null;
-              console.log(error);
-            })
-      iconLoading.value = false;
-      }
-      else{
-        message.info('网址无效');
+        const { data: res } = await proxy.$http.post('/ajax/weibo_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            heat: item.heat,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取微博热搜数据失败');
+        }
+      } catch (error) {
+        console.error('获取微博数据异常:', error);
+        message.error('获取微博热搜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
       }
     };
-    onMounted(() => {
-      const interval=setInterval(() => {
+
+    const fetchToutiaoData = async () => {
+      const platform = platforms.value.find(p => p.key === 'toutiao');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/toutiao_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            heat: item.heat,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取头条热榜数据失败');
+        }
+      } catch (error) {
+        console.error('获取头条数据异常:', error);
+        message.error('获取头条热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchTencentData = async () => {
+      const platform = platforms.value.find(p => p.key === 'tencent');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/tencent_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            author: item.author,
+            heat: item.heat,
+            cover: item.cover,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取腾讯新闻热榜数据失败');
+        }
+      } catch (error) {
+        console.error('获取腾讯新闻数据异常:', error);
+        message.error('获取腾讯新闻热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchSougouData = async () => {
+      const platform = platforms.value.find(p => p.key === 'sougou');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+      params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/sougou_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            heat: item.heat,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取搜狗热榜数据失败');
+        }
+      } catch (error) {
+        console.error('获取搜狗热榜数据异常:', error);
+        message.error('获取搜狗热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchJuejinData = async () => {
+      const platform = platforms.value.find(p => p.key === 'juejin');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/juejin_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            author: item.author,
+            author_avatar: item.author_avatar,
+            heat: item.heat,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取掘金热榜数据失败');
+        }
+      } catch (error) {
+        console.error('获取掘金热榜数据异常:', error);
+        message.error('获取掘金热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchHupuData = async () => {
+      const platform = platforms.value.find(p => p.key === 'hupu');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/hupu_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            heat: `${item.likes} | ${item.heat}`,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取虎扑步行街数据失败');
+        }
+      } catch (error) {
+        console.error('获取虎扑步行街数据异常:', error);
+        message.error('获取虎扑步行街数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchDouyinData = async () => {
+      const platform = platforms.value.find(p => p.key === 'douyin');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/douyin_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            heat: item.heat,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取抖音热榜数据失败');
+        }
+      } catch (error) {
+        console.error('获取抖音热榜数据异常:', error);
+        message.error('获取抖音热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchCsdnData = async () => {
+      const platform = platforms.value.find(p => p.key === 'csdn');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/csdn_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            heat: item.heat,
+            author: item.author,
+            author_avatar: item.author_avatar,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取CSDN热榜数据失败');
+        }
+      } catch (error) {
+        console.error('获取CSDN热榜数据异常:', error);
+        message.error('获取CSDN热榜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const fetchBaiduData = async () => {
+      const platform = platforms.value.find(p => p.key === 'baidu');
+      if (!platform) return;
+      
+      platform.loading = true;
+      try {
+        let params = new URLSearchParams();
+        params.append("timestamp", new Date().getTime());
+        params.append("token", $cookies.get('token'));
+        const { data: res } = await proxy.$http.post('/ajax/baidu_hot_ajax/', params);
+        
+        if (res.code === 0 && res.data && res.data.list) {
+          platform.items = res.data.list.map((item, index) => ({
+            title: item.title,
+            url: item.url,
+            img: item.img,
+            content: item.content,
+            heat: item.heat,
+            rank: index + 1
+          }));
+        } else {
+          message.error('获取百度热搜数据失败');
+        }
+      } catch (error) {
+        console.error('获取百度热搜数据异常:', error);
+        message.error('获取百度热搜数据异常，请稍后重试');
+      } finally {
+        platform.loading = false;
+      }
+    };
+
+    const refreshPlatform = async (platformKey) => {
+      const platform = platforms.value.find(p => p.key === platformKey);
+      if (!platform) return;
+      
+      if (platform.loading) {
+        message.info('数据正在加载中...');
+        return;
+      }
+
+      switch (platformKey) {
+        case 'bilibili':
+          await fetchBilibiliData();
+          break;
+        case 'zhihu':
+          await fetchZhihuData();
+          break;
+        case 'weibo':
+          await fetchWeiboData();
+          break;
+        case 'toutiao':
+          await fetchToutiaoData();
+          break;
+        case 'tencent':
+          await fetchTencentData();
+          break;
+        case 'sougou':
+          await fetchSougouData();
+          break;
+        case 'juejin':
+          await fetchJuejinData();
+          break;
+        case 'hupu':
+          await fetchHupuData();
+          break;
+        case 'douyin':
+          await fetchDouyinData();
+          break;
+        case 'csdn':
+          await fetchCsdnData();
+          break;
+        case 'baidu':
+          await fetchBaiduData();
+          break;
+        default:
+          message.info('该平台数据获取功能开发中...');
+      }
+    };
+
+    const getPlatformIcon = (key) => {
+      switch (key) {
+        case 'zhihu':
+          return '知';
+        case 'bilibili':
+          return 'B';
+        case 'weibo':
+          return '微';
+        case 'douyin':
+          return '抖';
+        case 'baidu':
+          return '百';
+        case 'toutiao':
+          return '头';
+        case 'tencent':
+          return '腾';
+        case 'sougou':
+          return '搜';
+        case 'juejin':
+          return '掘';
+        case 'hupu':
+          return '虎';
+        case 'csdn':
+          return 'C';
+        default:
+          return '';
+      }
+    };
+
+    onMounted(async () => {
+      const interval = setInterval(() => {
         const percent = defaultPercent.value + Math.round(Math.random()*7+2);
         defaultPercent.value = percent > 95 ? 95 : percent;
         if (defaultPercent.value>90){
           clearInterval(interval);
         }
       }, 100)
-      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get('token'));
-          params.append("timestamp",new Date().getTime());
-          params.append("is_private",0);
-      proxy.$http.post('/ajax/list_feed_ajax/', params).then(res => {
-        if (res.data.code=='401'){      //不在登陆状态
-      window.location.href ="/";
-    }
-        fileitems.value = res.data.data.feed
-        defaultPercent.value = 100;
-        loadingdone.value = true
-      });
-    })
-    const deletefeed = (id) => {
-      iconLoading.value = true;
-      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get('token'));
-      params.append("timestamp",new Date().getTime());
-      params.append("feed_id", id);
-      proxy.$http.post('/ajax/delete_feed_ajax/', params).then(res => {
-        fileitems.value = res.data.data.feed
-      });
-      visible.value = false;
-      iconLoading.value = false
-    };
-    const onFinish = values => {
-      iconLoading.value = true;
-      console.log('提交数据Success:', values);
-      let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
-      params.append("token", $cookies.get('token'));
-      params.append("timestamp",new Date().getTime());
-      params.append("feed_id", values.feed_id);
-      params.append("feed_name", values.feed_name);
-      params.append("feed_url", values.feed_url);
-      if (values.is_private == true) {
-          params.append("is_private", 1);
-        }
-        else {
-          params.append("is_private", 0);
-        }
-      proxy.$http.post('/ajax/save_feed_ajax/', params).then(res => {
-        if (res.data.msg!=''){
-          iconLoading.value = false;
-          message.success(res.data.msg);
-          if (res.data.msg=='添加成功'){
-            fileitems.value.unshift(res.data.data);
-          }
-          else{
-            
-          }
-        }
-      });
-    };
-    const onFinishFailed = errorInfo => {
-      //message.success(`失败.`);
-      console.log('Failed:', errorInfo);
-    };
-
-    const showRSSDrawer = (id) => {
-      rssVisible.value = true;
-      rssDrawerClass.value = "drawer-"+$cookies.get('theme')+"-theme";
       
-      // 清空之前的内容
-      rssItems.value = [];
-      rssTitle.value = '';
-
-      defaultPercent.value = 0;
-      loadingdone.value = false
-      const interval=setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
-          clearInterval(interval);
-        }
-      }, 100)
+      // 初始化加载数据
+      await Promise.all([
+        fetchBilibiliData(),
+        fetchZhihuData(),
+        fetchWeiboData(),
+        fetchToutiaoData(),
+        fetchTencentData(),
+        fetchSougouData(),
+        fetchJuejinData(),
+        fetchHupuData(),
+        fetchDouyinData(),
+        fetchCsdnData(),
+        fetchBaiduData()
+      ]);
       
-      let params = new URLSearchParams();
-      params.append("token", $cookies.get('token'));
-      params.append("timestamp", new Date().getTime());
-      params.append("feed_id", id);
-      
-      proxy.$http.post('/ajax/rss_ajax/', params).then(res => {
-        if (res.data.code == '401') {
-          window.location.href = "/";
-        }
-        rssTitle.value = res.data.data.title;
-        rssItems.value = res.data.data.xml_json;
-        defaultPercent.value = 100;
-        loadingdone.value = true
-      });
-    };
-
-    const onRSSClose = () => {
-      rssVisible.value = false;
-    };
-
-    const showRSSContent = (title, url, content) => {
-      rssContentVisible.value = true;
-      rssContentTitle.value = title;
-      rssContentDrawerClass.value = "drawer-"+$cookies.get('theme')+"-theme";
-      rssContent.value = content + '<p><a href="'+url+'" target=_blank>'+url+'</a></p>';
-    };
-
-    const onRSSContentClose = () => {
-      rssContentVisible.value = false;
-    };
+      defaultPercent.value = 100;
+      loadingdone.value = true;
+    });
 
     return {
-      file_key,
-      fileitems,
-      visible,
-      drawer,
-      showDrawer,
-      onClose,
-      deletefeed,
-      fileList: ref([]),
       defaultPercent,
       loadingdone,
-      iconLoading,
-      formState,
-      getUrl,
-      onFinish,
-      onFinishFailed,
-      rssVisible,
-      rssTitle,
-      rssItems,
-      rssDrawerClass,
-      rssContentVisible,
-      rssContentTitle,
-      rssContent,
-      rssContentDrawerClass,
-      showRSSDrawer,
-      onRSSClose,
-      showRSSContent,
-      onRSSContentClose
+      platforms,
+      refreshPlatform,
+      getPlatformIcon
     };
   },
 }

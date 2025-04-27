@@ -25,7 +25,7 @@ import {
   UserAddOutlined,
   LoginOutlined,
   CalendarOutlined,
-  PlusOutlined,GlobalOutlined,ApiOutlined,KeyOutlined
+  PlusOutlined,GlobalOutlined,ApiOutlined,KeyOutlined,CoffeeOutlined
 } from "@ant-design/icons-vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
@@ -46,7 +46,7 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined,GlobalOutlined,ApiOutlined,KeyOutlined
+    SearchOutlined,GlobalOutlined,ApiOutlined,KeyOutlined,CoffeeOutlined
   },
   setup() {
     const items = ref([]);    // 书签列表
@@ -927,6 +927,10 @@ if (res.data.data.is_same==1){
             <a-menu-item key="18"  @click="handleClick">
             <key-outlined /><span>
               <RouterLink to="/pwdmemo" style="padding-left: 8px">密码管理</RouterLink></span>
+            </a-menu-item>
+            <a-menu-item key="19"  @click="handleClick">
+            <coffee-outlined /><span>
+              <RouterLink to="/pond" style="padding-left: 8px">鱼塘</RouterLink></span>
             </a-menu-item>
           <a-sub-menu key="sub1">
             <template #title>
