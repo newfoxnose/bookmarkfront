@@ -9,8 +9,8 @@ import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 dayjs.locale("zh-cn");
 import { RouterLink, RouterView } from "vue-router";
-import { message,Modal } from "ant-design-vue";
-import { defineComponent, ref, watch,nextTick } from "vue";
+import { message, Modal } from "ant-design-vue";
+import { defineComponent, ref, watch, nextTick } from "vue";
 import { onMounted, reactive, getCurrentInstance, toRefs } from "vue";
 import {
   SearchOutlined,
@@ -25,7 +25,7 @@ import {
   UserAddOutlined,
   LoginOutlined,
   CalendarOutlined,
-  PlusOutlined,GlobalOutlined,ApiOutlined,KeyOutlined,CoffeeOutlined
+  PlusOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, CoffeeOutlined
 } from "@ant-design/icons-vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
@@ -46,7 +46,7 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined,GlobalOutlined,ApiOutlined,KeyOutlined,CoffeeOutlined
+    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, CoffeeOutlined
   },
   setup() {
     const items = ref([]);    // 书签列表
@@ -91,7 +91,7 @@ export default defineComponent({
           addBookmark(editId, "删除");
         },
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel() {},
+        onCancel() { },
       });
     };
     onMounted(() => {
@@ -115,26 +115,26 @@ export default defineComponent({
         }
       });
 
-     
 
-      if ($cookies.get('token') != null && $cookies.get('token') != ''){
+
+      if ($cookies.get('token') != null && $cookies.get('token') != '') {
 
         proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
-        if (folder_res.data.code == "401") {
-          //不在登陆状态跳转到首页
-          window.location.href = "/";
-        }
-        folder_list.value = folder_res.data.data.data;
-        folder_id.value = folder_res.data.data.data[0].value;
-      });
+          if (folder_res.data.code == "401") {
+            //不在登陆状态跳转到首页
+            window.location.href = "/";
+          }
+          folder_list.value = folder_res.data.data.data;
+          folder_id.value = folder_res.data.data.data[0].value;
+        });
 
 
         proxy.$http.post("/ajax/home_stream_ajax/0/", params).then((res) => {
-        items.value = res.data.data;
-        if (res.data.data.next_folder_index != -1) {
-          home_stream_ajax(0);
-        }
-      });
+          items.value = res.data.data;
+          if (res.data.data.next_folder_index != -1) {
+            home_stream_ajax(0);
+          }
+        });
       }
     });
 
@@ -142,25 +142,25 @@ export default defineComponent({
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("timestamp", new Date().getTime());
       params.append("token", $cookies.get("token"));
-      params.append("folder_md5", localStorage.getItem(folder_index+'md5'));
+      params.append("folder_md5", localStorage.getItem(folder_index + 'md5'));
       proxy.$http
         .post("/ajax/home_stream_ajax/0/" + folder_index, params)
         .then((res) => {
-          
-         
-    //console.log("recevied folder_index ",res.data.data.folder_index,"recevied local_folder_md5 ",res.data.data.local_folder_md5,"received server_folder_md5 ",res.data.data.server_folder_md5);
-    //console.log("localstorage md5 is ",localStorage.getItem(folder_index+'md5'));
+
+
+          //console.log("recevied folder_index ",res.data.data.folder_index,"recevied local_folder_md5 ",res.data.data.local_folder_md5,"received server_folder_md5 ",res.data.data.server_folder_md5);
+          //console.log("localstorage md5 is ",localStorage.getItem(folder_index+'md5'));
           if (res.data.data.next_folder_index != -1) {
-if (res.data.data.is_same==1){
-  items.value.folder[folder_index] = JSON.parse(localStorage.getItem(folder_index));
-  console.log("same folder, no need to update");
-}else{
-  let temp=res.data.data.server_folder_json;
-          localStorage.setItem(folder_index,temp );
-          localStorage.setItem(folder_index+'md5',CryptoJS.MD5(temp).toString() );
-  items.value.folder[folder_index] = res.data.data.folder[folder_index];
-  console.log("different folder, need to update");
-}            
+            if (res.data.data.is_same == 1) {
+              items.value.folder[folder_index] = JSON.parse(localStorage.getItem(folder_index));
+              console.log("same folder, no need to update");
+            } else {
+              let temp = res.data.data.server_folder_json;
+              localStorage.setItem(folder_index, temp);
+              localStorage.setItem(folder_index + 'md5', CryptoJS.MD5(temp).toString());
+              items.value.folder[folder_index] = res.data.data.folder[folder_index];
+              console.log("different folder, need to update");
+            }
 
             home_stream_ajax(res.data.data.next_folder_index);
             increaseloading();
@@ -240,7 +240,7 @@ if (res.data.data.is_same==1){
         state.collapsed = true;
       }
     };
-//弹出编辑书签抽屉
+    //弹出编辑书签抽屉
     const drawerclass = ref("");
     const url = ref(String);
     const title = ref(String);
@@ -268,7 +268,7 @@ if (res.data.data.is_same==1){
       iconLoading.value = false;
       drawer2visible.value = false;
     };
-    
+
     const addBookmark = (id, action) => {
       if (url.value != "" && title.value != "" && folder_id.value != "") {
         iconLoading.value = true;
@@ -390,7 +390,7 @@ if (res.data.data.is_same==1){
       is_private: false,
       is_recommend: false
     });
-    
+
     // 修改为笔记专用的变量名
     const blogFormState = ref({
       blog_title: "",
@@ -414,7 +414,7 @@ if (res.data.data.is_same==1){
         nextTick(() => {
           setTimeout(() => {
             DrawerinputRef.value.focus();
-            console.log("search is ",newVal);
+            console.log("search is ", newVal);
             // 发起笔记搜索请求
             const getStringLength = (str) => {
               let length = 0;
@@ -427,14 +427,14 @@ if (res.data.data.is_same==1){
               }
               return length;
             };
-            
+
             if (getStringLength(newVal) >= 4) {
               let params = new URLSearchParams();
               params.append("token", $cookies.get("token"));
               params.append("timestamp", new Date().getTime());
               params.append("searchstring", newVal);
               proxy.$http.post("/ajax/search_blog_ajax", params).then((res) => {
-                console.log("search blog ajax res is ",res.data);
+                console.log("search blog ajax res is ", res.data);
                 if (res.data.code == "200") {
                   searchBlogResults.value = res.data.data.blog;
                 }
@@ -445,7 +445,7 @@ if (res.data.data.is_same==1){
           }, 30);
         });
       }
-      else{
+      else {
         visibleSearch.value = false;
         nextTick(() => {
           inputRef.value.focus();
@@ -453,7 +453,7 @@ if (res.data.data.is_same==1){
       }
     });
 
-    
+
     const showDrawer2 = (drawerTitle, id) => {
       drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
       updatedDrawerTitle.value = drawerTitle;
@@ -596,7 +596,7 @@ if (res.data.data.is_same==1){
       save
     };
   },
-  
+
   data() {
     return {
       editable: "yes",
@@ -612,22 +612,22 @@ if (res.data.data.is_same==1){
       ///*
       toolbars: [
         [
-            'fullscreen', 'undo', 'redo', '|',
-            'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', '|', 'forecolor', 'backcolor', '|', 'removeformat', '|',
-            'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
-            'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
-            'paragraph', 'fontfamily', 'fontsize', '|',
-            'directionalityltr', 'directionalityrtl', '|',
-            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|',
-            'link', 'unlink', 'anchor', '|',
-            'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
-            'simpleupload', 'insertimage', 'emotion','insertvideo',  'attachment',  '|',
-            'insertframe', 'insertcode',  'pagebreak', 'template', 'background', '|',
-            'horizontal', 'date', 'time', 'spechars', 'snapscreen', '|',
-            'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', '|',
-            'print', 'preview', 'searchreplace'
+          'fullscreen', 'undo', 'redo', '|',
+          'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', '|', 'forecolor', 'backcolor', '|', 'removeformat', '|',
+          'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
+          'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
+          'paragraph', 'fontfamily', 'fontsize', '|',
+          'directionalityltr', 'directionalityrtl', '|',
+          'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|',
+          'link', 'unlink', 'anchor', '|',
+          'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
+          'simpleupload', 'insertimage', 'emotion', 'insertvideo', 'attachment', '|',
+          'insertframe', 'insertcode', 'pagebreak', 'template', 'background', '|',
+          'horizontal', 'date', 'time', 'spechars', 'snapscreen', '|',
+          'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', '|',
+          'print', 'preview', 'searchreplace'
         ]
-    ],
+      ],
       //*/
       UEDITOR_HOME_URL: "/UEditor/", // 访问 UEditor 静态资源的根路径，可参考常见问题1
       lang: "zh-cn",
@@ -800,24 +800,24 @@ if (res.data.data.is_same==1){
     },
     getContextWithHighlight(content, keyword) {
       if (!content || !keyword) return '';
-      
+
       // 找到关键词的位置
       const index = content.toLowerCase().indexOf(keyword.toLowerCase());
       if (index === -1) return '';
-      
+
       // 计算截取的起始和结束位置
       let start = Math.max(0, index - 20);
       let end = Math.min(content.length, index + keyword.length + 20);
-      
+
       // 如果不是从开头截取，加上省略号
       let result = start > 0 ? '...' : '';
-      
+
       // 获取上下文
       result += content.substring(start, end);
-      
+
       // 如果不是截取到结尾，加上省略号
       result += end < content.length ? '...' : '';
-      
+
       // 高亮关键词
       return this.highlightKeyword(result, keyword);
     }
@@ -827,185 +827,165 @@ if (res.data.data.is_same==1){
 
 <template>
 
-    <a-layout style="min-height: 100vh"
-  v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress
-      type="circle"
-      :percent="defaultPercent"
-      status="active"
-      :show-info="false"
-      :stroke-color="{
+  <a-layout style="min-height: 100vh" v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
+    <div class="loadingbar" v-show="loadingdone == false">
+      <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
         '0%': '#108ee9',
         '100%': '#87d068',
-      }"
-    />
-  </div>
-    <a-layout-content  :class="contenttheme">
+      }" />
+    </div>
+    <a-layout-content :class="contenttheme">
       <a-layout>
-        
-  <a-layout-sider v-model:collapsed="collapsed" :theme="theme"  breakpoint="lg" collapsed-width="0" @breakpoint="onBreakpoint">
-      <div class="logo" :theme="theme">
-        <img :src="logourl" height="30" />
-      </div>
-      <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed==false">
+
+        <a-layout-sider v-model:collapsed="collapsed" :theme="theme" breakpoint="lg" collapsed-width="0"
+          @breakpoint="onBreakpoint">
+          <div class="logo" :theme="theme">
+            <img :src="logourl" height="30" />
+          </div>
+          <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed == false">
             <a-collapse-panel key="xx" header="待办">
               <p v-for="item in todo_items">
-                <a-checkbox
-                  v-if="item.is_done == 0"
-                  @change="toggleTodo(item.id)"
-                  v-model:checked="item.is_done"
-                  ><span :style="{color:item.badge_type}">{{ item.summary }}</span></a-checkbox
-                >
-                <a-checkbox
-                  v-else
-                  @change="toggleTodo(item.id)"
-                  v-model:checked="item.is_done"
-                  ><a-typography-text delete @change="toggleTodo(item.id)">
-                    <span :style="{color:item.badge_type}">{{item.summary }}</span>
-                 </a-typography-text></a-checkbox
-                >
+                <a-checkbox v-if="item.is_done == 0" @change="toggleTodo(item.id)" v-model:checked="item.is_done"><span
+                    :style="{ color: item.badge_type }">{{ item.summary }}</span></a-checkbox>
+                <a-checkbox v-else @change="toggleTodo(item.id)" v-model:checked="item.is_done"><a-typography-text
+                    delete @change="toggleTodo(item.id)">
+                    <span :style="{ color: item.badge_type }">{{ item.summary }}</span>
+                  </a-typography-text></a-checkbox>
               </p>
               <div class="search">
                 <a-input v-model:value="newtodosummary">
 
                   <template #addonBefore>
-                    <a-select :showArrow=false
-      ref="select"
-      v-model:value="badge_type"
-      style="width: 32px"
-    >
-      <a-select-option value="#666"><a-badge color="#666"  class="big-dot" /></a-select-option>
-      <a-select-option value="red"><a-badge color="red"  class="big-dot" /></a-select-option>
-      <a-select-option value="orange"><a-badge color="orange"  class="big-dot" /></a-select-option>
-      <a-select-option value="green"><a-badge color="green"  class="big-dot" /></a-select-option>
-      <a-select-option value="blue"><a-badge color="blue"  class="big-dot" /></a-select-option>
-      <a-select-option value="purple"><a-badge color="purple"  class="big-dot" /></a-select-option>
-    </a-select>
-</template>
+                    <a-select :showArrow=false ref="select" v-model:value="badge_type" style="width: 32px">
+                      <a-select-option value="#666"><a-badge color="#666" class="big-dot" /></a-select-option>
+                      <a-select-option value="red"><a-badge color="red" class="big-dot" /></a-select-option>
+                      <a-select-option value="orange"><a-badge color="orange" class="big-dot" /></a-select-option>
+                      <a-select-option value="green"><a-badge color="green" class="big-dot" /></a-select-option>
+                      <a-select-option value="blue"><a-badge color="blue" class="big-dot" /></a-select-option>
+                      <a-select-option value="purple"><a-badge color="purple" class="big-dot" /></a-select-option>
+                    </a-select>
+                  </template>
                   <template #addonAfter>
                     <plus-outlined @click="createTodo(newtodosummary)" />
                   </template>
                 </a-input>
               </div>
             </a-collapse-panel>
-            
-          </a-collapse>
-      <a-menu
-        v-model:selectedKeys="selectedKeys"
-        mode="inline"
-        :theme="theme"
-        v-model:openKeys="openKeys"
-      >
-          <a-menu-item key="1"  @click="handleClick">
-            <star-outlined />
-            <span>
-            <RouterLink to="/home" style="padding-left: 8px">书签</RouterLink>
-          </span>
-          </a-menu-item>
-          <a-menu-item key="2"  @click="handleClick">
-            <form-outlined /><span>
-            <RouterLink to="/note" style="padding-left: 8px">随手记</RouterLink></span>
-          </a-menu-item>
-          <a-menu-item key="3"  @click="handleClick">
-            <database-outlined /><span>
-            <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink></span>
-          </a-menu-item>
 
-          <a-menu-item key="5"  @click="handleClick">
-            <profile-outlined /><span>
-            <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink></span>
-          </a-menu-item>
-          <a-menu-item key="15"  @click="handleClick">
-            <global-outlined /><span>
-              <RouterLink to="/monitoring" style="padding-left: 8px">监控网站状态</RouterLink></span>
-            </a-menu-item>
-            <a-menu-item key="17"  @click="handleClick">
-            <api-outlined /><span>
-              <RouterLink to="/fetch" style="padding-left: 8px">数据抓取</RouterLink></span>
-            </a-menu-item>
-            <a-menu-item key="18"  @click="handleClick">
-            <key-outlined /><span>
-              <RouterLink to="/pwdmemo" style="padding-left: 8px">密码管理</RouterLink></span>
-            </a-menu-item>
-            <a-menu-item key="19"  @click="handleClick">
-            <coffee-outlined /><span>
-              <RouterLink to="/pond" style="padding-left: 8px">鱼塘</RouterLink></span>
-            </a-menu-item>
-          <a-sub-menu key="sub1">
-            <template #title>
+          </a-collapse>
+          <a-menu v-model:selectedKeys="selectedKeys" mode="inline" :theme="theme" v-model:openKeys="openKeys">
+            <a-menu-item key="1" @click="handleClick">
+              <star-outlined />
               <span>
-                <more-outlined />
-                <span>更多</span>
+                <RouterLink to="/home" style="padding-left: 8px">书签</RouterLink>
               </span>
-            </template>
-            <a-menu-item key="4"  @click="handleClick">
-            <comment-outlined /><span>
-            <RouterLink to="/chat" style="padding-left: 8px"
-              >CHATGPT</RouterLink
-            ></span>
-          </a-menu-item>
-            <a-menu-item key="6"  @click="handleClick">
-            <wifi-outlined /><span>
-            <RouterLink to="/rss" style="padding-left: 8px">RSS阅读器</RouterLink></span>
-          </a-menu-item>
-          <a-menu-item key="16"  @click="handleClick">
-            <calendar-outlined /><span>
-            <RouterLink to="/calendar" style="padding-left: 8px"
-              >日历</RouterLink
-            ></span>
-          </a-menu-item>
-            <a-menu-item key="8"  @click="handleClick">
-              <RouterLink to="/manage">管理目录</RouterLink>
             </a-menu-item>
-            <a-menu-item key="9" v-if="useremail != 'test@test.com'"  @click="handleClick">
-              <RouterLink to="/profile">个人设置</RouterLink>
+            <a-menu-item key="2" @click="handleClick">
+              <form-outlined /><span>
+                <RouterLink to="/note" style="padding-left: 8px">随手记</RouterLink>
+              </span>
             </a-menu-item>
-            <a-menu-item key="10" v-if="1 == 2"  @click="handleClick">
-              <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
+            <a-menu-item key="3" @click="handleClick">
+              <database-outlined /><span>
+                <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink>
+              </span>
             </a-menu-item>
-            <a-menu-item key="11"  @click="handleClick">
-              <RouterLink to="/upload">导入书签</RouterLink>
+
+            <a-menu-item key="5" @click="handleClick">
+              <profile-outlined /><span>
+                <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink>
+              </span>
             </a-menu-item>
-            <a-menu-item key="12"  @click="handleClick">
-              <RouterLink to="/export">导出书签至本地</RouterLink>
+            <a-menu-item key="15" @click="handleClick">
+              <global-outlined /><span>
+                <RouterLink to="/monitoring" style="padding-left: 8px">监控网站状态</RouterLink>
+              </span>
             </a-menu-item>
-            <a-menu-item key="13" v-if="useremail != 'test@test.com'"  @click="handleClick">
-              <RouterLink to="/email">发送书签至邮箱</RouterLink>
+            <a-menu-item key="17" @click="handleClick">
+              <api-outlined /><span>
+                <RouterLink to="/fetch" style="padding-left: 8px">数据抓取</RouterLink>
+              </span>
             </a-menu-item>
-            <a-menu-item key="14">
-              <RouterLink to="/logout">退出</RouterLink>
-            </a-menu-item>
-          </a-sub-menu>
-      </a-menu>
-      <div style="text-align: center; padding-top: 30px">
-        <a-switch
-          :checked="theme == 'dark'"
-          checked-children="Dark"
-          un-checked-children="Light"
-          @change="changeTheme"
-        />
-      </div>
-    </a-layout-sider>
-    <a-layout-content :class="contenttheme" style="padding-bottom: 80px">
-        <RouterView />
-      </a-layout-content>
+
+            <a-sub-menu key="sub1">
+              <template #title>
+                <span>
+                  <more-outlined />
+                  <span>更多</span>
+                </span>
+              </template>
+              <a-menu-item key="4" @click="handleClick">
+                <comment-outlined /><span>
+                  <RouterLink to="/chat" style="padding-left: 8px">CHATGPT</RouterLink>
+                </span>
+              </a-menu-item>
+              <a-menu-item key="18" @click="handleClick">
+                <key-outlined /><span>
+                  <RouterLink to="/pwdmemo" style="padding-left: 8px">密码管理</RouterLink>
+                </span>
+              </a-menu-item>
+              <a-menu-item key="6" @click="handleClick">
+                <wifi-outlined /><span>
+                  <RouterLink to="/rss" style="padding-left: 8px">RSS阅读器</RouterLink>
+                </span>
+              </a-menu-item>
+              <a-menu-item key="16" @click="handleClick">
+                <calendar-outlined /><span>
+                  <RouterLink to="/calendar" style="padding-left: 8px">日历</RouterLink>
+                </span>
+              </a-menu-item>
+              <a-menu-item key="19" @click="handleClick">
+                <coffee-outlined /><span>
+                  <RouterLink to="/coffee" style="padding-left: 8px">喝咖啡</RouterLink>
+                </span>
+              </a-menu-item>
+              <a-menu-item key="8" @click="handleClick">
+                <RouterLink to="/manage">管理目录</RouterLink>
+              </a-menu-item>
+              <a-menu-item key="9" v-if="useremail != 'test@test.com'" @click="handleClick">
+                <RouterLink to="/profile">个人设置</RouterLink>
+              </a-menu-item>
+              <a-menu-item key="10" v-if="1 == 2" @click="handleClick">
+                <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
+              </a-menu-item>
+              <a-menu-item key="11" @click="handleClick">
+                <RouterLink to="/upload">导入书签</RouterLink>
+              </a-menu-item>
+              <a-menu-item key="12" @click="handleClick">
+                <RouterLink to="/export">导出书签至本地</RouterLink>
+              </a-menu-item>
+              <a-menu-item key="13" v-if="useremail != 'test@test.com'" @click="handleClick">
+                <RouterLink to="/email">发送书签至邮箱</RouterLink>
+              </a-menu-item>
+              <a-menu-item key="14">
+                <RouterLink to="/logout">退出</RouterLink>
+              </a-menu-item>
+            </a-sub-menu>
+          </a-menu>
+          <div style="text-align: center; padding-top: 30px">
+            <a-switch :checked="theme == 'dark'" checked-children="Dark" un-checked-children="Light"
+              @change="changeTheme" />
+          </div>
+        </a-layout-sider>
+        <a-layout-content :class="contenttheme" style="padding-bottom: 80px">
+          <RouterView />
+        </a-layout-content>
       </a-layout>
     </a-layout-content>
     <a-layout-footer style="text-align: center" :class="contenttheme">
-        <div class="search-div" v-if="search == ''">
-<div class="bookmark-search">
-  <a-input v-model:value="search" ref="inputRef">
-    <template #addonBefore>
-      <star-outlined @click="fatherMethod('新建书签')" />
-    </template>
-    <template #addonAfter>
-      <close-outlined @click="clearQuestion" />
-    </template>
-  </a-input>
-</div>
-</div>
-  </a-layout-footer>
+      <div class="search-div" v-if="search == ''">
+        <div class="bookmark-search">
+          <a-input v-model:value="search" ref="inputRef">
+            <template #addonBefore>
+              <star-outlined @click="fatherMethod('新建书签')" />
+            </template>
+            <template #addonAfter>
+              <close-outlined @click="clearQuestion" />
+            </template>
+          </a-input>
+        </div>
+      </div>
+    </a-layout-footer>
   </a-layout>
   <a-layout v-else>
     <IndexView />
@@ -1014,39 +994,22 @@ if (res.data.data.is_same==1){
 
 
 
-  <a-drawer v-model:visible="visibleSearch" :title="`关键词${search}的搜索结果`" @ok="handleSearchOk" placement="bottom" :class="drawerclass" :footer="null" height="100%" @close="clearQuestion">
+  <a-drawer v-model:visible="visibleSearch" :title="`关键词${search}的搜索结果`" @ok="handleSearchOk" placement="bottom"
+    :class="drawerclass" :footer="null" height="100%" @close="clearQuestion">
     <a-tabs v-model:activeKey="activeTabKey">
       <a-tab-pane key="1" tab="书签">
         <h3>根目录</h3>
-        <bookmarkitem
-          v-for="bookmarkitem in items.root_bookmarks"
-          :id="bookmarkitem.id"
-          :folder_id="bookmarkitem.folder_id"
-          :url="bookmarkitem.url"
-          :title="bookmarkitem.title"
-          :pinyin="bookmarkitem.pinyin"
-          :short_title="bookmarkitem.short_title"
-          :is_private="bookmarkitem.is_private"
-          :is_published="bookmarkitem.is_published"
-          :is_recommend="bookmarkitem.is_recommend"
-          :is_friendlink="bookmarkitem.is_friendlink"
-          :http_code="bookmarkitem.http_code"
-          :icon="bookmarkitem.icon_display"
-          :search="search"
-          :editable="editable"
-          @editbookmark="fatherMethod"
-        ></bookmarkitem>
+        <bookmarkitem v-for="bookmarkitem in items.root_bookmarks" :id="bookmarkitem.id"
+          :folder_id="bookmarkitem.folder_id" :url="bookmarkitem.url" :title="bookmarkitem.title"
+          :pinyin="bookmarkitem.pinyin" :short_title="bookmarkitem.short_title" :is_private="bookmarkitem.is_private"
+          :is_published="bookmarkitem.is_published" :is_recommend="bookmarkitem.is_recommend"
+          :is_friendlink="bookmarkitem.is_friendlink" :http_code="bookmarkitem.http_code"
+          :icon="bookmarkitem.icon_display" :search="search" :editable="editable" @editbookmark="fatherMethod">
+        </bookmarkitem>
         <div v-for="item in items.folder">
-          <subfolder
-            :folder_name="item.folder_name"
-            :folder_id="item.id"
-            :folder_bookmark="item.bookmarks"
-            :subfolderx="item.subfolder"
-            :search="search"
-            :editable="editable"
-            :display_offset="item.display_offset"
-            :fatherMethod="fatherMethod"
-          >
+          <subfolder :folder_name="item.folder_name" :folder_id="item.id" :folder_bookmark="item.bookmarks"
+            :subfolderx="item.subfolder" :search="search" :editable="editable" :display_offset="item.display_offset"
+            :fatherMethod="fatherMethod">
           </subfolder>
         </div>
       </a-tab-pane>
@@ -1054,13 +1017,11 @@ if (res.data.data.is_same==1){
         <div v-if="searchBlogResults && searchBlogResults.length > 0">
           <div v-for="blog in searchBlogResults" :key="blog.id" style="margin-bottom: 20px;">
             <h3>
-              <a
-              style="margin-left: 20px"
-              @click="showDrawer2(blog.title, blog.id)"
-              ><span v-html="highlightKeyword(blog.title, search)"></span></a
-            >
+              <a style="margin-left: 20px" @click="showDrawer2(blog.title, blog.id)"><span
+                  v-html="highlightKeyword(blog.title, search)"></span></a>
               <template v-if="blog.content">
-                <span style="font-size: 14px; font-weight: normal; margin-left: 10px; color: #666;" v-html="getContextWithHighlight(blog.content, search)"></span>
+                <span style="font-size: 14px; font-weight: normal; margin-left: 10px; color: #666;"
+                  v-html="getContextWithHighlight(blog.content, search)"></span>
               </template>
             </h3>
             <div style="color: #999; font-size: 12px; margin-top: 5px;">
@@ -1086,23 +1047,11 @@ if (res.data.data.is_same==1){
       </div>
     </div>
   </a-drawer>
-  
-  <a-drawer
-    :width="500"
-    :title="updatedDrawerTitle"
-    :class="drawerclass"
-    placement="bottom"
-    :visible="visible"
-    @close="onClose"
-  >
-  <template #extra v-if="updatedDrawerTitle == '编辑书签'">
-      <a-button
-        type="primary"
-        danger
-        @click="showconfirmdelete(editId)"
-        :loading="iconLoading"
-        >删除</a-button
-      >
+
+  <a-drawer :width="500" :title="updatedDrawerTitle" :class="drawerclass" placement="bottom" :visible="visible"
+    @close="onClose">
+    <template #extra v-if="updatedDrawerTitle == '编辑书签'">
+      <a-button type="primary" danger @click="showconfirmdelete(editId)" :loading="iconLoading">删除</a-button>
     </template>
     <p>
       <a-input v-model:value="url" placeholder="网址">
@@ -1116,27 +1065,13 @@ if (res.data.data.is_same==1){
       <a-input v-model:value="title" placeholder="标题" />
     </p>
     <p>
-      <a-select
-        style="width: 100%"
-        v-model:value="folder_id"
-        v-if="folder_list"
-      >
-        <a-select-option
-          v-for="item in folder_list"
-          :value="item.value"
-          :lv="item.lv"
-          :class="drawerclass"
-        >
-          {{ item.name }}</a-select-option
-        >
+      <a-select style="width: 100%" v-model:value="folder_id" v-if="folder_list">
+        <a-select-option v-for="item in folder_list" :value="item.value" :lv="item.lv" :class="drawerclass">
+          {{ item.name }}</a-select-option>
       </a-select>
     </p>
     <p>
-      <a-input
-        v-model:value="new_folder"
-        placeholder="在当前位置创建新目录"
-        style="width: 100%"
-      >
+      <a-input v-model:value="new_folder" placeholder="在当前位置创建新目录" style="width: 100%">
         <template #addonAfter>
           <plus-outlined @click="newFolder" v-if="!new_folder_clicked" />
           <a-spin size="small" v-if="new_folder_clicked" />
@@ -1148,85 +1083,48 @@ if (res.data.data.is_same==1){
       <a-checkbox v-model:checked="is_recommend">推荐</a-checkbox>
     </p>
     <p>
-      <a-button
-        type="primary"
-        @click="addBookmark(editId)"
-        :loading="iconLoading"
-        >提交</a-button
-      >
+      <a-button type="primary" @click="addBookmark(editId)" :loading="iconLoading">提交</a-button>
       &nbsp;
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </p>
   </a-drawer>
 
 
-  <a-modal
-    v-model:visible="drawer2visible"
-    :title="updatedDrawerTitle"
-    width="100%"
-    wrap-class-name="full-modal"
-    :class="drawerclass"
-    :footer="null"
-    @close="onClose2"
-  >
+  <a-modal v-model:visible="drawer2visible" :title="updatedDrawerTitle" width="100%" wrap-class-name="full-modal"
+    :class="drawerclass" :footer="null" @close="onClose2">
     <a-form :model="blogFormState">
       <a-row>
         <a-col :span="8">
           <p>
-            <a-input
-              v-model:value="blogFormState.blog_title"
-              placeholder="请输入标题"
-            /></p
-        ></a-col>
+            <a-input v-model:value="blogFormState.blog_title" placeholder="请输入标题" />
+          </p>
+        </a-col>
         <a-col :span="8">
           <p style="padding-left: 20px">
-            <a-select
-              style="width: 100%"
-              v-model:value="blogFormState.blog_folder_id"
-              v-if="folder_list"
-            >
-              <a-select-option
-                v-for="item in folder_list"
-                :value="item.value"
-                :lv="item.lv"
-                :class="drawerclass"
-              >
-                {{ item.name }}</a-select-option
-              >
+            <a-select style="width: 100%" v-model:value="blogFormState.blog_folder_id" v-if="folder_list">
+              <a-select-option v-for="item in folder_list" :value="item.value" :lv="item.lv" :class="drawerclass">
+                {{ item.name }}</a-select-option>
             </a-select>
-          </p></a-col
-        >
+          </p>
+        </a-col>
         <a-col :span="4">
           <p style="padding-left: 20px; white-space: nowrap">
-            <a-checkbox v-model:checked="blogFormState.blog_is_recommend"
-              >置顶</a-checkbox
-            >
+            <a-checkbox v-model:checked="blogFormState.blog_is_recommend">置顶</a-checkbox>
             <a-checkbox v-model:checked="blogFormState.blog_is_private">私密</a-checkbox>
-          </p></a-col
-        >
+          </p>
+        </a-col>
         <a-col :span="4" align="right">
-          <a-button
-        type="primary"
-        @click="save()"
-        :loading="iconLoading"
-        >保存</a-button
-      >
-      &nbsp;
-      <a-button style="margin-right: 8px" @click="onClose2">取消</a-button></a-col
-        >
+          <a-button type="primary" @click="save()" :loading="iconLoading">保存</a-button>
+          &nbsp;
+          <a-button style="margin-right: 8px" @click="onClose2">取消</a-button></a-col>
       </a-row>
     </a-form>
-    <vue-ueditor-wrap
-      v-model="valueHtml"
-      :config="editorConfig"
-      editor-id="editor-demo-02"
-    ></vue-ueditor-wrap>
+    <vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-02"></vue-ueditor-wrap>
   </a-modal>
 
 </template>
 
 <style scoped>
-
 .search-div {
   display: flex;
   flex-direction: column;

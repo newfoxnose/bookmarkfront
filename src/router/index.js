@@ -114,9 +114,9 @@ const router = createRouter({
         name: "pwdmemo",
         component: () => import("../views/PwdMemoView.vue"),
       },{
-        path: "/pond",
-        name: "pond",
-        component: () => import("../views/PondView.vue"),
+        path: "/coffee",
+        name: "coffee",
+        component: () => import("../views/CoffeeView.vue"),
       }
   ],
 });

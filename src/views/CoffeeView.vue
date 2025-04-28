@@ -5,11 +5,13 @@
       '100%': '#87d068',
     }" />
  </div>
-  
+ <h3 class="content-title">喝咖啡</h3>
+
   <div class="hot-list-container">
-    <h3 class="content-title">热门榜单</h3>
+
     
     <div class="platform-grid">
+      
       <div v-for="platform in platforms" :key="platform.key" class="platform-card">
         <div class="platform-header">
           <div class="header-left">
@@ -26,7 +28,6 @@
             <div class="rank" :class="{ 'top-rank': index < 3 }">{{ index + 1 }}</div>
             <div class="content">
               <a :href="item.url" target="_blank" class="title">{{ item.title }}</a>
-              <span class="heat" v-if="item.heat">{{ item.heat }}</span>
             </div>
           </div>
         </div>
@@ -50,19 +51,19 @@
   padding: 20px;
 }
 
-.content-title {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
-}
 
 .platform-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
+  gap: 24px;
   margin: 0 auto;
   max-width: 1200px;
+  width: 100%;
+  background: #eee;
+  padding: 20px;
+  border-radius: 8px;
 }
+
 
 .platform-card {
   background: #fff;
@@ -72,9 +73,8 @@
   transition: all 0.3s;
   position: relative;
   min-width: 0;
-  max-width: 360px;
-  margin: 0 auto;
-
+  width: 100%;
+  padding-bottom: 10px;
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     
@@ -83,7 +83,26 @@
     }
   }
 }
-
+/* 深色主题下的样式 */
+.content-dark-theme .platform-grid {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0;
+  border-color: #333;
+}
+.content-dark-theme .platform-card {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0;
+  border: 1px solid #3a3a3a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.content-dark-theme .platform-header {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0;
+  border-bottom: 1px solid #3a3a3a;
+}
+.content-dark-theme .platform-header h4 {
+  color: #fff;
+}
 .platform-header {
   display: flex;
   justify-content: space-between;
@@ -163,29 +182,41 @@
 
 .hot-list {
   padding: 2px 0;
-  max-height: 400px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-
-  /* 隐藏默认滚动条（Chrome/Safari） */
+  max-height: 320px;
+  overflow: auto;
+  scrollbar-width: none; /* 隐藏Firefox滚动条 */
+  /* 悬停时不影响列表宽度 */
+  padding-right: 8px;
+  &:hover {
+    padding-right: 0;
+  }
+  /* 隐藏WebKit浏览器滚动条 */
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 0;
     background: transparent;
   }
 
-  &::-webkit-scrollbar-track {
-    background: transparent;
+  /* 悬停时显示Firefox滚动条 */
+  &:hover {
+    scrollbar-width: auto;
   }
 
-  &::-webkit-scrollbar-thumb {
-    background: transparent;
+  /* 悬停时显示WebKit滚动条并设置样式 */
+  &:hover::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &:hover::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: #888;
     border-radius: 4px;
   }
 
-  /* 鼠标悬停时显示滚动条 */
-  &:hover::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
+  &:hover::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 }
 
@@ -228,14 +259,15 @@
 
 .title {
   color: #121212;
-  font-size: 14px;
+  font-size: 16px;
   text-decoration: none;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
   line-height: 1.5;
   flex: 1;
+  word-break: break-all;
 
   &:hover {
     color: #175199;
@@ -246,6 +278,69 @@
   color: #8590a6;
   font-size: 12px;
   white-space: nowrap;
+}
+
+/* 深色主题下的样式 */
+.content-dark-theme .hot-item {
+  &:hover {
+    background-color: #3a3a3a;
+  }
+}
+
+.content-dark-theme .title {
+  color: #e0e0e0;
+  
+  &:hover {
+    color: #1890ff;
+  }
+}
+
+.content-dark-theme .rank {
+  color: #888;
+}
+
+.content-dark-theme .top-rank {
+  color: #ff4d4f;
+}
+
+.content-dark-theme .update-time {
+  color: #888;
+}
+
+.content-dark-theme .platform-icon {
+  &.zhihu {
+    background: #056de8;
+  }
+  &.bilibili {
+    background: #fb7299;
+  }
+  &.weibo {
+    background: #ff8200;
+  }
+  &.douyin {
+    background: #000000;
+  }
+  &.baidu {
+    background: #4e6ef2;
+  }
+  &.toutiao {
+    background: #ff2442;
+  }
+  &.tencent {
+    background: #2c2c2c;
+  }
+  &.sougou {
+    background: #f94d1b;
+  }
+  &.juejin {
+    background: #1e80ff;
+  }
+  &.hupu {
+    background: #c01d2f;
+  }
+  &.csdn {
+    background: #fc5531;
+  }
 }
 </style>
 
@@ -267,45 +362,10 @@ export default {
     const { proxy } = getCurrentInstance()
 
     const platforms = ref([
-      { 
-        key: 'weibo', 
-        name: '微博热搜',
-        items: [],
-        loading: false
-      },
+     
       { 
         key: 'zhihu', 
         name: '知乎热榜',
-        items: [],
-        loading: false
-      },
-      { 
-        key: 'bilibili', 
-        name: 'B站热榜',
-        items: [],
-        loading: false
-      },
-      { 
-        key: 'toutiao', 
-        name: '头条热榜',
-        items: [],
-        loading: false
-      },
-      { 
-        key: 'tencent', 
-        name: '腾讯新闻',
-        items: [],
-        loading: false
-      },
-      { 
-        key: 'sougou', 
-        name: '搜狗热榜',
-        items: [],
-        loading: false
-      },
-      { 
-        key: 'juejin', 
-        name: '掘金热榜',
         items: [],
         loading: false
       },
@@ -316,8 +376,44 @@ export default {
         loading: false
       },
       { 
+        key: 'bilibili', 
+        name: 'B站',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'juejin', 
+        name: '掘金',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'toutiao', 
+        name: '今日头条',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'tencent', 
+        name: '腾讯新闻',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'weibo', 
+        name: '微博热搜',
+        items: [],
+        loading: false
+      },
+      { 
+        key: 'sougou', 
+        name: '搜狗热榜',
+        items: [],
+        loading: false
+      },
+      { 
         key: 'douyin', 
-        name: '抖音热榜',
+        name: '抖音',
         items: [],
         loading: false
       },
@@ -778,3 +874,4 @@ export default {
   },
 }
 </script>
+
