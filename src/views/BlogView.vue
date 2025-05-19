@@ -130,58 +130,69 @@
     :footer="null"
     @close="onClose"
   >
-    <a-form :model="formState">
-      <a-row>
-        <a-col :span="8">
-          <p>
-            <a-input
-              v-model:value="formState.title"
-              placeholder="请输入标题"
-            /></p
-        ></a-col>
-        <a-col :span="6">
-          <p style="padding-left: 20px">
-            <a-select
-              style="width: 100%"
-              v-model:value="formState.folder_id"
-              v-if="folder_list"
-            >
-              <a-select-option
-                v-for="item in folder_list"
-                :value="item.value"
-                :lv="item.lv"
-                :class="drawerclass"
+    <div class="form-header">
+      <a-form :model="formState">
+        <a-row>
+          <a-col :span="8">
+            <p>
+              <a-input
+                v-model:value="formState.title"
+                placeholder="请输入标题"
+              /></p
+          ></a-col>
+          <a-col :span="4">
+            <p style="padding-left: 20px">
+              <a-select
+                style="width: 100%"
+                v-model:value="formState.folder_id"
+                v-if="folder_list"
               >
-                {{ item.name }}</a-select-option
+                <a-select-option
+                  v-for="item in folder_list"
+                  :value="item.value"
+                  :lv="item.lv"
+                  :class="drawerclass"
+                >
+                  {{ item.name }}</a-select-option
+                >
+              </a-select>
+            </p></a-col
+          >
+          <a-col :span="4">
+            <p style="padding-left: 20px; white-space: nowrap">
+              <a-checkbox v-model:checked="formState.is_recommend"
+                >置顶</a-checkbox
               >
-            </a-select>
-          </p></a-col
-        >
-        <a-col :span="4">
-          <p style="padding-left: 20px; white-space: nowrap">
-            <a-checkbox v-model:checked="formState.is_recommend"
-              >置顶</a-checkbox
+              <a-checkbox v-model:checked="formState.is_private">私密</a-checkbox>
+            </p></a-col
+          >
+          <a-col :span="8" align="right">
+            <a-button
+              type="primary"
+              @click="save(formState_inputpassword.password)"
+              :loading="iconLoading"
+              >保存并关闭（Ctrl+S）</a-button
             >
-            <a-checkbox v-model:checked="formState.is_private">私密</a-checkbox>
-          </p></a-col
-        >
-        <a-col :span="6" align="right">
-          <a-button
-        type="primary"
-        @click="save(formState_inputpassword.password)"
-        :loading="iconLoading"
-        >保存</a-button
-      >
-      （或者使用快捷键Ctrl+S）&nbsp;
-      <a-button style="margin-right: 8px" @click="onClose">取消</a-button></a-col
-        >
-      </a-row>
-    </a-form>
-    <vue-ueditor-wrap
-      v-model="valueHtml"
-      :config="editorConfig"
-      editor-id="editor-demo-01"
-    ></vue-ueditor-wrap>
+            <a-button
+              type="primary"
+              style="margin-left: 8px"
+              @click="saveOnly(formState_inputpassword.password)"
+              :loading="iconLoading"
+              >保存</a-button
+            >
+            &nbsp;
+            <a-button style="margin-right: 8px" @click="onClose">取消</a-button></a-col
+          >
+        </a-row>
+      </a-form>
+    </div>
+    <div class="editor-container">
+      <vue-ueditor-wrap
+        v-model="valueHtml"
+        :config="editorConfig"
+        editor-id="editor-demo-01"
+      ></vue-ueditor-wrap>
+    </div>
   </a-modal>
   <a-modal
     v-model:visible="visible_inputpassword"
@@ -225,7 +236,24 @@
   }
   .ant-modal-body {
     flex: 1;
+    position: relative;
+    overflow: hidden;
   }
+}
+
+.form-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+}
+
+.editor-container {
+  height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 </style>
 <style scoped>
@@ -537,6 +565,54 @@ export default {
           });
       }
     };
+    const saveOnly = (password) => {
+      console.log(router.currentRoute.value.params);
+      iconLoading.value = true;
+      if (
+        proxy.$func.getVarType(formState.value.title) == "undefined" ||
+        formState.value.title == ""
+      ) {
+        message.info("标题不能为空");
+        iconLoading.value = false;
+      } else {
+        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+        params.append("token", $cookies.get("token"));
+        params.append("timestamp", new Date().getTime());
+        params.append("content", valueHtml.value);
+        params.append("title", formState.value.title);
+        params.append("folder_id", formState.value.folder_id);
+        params.append("password", password ? md5(password) : '');
+        if (blog_id.value != 0) {
+          params.append("post_id", blog_id.value);
+        }
+        if (formState.value.is_private == true) {
+          params.append("is_private", 1);
+        } else {
+          params.append("is_private", 0);
+        }
+        if (formState.value.is_recommend == true) {
+          params.append("is_recommend", 1);
+        } else {
+          params.append("is_recommend", 0);
+        }
+        proxy.$http
+          .post("/ajax/save_blog_ajax/", params)
+          .then((res) => {
+            message.info(res.data.msg);
+            iconLoading.value = false;
+            if (show_private.value == false) {
+              handlepagechange();
+            } else {
+              handleprivatepagechange(password);
+            }
+          })
+          .catch((error) => {
+            message.info("无法正常保存");
+            iconLoading.value = false;
+            console.log(error);
+          });
+      }
+    };
     const search = () => {
       iconLoading.value = true;
       if (
@@ -601,7 +677,8 @@ export default {
       handleprivatepagechange,
       search,
       searchstring,
-      uid
+      uid,
+      saveOnly
     };
   },
   watch: {
