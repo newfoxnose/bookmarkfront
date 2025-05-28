@@ -171,14 +171,14 @@
               type="primary"
               @click="save(formState_inputpassword.password)"
               :loading="iconLoading"
-              >保存并关闭（Ctrl+S）</a-button
+              >保存并关闭</a-button
             >
             <a-button
               type="primary"
               style="margin-left: 8px"
               @click="saveOnly(formState_inputpassword.password)"
               :loading="iconLoading"
-              >保存</a-button
+              >保存（Ctrl+S）</a-button
             >
             &nbsp;
             <a-button style="margin-right: 8px" @click="onClose">取消</a-button></a-col
@@ -344,6 +344,10 @@ export default {
     const activeKey = ref(0);
     const show_private = ref(false);
     const searchstring = ref("");
+    const isSaving = ref(false);
+    const saveRetryCount = ref(0);
+    const MAX_RETRIES = 3;
+
     const clicktab = (key) => {
       currentpage.value=1;
       if (key == -1) {
@@ -359,9 +363,22 @@ export default {
     const showDrawer = (drawerTitle, id, password) => {
       drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
       updatedDrawerTitle.value = drawerTitle;
+      
+      // 如果是新建操作，清除本地存储的blog_id
+      if (id === 0) {
+        localStorage.removeItem('current_blog_id');
+        visible.value = true;
+        formState.value.title = "无标题";
+        formState.value.folder_id = -1;
+        formState.value.is_private = false;
+        formState.value.is_recommend = false;
+        valueHtml.value = "<p>写点什么呢？</p>";
+        return;
+      }
+      
       if (id != 0) {
         blog_id.value = id;
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
+        let params = new URLSearchParams();
         params.append("token", $cookies.get("token"));
         params.append("timestamp", new Date().getTime());
         params.append("blog_id", blog_id.value);
@@ -390,13 +407,6 @@ export default {
             }
           }
         });
-      } else {
-        visible.value = true;
-        formState.value.title = "无标题";
-        formState.value.folder_id = -1;
-        formState.value.is_private = false;
-        formState.value.is_recommend = false;
-        valueHtml.value = "<p>写点什么呢？</p>";
       }
     };
 
@@ -437,7 +447,7 @@ export default {
         if (event.ctrlKey && (event.key === 's' || event.keyCode === 83)) {
           event.preventDefault();
           event.returnValue = false;
-          save();
+          saveOnly();
         }
     };
     const handlepagechange = (page) => {
@@ -516,102 +526,165 @@ export default {
       });
     };
     const save = (password) => {
-      console.log(router.currentRoute.value.params);
+      // 防重复提交检查
+      if (isSaving.value) {
+        message.info("正在保存中，请稍候...");
+        return;
+      }
+
+      // blog_id 验证
+      if (!blog_id.value && updatedDrawerTitle.value !== "新建笔记") {
+        message.error("保存失败：博客ID丢失");
+        return;
+      }
+
+      isSaving.value = true;
       iconLoading.value = true;
-      if (
-        proxy.$func.getVarType(formState.value.title) == "undefined" ||
-        formState.value.title == ""
-      ) {
+
+      if (!formState.value.title) {
         message.info("标题不能为空");
+        isSaving.value = false;
         iconLoading.value = false;
-      } else {
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("content", valueHtml.value);
-        params.append("title", formState.value.title);
-        params.append("folder_id", formState.value.folder_id);
-        params.append("password", password ? md5(password) : '');
-        if (blog_id.value != 0) {
-          params.append("post_id", blog_id.value);
-        }
-        if (formState.value.is_private == true) {
-          params.append("is_private", 1);
-        } else {
-          params.append("is_private", 0);
-        }
-        if (formState.value.is_recommend == true) {
-          params.append("is_recommend", 1);
-        } else {
-          params.append("is_recommend", 0);
-        }
+        return;
+      }
+
+      let params = new URLSearchParams();
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+      params.append("content", valueHtml.value);
+      params.append("title", formState.value.title);
+      params.append("folder_id", formState.value.folder_id);
+      params.append("password", password ? md5(password) : '');
+      
+      // 保存当前 blog_id 到本地存储
+      if (blog_id.value !== 0) {
+        localStorage.setItem('current_blog_id', blog_id.value);
+        params.append("post_id", blog_id.value);
+      }
+
+      params.append("is_private", formState.value.is_private ? 1 : 0);
+      params.append("is_recommend", formState.value.is_recommend ? 1 : 0);
+
+      const trySave = () => {
         proxy.$http
           .post("/ajax/save_blog_ajax/", params)
           .then((res) => {
-            //console.log(res.data.msg);
-            message.info(res.data.msg);
-            iconLoading.value = false;
-            if (show_private.value == false) {
-              handlepagechange();
+            if (res.data.code === 200) {
+              // 如果是新建操作，更新 blog_id
+              if (blog_id.value === 0 && res.data.data.blog_id) {
+                blog_id.value = res.data.data.blog_id;
+                localStorage.setItem('current_blog_id', res.data.data.blog_id);
+              }
+              message.info(res.data.msg);
+              if (show_private.value == false) {
+                handlepagechange();
+              } else {
+                handleprivatepagechange(password);
+              }
+              onClose();
             } else {
-              handleprivatepagechange(password);
+              message.error(res.data.msg || "保存失败");
             }
-            onClose();
+            isSaving.value = false;
+            iconLoading.value = false;
+            saveRetryCount.value = 0;
           })
           .catch((error) => {
-            message.info("无法正常保存");
-            iconLoading.value = false;
-            console.log(error);
+            console.error("保存失败:", error);
+            if (saveRetryCount.value < MAX_RETRIES) {
+              saveRetryCount.value++;
+              message.info(`保存失败，正在重试(${saveRetryCount.value}/${MAX_RETRIES})...`);
+              setTimeout(trySave, 1000);
+            } else {
+              message.error("保存失败，请稍后重试");
+              isSaving.value = false;
+              iconLoading.value = false;
+              saveRetryCount.value = 0;
+            }
           });
-      }
+      };
+
+      trySave();
     };
     const saveOnly = (password) => {
-      console.log(router.currentRoute.value.params);
+      // 防重复提交检查
+      if (isSaving.value) {
+        message.info("正在保存中，请稍候...");
+        return;
+      }
+
+      // blog_id 验证
+      if (!blog_id.value && updatedDrawerTitle.value !== "新建笔记") {
+        message.error("保存失败：博客ID丢失");
+        return;
+      }
+
+      isSaving.value = true;
       iconLoading.value = true;
-      if (
-        proxy.$func.getVarType(formState.value.title) == "undefined" ||
-        formState.value.title == ""
-      ) {
+
+      if (!formState.value.title) {
         message.info("标题不能为空");
+        isSaving.value = false;
         iconLoading.value = false;
-      } else {
-        let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
-        params.append("token", $cookies.get("token"));
-        params.append("timestamp", new Date().getTime());
-        params.append("content", valueHtml.value);
-        params.append("title", formState.value.title);
-        params.append("folder_id", formState.value.folder_id);
-        params.append("password", password ? md5(password) : '');
-        if (blog_id.value != 0) {
-          params.append("post_id", blog_id.value);
-        }
-        if (formState.value.is_private == true) {
-          params.append("is_private", 1);
-        } else {
-          params.append("is_private", 0);
-        }
-        if (formState.value.is_recommend == true) {
-          params.append("is_recommend", 1);
-        } else {
-          params.append("is_recommend", 0);
-        }
+        return;
+      }
+
+      let params = new URLSearchParams();
+      params.append("token", $cookies.get("token"));
+      params.append("timestamp", new Date().getTime());
+      params.append("content", valueHtml.value);
+      params.append("title", formState.value.title);
+      params.append("folder_id", formState.value.folder_id);
+      params.append("password", password ? md5(password) : '');
+      
+      // 保存当前 blog_id 到本地存储
+      if (blog_id.value !== 0) {
+        localStorage.setItem('current_blog_id', blog_id.value);
+        params.append("post_id", blog_id.value);
+      }
+
+      params.append("is_private", formState.value.is_private ? 1 : 0);
+      params.append("is_recommend", formState.value.is_recommend ? 1 : 0);
+
+      const trySave = () => {
         proxy.$http
           .post("/ajax/save_blog_ajax/", params)
           .then((res) => {
-            message.info(res.data.msg);
-            iconLoading.value = false;
-            if (show_private.value == false) {
-              handlepagechange();
+            if (res.data.code === 200) {
+              // 如果是新建操作，更新 blog_id
+              if (blog_id.value === 0 && res.data.data.blog_id) {
+                blog_id.value = res.data.data.blog_id;
+                localStorage.setItem('current_blog_id', res.data.data.blog_id);
+              }
+              message.info(res.data.msg);
+              if (show_private.value == false) {
+                handlepagechange();
+              } else {
+                handleprivatepagechange(password);
+              }
             } else {
-              handleprivatepagechange(password);
+              message.error(res.data.msg || "保存失败");
             }
+            isSaving.value = false;
+            iconLoading.value = false;
+            saveRetryCount.value = 0;
           })
           .catch((error) => {
-            message.info("无法正常保存");
-            iconLoading.value = false;
-            console.log(error);
+            console.error("保存失败:", error);
+            if (saveRetryCount.value < MAX_RETRIES) {
+              saveRetryCount.value++;
+              message.info(`保存失败，正在重试(${saveRetryCount.value}/${MAX_RETRIES})...`);
+              setTimeout(trySave, 1000);
+            } else {
+              message.error("保存失败，请稍后重试");
+              isSaving.value = false;
+              iconLoading.value = false;
+              saveRetryCount.value = 0;
+            }
           });
-      }
+      };
+
+      trySave();
     };
     const search = () => {
       iconLoading.value = true;
@@ -678,7 +751,10 @@ export default {
       search,
       searchstring,
       uid,
-      saveOnly
+      saveOnly,
+      isSaving,
+      saveRetryCount,
+      MAX_RETRIES
     };
   },
   watch: {
