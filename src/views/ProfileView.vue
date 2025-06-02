@@ -2,7 +2,11 @@
 import { message } from 'ant-design-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import md5 from 'js-md5';
+import { CopyOutlined } from '@ant-design/icons-vue';
 export default defineComponent({
+  components: {
+    CopyOutlined,
+  },
   setup() {
     $cookies.set('selectedkey','9',"720h") 
     $cookies.set('openkey','sub1',"720h") 
@@ -58,7 +62,16 @@ export default defineComponent({
       formState,
       onFinish,
       onFinishFailed,
-      iconLoading
+      iconLoading,
+      copyApiKey: () => {
+        if (formState.value.api_key) {
+          navigator.clipboard.writeText(formState.value.api_key).then(() => {
+            message.success('API KEY 已复制到剪贴板');
+          }).catch(() => {
+            message.error('复制失败，请手动复制');
+          });
+        }
+      }
     };
   },
   data() {
@@ -79,6 +92,15 @@ export default defineComponent({
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
       <a-input v-model:value="formState.email" disabled/>
     </a-form-item>
+    <a-form-item label="API KEY" name="api_key">
+      <a-input-group compact>
+        <a-input v-model:value="formState.api_key" disabled style="width: calc(100% - 40px)" />
+        <a-button type="primary" @click="copyApiKey" style="width: 40px">
+          <copy-outlined />
+        </a-button>
+      </a-input-group>
+    </a-form-item>
+    <h3 class="content-title">修改密码</h3><br>
     <a-form-item label="SLOGAN" name="slogan" style="display:none">
       <a-input v-model:value="formState.slogan" />
     </a-form-item>
@@ -114,6 +136,7 @@ export default defineComponent({
       <a-button type="primary" html-type="submit" :loading="iconLoading">提交</a-button>
     </a-form-item>
   </a-form>
+
 </template>
 
 <style scoped>
