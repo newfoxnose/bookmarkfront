@@ -25,7 +25,7 @@ import {
   UserAddOutlined,
   LoginOutlined,
   CalendarOutlined,
-  PlusOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, CoffeeOutlined
+  PlusOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined
 } from "@ant-design/icons-vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
@@ -46,7 +46,7 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, CoffeeOutlined
+    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined
   },
   setup() {
     const items = ref([]);    // 书签列表
@@ -935,8 +935,8 @@ export default defineComponent({
                 </span>
               </a-menu-item>
               <a-menu-item key="19" @click="handleClick">
-                <coffee-outlined /><span>
-                  <RouterLink to="/coffee" style="padding-left: 8px">喝咖啡</RouterLink>
+                <fire-outlined /><span>
+                  <RouterLink to="/hot" style="padding-left: 8px">热榜</RouterLink>
                 </span>
               </a-menu-item>
               <a-menu-item key="8" @click="handleClick">

@@ -5,7 +5,7 @@
       '100%': '#87d068',
     }" />
  </div>
- <h3 class="content-title">喝咖啡</h3>
+ <h3 class="content-title">热榜</h3>
 
   <div class="hot-list-container">
 
@@ -17,7 +17,7 @@
           <div class="header-left">
             <span class="platform-icon" :class="platform.key">{{ getPlatformIcon(platform.key) }}</span>
             <h4>{{ platform.name }}</h4>
-            <span class="update-time" v-if="platform.items.length">（{{ Math.floor(Math.random() * 60) }}分钟前）</span>
+            <span class="update-time" v-if="platform.timeAgo">{{ platform.timeAgo }}</span>
           </div>
           <a-button type="link" class="refresh-btn" @click="refreshPlatform(platform.key)" :loading="platform.loading">
             <template #icon><sync-outlined /></template>
@@ -367,13 +367,15 @@ export default {
         key: 'zhihu', 
         name: '知乎热榜',
         items: [],
-        loading: false
+        loading: false,
+        lastUpdateTime: null
       },
       { 
         key: 'hupu', 
         name: '虎扑步行街',
         items: [],
-        loading: false
+        loading: false,
+        lastUpdateTime: null
       },
       { 
         key: 'bilibili', 
@@ -431,6 +433,21 @@ export default {
       }
     ]);
 
+    const getTimeAgo = (timestamp) => {
+      if (!timestamp) return '';
+      const now = new Date();
+      const diff = Math.floor((now - timestamp) / (1000 * 60));
+      return `${diff}分钟前`;
+    };
+
+    const updateTimeDisplay = () => {
+      platforms.value.forEach(platform => {
+        if (platform.lastUpdateTime) {
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
+        }
+      });
+    };
+
     const fetchBilibiliData = async () => {
       const platform = platforms.value.find(p => p.key === 'bilibili');
       if (!platform) return;
@@ -449,6 +466,8 @@ export default {
             author: item.owner.name,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取B站热榜数据失败');
         }
@@ -479,6 +498,8 @@ export default {
             excerpt: item.excerpt,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取知乎热榜数据失败');
         }
@@ -498,7 +519,7 @@ export default {
       try {
         let params = new URLSearchParams();
         params.append("timestamp", new Date().getTime());
-          params.append("token", $cookies.get('token'));
+        params.append("token", $cookies.get('token'));
         const { data: res } = await proxy.$http.post('/ajax/weibo_hot_ajax/', params);
         
         if (res.code === 0 && res.data && res.data.list) {
@@ -508,6 +529,8 @@ export default {
             heat: item.heat,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取微博热搜数据失败');
         }
@@ -537,6 +560,8 @@ export default {
             heat: item.heat,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取头条热榜数据失败');
         }
@@ -568,6 +593,8 @@ export default {
             cover: item.cover,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取腾讯新闻热榜数据失败');
         }
@@ -587,7 +614,7 @@ export default {
       try {
         let params = new URLSearchParams();
         params.append("timestamp", new Date().getTime());
-      params.append("token", $cookies.get('token'));
+        params.append("token", $cookies.get('token'));
         const { data: res } = await proxy.$http.post('/ajax/sougou_hot_ajax/', params);
         
         if (res.code === 0 && res.data && res.data.list) {
@@ -597,6 +624,8 @@ export default {
             heat: item.heat,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取搜狗热榜数据失败');
         }
@@ -628,6 +657,8 @@ export default {
             heat: item.heat,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取掘金热榜数据失败');
         }
@@ -657,6 +688,8 @@ export default {
             heat: `${item.likes} | ${item.heat}`,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取虎扑步行街数据失败');
         }
@@ -686,6 +719,8 @@ export default {
             heat: item.heat,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取抖音热榜数据失败');
         }
@@ -717,6 +752,8 @@ export default {
             author_avatar: item.author_avatar,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取CSDN热榜数据失败');
         }
@@ -748,6 +785,8 @@ export default {
             heat: item.heat,
             rank: index + 1
           }));
+          platform.lastUpdateTime = new Date();
+          platform.timeAgo = getTimeAgo(platform.lastUpdateTime);
         } else {
           message.error('获取百度热搜数据失败');
         }
@@ -860,6 +899,9 @@ export default {
         fetchBaiduData()
       ]);
       
+      // 设置定时器每分钟更新一次时间显示
+      setInterval(updateTimeDisplay, 60000);
+      
       defaultPercent.value = 100;
       loadingdone.value = true;
     });
@@ -869,7 +911,8 @@ export default {
       loadingdone,
       platforms,
       refreshPlatform,
-      getPlatformIcon
+      getPlatformIcon,
+      getTimeAgo
     };
   },
 }
