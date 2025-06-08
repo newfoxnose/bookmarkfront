@@ -25,7 +25,7 @@ import {
   UserAddOutlined,
   LoginOutlined,
   CalendarOutlined,
-  PlusOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined
+  PlusOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined
 } from "@ant-design/icons-vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
@@ -46,7 +46,7 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined
+    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined
   },
   setup() {
     const items = ref([]);    // 书签列表
@@ -906,7 +906,11 @@ export default defineComponent({
                 <RouterLink to="/fetch" style="padding-left: 8px">数据抓取</RouterLink>
               </span>
             </a-menu-item>
-
+            <a-menu-item key="20" @click="handleClick">
+              <read-outlined /><span>
+                <RouterLink to="/txtreader" style="padding-left: 8px">TXT电子书</RouterLink>
+              </span>
+            </a-menu-item>
             <a-sub-menu key="sub1">
               <template #title>
                 <span>

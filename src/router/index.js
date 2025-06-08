@@ -117,6 +117,10 @@ const router = createRouter({
         path: "/hot",
         name: "hot",
         component: () => import("../views/HotView.vue"),
+      },{
+        path: "/txtreader",
+        name: "txtreader",
+        component: () => import("../views/TxtReaderView.vue"),
       }
   ],
 });
