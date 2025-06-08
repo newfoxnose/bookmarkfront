@@ -29,17 +29,17 @@
         :src=" item.path + item.key "
       />
       <a v-else target="_blank" :href=" item.path + item.key " style="margin-left:5px;">
-        {{ item.key.substring(11) }}
+        {{ item.displayname }}
       </a>
       <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime)
         }})</span>
       <a v-if="['xls','xlsx','doc','docx','ppt','pptx'].indexOf(lcase_ext) !== -1" target="_blank" :href="'https://view.officeapps.live.com/op/view.aspx?src='+ encodeURIComponent(item.path  + item.key) " style="margin-left:5px;">
         在线查看
       </a>
-      <a v-else-if="['txt'].indexOf(lcase_ext) !== -1" @click="readBook(item.key, lcase_ext)" style="margin-left:5px; cursor: pointer;">
+      <a v-else-if="['txt'].indexOf(lcase_ext) !== -1" @click="readBook(item.displayname,item.key, lcase_ext)" style="margin-left:5px; cursor: pointer;">
         在线阅读
       </a>
-      <a v-else-if="['epub'].indexOf(lcase_ext) !== -1" @click="readEpubBook(item.path + item.key, lcase_ext)" style="margin-left:5px; cursor: pointer;">
+      <a v-else-if="['epub'].indexOf(lcase_ext) !== -1" @click="readEpubBook(item.displayname,item.path + item.key, lcase_ext)" style="margin-left:5px; cursor: pointer;">
         在线阅读
       </a>
       <a style="margin-left:20px;" @click="deletefile(item.key)">删除</a>
@@ -284,7 +284,7 @@ export default {
     const isEpub = ref(false);
     const epubFileUrl = ref('');
 
-    const readBook = (file, ext) => {
+    const readBook = (displayname,file, ext) => {
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
       params.append("timestamp", new Date().getTime());
@@ -292,7 +292,7 @@ export default {
       
       isEpub.value = false;
       visible.value = true;
-      articletitle.value = file.replace("attachment/", "");
+      articletitle.value = displayname;
       
       proxy.$http.post('/ajax/read_file_ajax/', params).then(res => {
         if (res.data.code == '200') {
@@ -308,10 +308,10 @@ export default {
       });
     };
 
-    const readEpubBook = (fileUrl, ext) => {
+    const readEpubBook = (displayname,fileUrl, ext) => {
       isEpub.value = true;
       visible.value = false;
-      articletitle.value = fileUrl.split('/').pop();
+      articletitle.value = displayname;
       epubFileUrl.value = fileUrl;
     };
 
