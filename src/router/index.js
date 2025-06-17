@@ -122,11 +122,6 @@ const router = createRouter({
         name: "txtreader",
         component: () => import("../views/TxtReaderView.vue"),
       },
-      {
-        path: "/ads.txt",
-        name: "ads",
-        component: () => import("../views/AdsView.vue"),
-      },
   ],
 });
 
