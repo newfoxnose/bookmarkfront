@@ -12,7 +12,8 @@
     />
   </div>
   <h3  class="content-title">笔记<br><br>
-    <a-button type="primary" @click="showDrawer('新建笔记', 0)"><form-outlined />新建</a-button>
+    <a-button type="primary" @click="showDrawer('新建笔记', 0, '', false)"><form-outlined />新建</a-button>
+    <a-button type="primary" style="margin-left: 8px" @click="showDrawer('新建笔记（MarkDown）', 0, '', true)"><form-outlined />新建（MarkDown）</a-button>
   </h3>
 
   <a-tabs v-model:activeKey="activeKey" @tabClick="clicktab">
@@ -187,11 +188,24 @@
       </a-form>
     </div>
     <div class="editor-container">
+      <!-- 根据is_markdown字段选择编辑器类型 -->
       <vue-ueditor-wrap
+        v-if="!isMarkdownMode"
         v-model="valueHtml"
         :config="editorConfig"
         editor-id="editor-demo-01"
       ></vue-ueditor-wrap>
+      
+      <!-- Markdown编辑器 -->
+      <md-editor
+        v-else
+        v-model="markdownContent"
+        :toolbars="markdownToolbars"
+        :preview="true"
+        :code-theme="'github'"
+        :language="'zh-CN'"
+        style="height: 100%;"
+      />
     </div>
   </a-modal>
   <a-modal
@@ -255,6 +269,20 @@
   height: calc(100vh - 120px);
   overflow-y: auto;
 }
+
+/* Markdown编辑器样式 */
+.editor-container .md-editor {
+  height: 100% !important;
+  border: none !important;
+}
+
+.editor-container .md-editor .md-toolbar {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.editor-container .md-editor .md-content {
+  height: calc(100% - 50px) !important;
+}
 </style>
 <style scoped>
 .ext {
@@ -296,6 +324,10 @@ import { onMounted, getCurrentInstance, defineComponent, ref } from "vue";
 import * as qiniu from "qiniu-js";
 import { Base64 } from "js-base64";
 import { useRouter } from "vue-router";
+// 导入md-editor-v3
+import { MdEditor } from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
+
 export default {
   components: {
     CloseOutlined,
@@ -304,7 +336,8 @@ export default {
     LikeTwoTone,
     StarOutlined,
     FormOutlined,
-    SearchOutlined
+    SearchOutlined,
+    MdEditor
   },
   setup() {
     $cookies.set("selectedkey", "5", "720h");
@@ -319,6 +352,12 @@ export default {
 
     // 内容 HTML
     const valueHtml = ref("<p>写点什么呢？</p>");
+    
+    // Markdown内容
+    const markdownContent = ref("# 写点什么呢？");
+    
+    // 是否为Markdown模式
+    const isMarkdownMode = ref(false);
 
     const defaultPercent = ref(10);
     const loadingdone = ref(false);
@@ -348,6 +387,13 @@ export default {
     const saveRetryCount = ref(0);
     const MAX_RETRIES = 3;
 
+    // Markdown编辑器工具栏配置
+    const markdownToolbars = [
+      'bold', 'underline', 'italic', 'strikethrough', 'title', 'sub', 'sup', 'quote', 'unordered-list', 'ordered-list', 'task-list', '-',
+      'code', 'code-block', 'link', 'image', 'table', 'mermaid', 'katex', '-',
+      'preview', 'fullscreen', 'content'
+    ];
+
     const clicktab = (key) => {
       currentpage.value=1;
       if (key == -1) {
@@ -360,7 +406,7 @@ export default {
       }
     };
 
-    const showDrawer = (drawerTitle, id, password) => {
+    const showDrawer = (drawerTitle, id, password, isMarkdown) => {
       drawerclass.value = "drawer-" + $cookies.get("theme") + "-theme";
       updatedDrawerTitle.value = drawerTitle;
       
@@ -372,7 +418,15 @@ export default {
         formState.value.folder_id = -1;
         formState.value.is_private = false;
         formState.value.is_recommend = false;
-        valueHtml.value = "<p>写点什么呢？</p>";
+        
+        // 根据isMarkdown参数决定使用哪种编辑器
+        if (isMarkdown) {
+          isMarkdownMode.value = true;
+          markdownContent.value = "# 写点什么呢？\n\n开始你的 Markdown 笔记...";
+        } else {
+          isMarkdownMode.value = false;
+          valueHtml.value = "<p>写点什么呢？</p>";
+        }
         return;
       }
       
@@ -390,7 +444,16 @@ export default {
           } else {
             visible.value = true;
             visible_inputpassword.value = false;
-            valueHtml.value = res.data.data.blog.content;
+            
+            // 根据is_markdown字段决定使用哪种编辑器
+            if (res.data.data.blog.is_markdown == 1) {
+              isMarkdownMode.value = true;
+              markdownContent.value = res.data.data.blog.content;
+            } else {
+              isMarkdownMode.value = false;
+              valueHtml.value = res.data.data.blog.content;
+            }
+            
             defaultPercent.value = 100;
             loadingdone.value = true;
             formState.value.title = res.data.data.blog.title;
@@ -426,6 +489,8 @@ export default {
       visible.value = false;
       visible_inputpassword.value = false;
       blog_id.value = 0;
+      // 重置编辑器模式
+      isMarkdownMode.value = false;
     };
 
     onMounted(() => {
@@ -533,7 +598,7 @@ export default {
       }
 
       // blog_id 验证
-      if (!blog_id.value && updatedDrawerTitle.value !== "新建笔记") {
+      if (!blog_id.value && !updatedDrawerTitle.value.includes("新建笔记")) {
         message.error("保存失败：博客ID丢失");
         return;
       }
@@ -551,7 +616,10 @@ export default {
       let params = new URLSearchParams();
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
-      params.append("content", valueHtml.value);
+      
+      // 根据编辑器类型获取内容
+      const content = isMarkdownMode.value ? markdownContent.value : valueHtml.value;
+      params.append("content", content);
       params.append("title", formState.value.title);
       params.append("folder_id", formState.value.folder_id);
       params.append("password", password ? md5(password) : '');
@@ -564,6 +632,8 @@ export default {
 
       params.append("is_private", formState.value.is_private ? 1 : 0);
       params.append("is_recommend", formState.value.is_recommend ? 1 : 0);
+      // 添加is_markdown字段
+      params.append("is_markdown", isMarkdownMode.value ? 1 : 0);
 
       const trySave = () => {
         proxy.$http
@@ -614,7 +684,7 @@ export default {
       }
 
       // blog_id 验证
-      if (!blog_id.value && updatedDrawerTitle.value !== "新建笔记") {
+      if (!blog_id.value && !updatedDrawerTitle.value.includes("新建笔记")) {
         message.error("保存失败：博客ID丢失");
         return;
       }
@@ -632,7 +702,10 @@ export default {
       let params = new URLSearchParams();
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
-      params.append("content", valueHtml.value);
+      
+      // 根据编辑器类型获取内容
+      const content = isMarkdownMode.value ? markdownContent.value : valueHtml.value;
+      params.append("content", content);
       params.append("title", formState.value.title);
       params.append("folder_id", formState.value.folder_id);
       params.append("password", password ? md5(password) : '');
@@ -645,6 +718,8 @@ export default {
 
       params.append("is_private", formState.value.is_private ? 1 : 0);
       params.append("is_recommend", formState.value.is_recommend ? 1 : 0);
+      // 添加is_markdown字段
+      params.append("is_markdown", isMarkdownMode.value ? 1 : 0);
 
       const trySave = () => {
         proxy.$http
@@ -722,6 +797,9 @@ export default {
       formState,
       folder_list,
       valueHtml,
+      markdownContent,
+      isMarkdownMode,
+      markdownToolbars,
       save,
       iconLoading,
       file_key,
