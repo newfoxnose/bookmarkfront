@@ -943,6 +943,11 @@ export default defineComponent({
                   <RouterLink to="/hot" style="padding-left: 8px">热榜</RouterLink>
                 </span>
               </a-menu-item>
+              <a-menu-item key="21" @click="handleClick">
+                <fire-outlined /><span>
+                  <RouterLink to="/dict" style="padding-left: 8px">词典管理</RouterLink>
+                </span>
+              </a-menu-item>
               <a-menu-item key="8" @click="handleClick">
                 <RouterLink to="/manage">管理目录</RouterLink>
               </a-menu-item>

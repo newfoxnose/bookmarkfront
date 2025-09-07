@@ -121,6 +121,10 @@ const router = createRouter({
         path: "/txtreader",
         name: "txtreader",
         component: () => import("../views/TxtReaderView.vue"),
+      },{
+        path: "/dict",
+        name: "dict",
+        component: () => import("../views/DictView.vue"),
       },
   ],
 });
