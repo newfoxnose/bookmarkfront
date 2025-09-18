@@ -3,9 +3,11 @@ import { message } from 'ant-design-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import md5 from 'js-md5';
 import { CopyOutlined } from '@ant-design/icons-vue';
+import VirtualKeyboard from '@/components/VirtualKeyboard.vue';
 export default defineComponent({
   components: {
     CopyOutlined,
+    VirtualKeyboard,
   },
   setup() {
     $cookies.set('selectedkey','9',"720h") 
@@ -13,6 +15,7 @@ export default defineComponent({
     const iconLoading = ref(false);
     const { proxy } = getCurrentInstance()
     const formState = ref([])
+    const showKeyboard = ref(false) // 控制虚拟键盘显示状态
     onMounted(() => {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get('token'));
@@ -34,7 +37,7 @@ export default defineComponent({
         if (values[x]==null){
           values[x]='';
         }
-        if (x=="current_pwd"||x=="pwd"||x=="pwd_repeat"){
+        if (x=="current_pwd"||x=="pwd"||x=="pwd_repeat"||x=="private_code"){
           params.append(x, md5(values[x]));
         }
         else{
@@ -58,11 +61,31 @@ export default defineComponent({
       //message.success(`失败.`);
       console.log('Failed:', errorInfo);
     };
+    // 打开虚拟键盘
+    const openKeyboard = () => {
+      showKeyboard.value = true;
+    };
+    
+    // 关闭虚拟键盘
+    const closeKeyboard = () => {
+      showKeyboard.value = false;
+    };
+    
+    // 确认输入
+    const confirmKeyboardInput = (value) => {
+      formState.value.private_code = value;
+      closeKeyboard();
+    };
+
     return {
       formState,
       onFinish,
       onFinishFailed,
       iconLoading,
+      showKeyboard,
+      openKeyboard,
+      closeKeyboard,
+      confirmKeyboardInput,
       copyApiKey: () => {
         if (formState.value.api_key) {
           navigator.clipboard.writeText(formState.value.api_key).then(() => {
@@ -100,6 +123,8 @@ export default defineComponent({
         </a-button>
       </a-input-group>
     </a-form-item>
+
+
     <h3 class="content-title">修改密码</h3><br>
     <a-form-item label="SLOGAN" name="slogan" style="display:none">
       <a-input v-model:value="formState.slogan" />
@@ -122,6 +147,15 @@ export default defineComponent({
         <a-radio-button v-for="item in theme_list" :value="item" class="theme_thumbnail"><img :src="'images/'+ item +'.png'" /></a-radio-button>
       </a-radio-group>
 </a-form-item>
+<a-form-item label="私有内容口令（不修改请留空）" name="private_code" :rules="[{ required:false }]">
+      <a-input-password 
+        v-model:value="formState.private_code" 
+        readonly
+        placeholder="点击输入私有内容口令"
+        @click="openKeyboard"
+        style="cursor: pointer;"
+      />
+    </a-form-item>
 <a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
       <a-input-password v-model:value="formState.pwd"  />
     </a-form-item>
@@ -136,6 +170,14 @@ export default defineComponent({
       <a-button type="primary" html-type="submit" :loading="iconLoading">提交</a-button>
     </a-form-item>
   </a-form>
+
+  <!-- 虚拟数字键盘 -->
+  <VirtualKeyboard 
+    v-model="formState.private_code"
+    :visible="showKeyboard"
+    @confirm="confirmKeyboardInput"
+    @close="closeKeyboard"
+  />
 
 </template>
 

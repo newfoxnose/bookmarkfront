@@ -20,6 +20,8 @@ import {
 import { message, Modal } from "ant-design-vue";
 import { inject } from 'vue';
 import html2canvas from "html2canvas";
+// 导入虚拟键盘组件
+import VirtualKeyboard from '@/components/VirtualKeyboard.vue';
 export default defineComponent({
   components: {
     bookmarkitem,
@@ -28,6 +30,7 @@ export default defineComponent({
     StarOutlined,
     SearchOutlined,
     PlusOutlined,
+    VirtualKeyboard,
   },
   setup() {
     $cookies.set("selectedkey", "1", "720h");
@@ -59,6 +62,10 @@ export default defineComponent({
     const formState_inputpassword = ref([]);
     const show_private = ref(false);
 
+    // 虚拟键盘相关状态
+    const showKeyboard = ref(false);
+    const privateCode = ref('');
+
 
 
     const showDrawer = (drawerTitle) => {
@@ -89,11 +96,15 @@ export default defineComponent({
     const clicktab = (key) => {
       console.log(key);
       if (key == -1) {
-        visible_inputpassword.value = true;
+        // 显示虚拟键盘输入私有内容口令
+        showKeyboard.value = true;
+        privateCode.value = '';
       } else {
         show_private.value = false;
         visible_inputpassword.value = false;
         formState_inputpassword.value.password = "";
+        showKeyboard.value = false;
+        privateCode.value = '';
       }
     };
 
@@ -183,6 +194,24 @@ export default defineComponent({
           message.error("密码错误");
         }
       });
+    };
+
+    // 虚拟键盘相关方法
+    const openKeyboard = () => {
+      showKeyboard.value = true;
+    };
+    
+    // 关闭虚拟键盘
+    const closeKeyboard = () => {
+      showKeyboard.value = false;
+    };
+    
+    // 确认虚拟键盘输入
+    const confirmKeyboardInput = (value) => {
+      privateCode.value = value;
+      // 使用虚拟键盘输入的口令调用私有内容加载
+      private_stream_ajax(value);
+      closeKeyboard();
     };
 
     const addBookmark = (id, action) => {
@@ -333,6 +362,12 @@ export default defineComponent({
       formState_inputpassword,
       show_private,
       private_stream_ajax,
+      // 虚拟键盘相关
+      showKeyboard,
+      privateCode,
+      openKeyboard,
+      closeKeyboard,
+      confirmKeyboardInput,
     };
   },
   data() {
@@ -729,6 +764,14 @@ export default defineComponent({
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </p>
   </a-drawer>
+
+  <!-- 虚拟数字键盘 -->
+  <VirtualKeyboard 
+    v-model="privateCode"
+    :visible="showKeyboard"
+    @confirm="confirmKeyboardInput"
+    @close="closeKeyboard"
+  />
 </template>
 
 <style scoped>

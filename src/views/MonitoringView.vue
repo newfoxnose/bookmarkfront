@@ -27,6 +27,7 @@
       :data-source="fileitems" 
       :pagination="false"
       :scroll="{ x: true }"
+      :row-class-name="getRowClassName"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'url'">
@@ -77,6 +78,34 @@
 .input-label {
   line-height: 32px;
   text-align: center;
+}
+
+/* 无法访问的网站行高亮样式 */
+:deep(.error-row) {
+  background-color: #fff2f0 !important;
+  border-left: 4px solid #ff4d4f;
+}
+
+:deep(.error-row:hover) {
+  background-color: #ffe7e6 !important;
+}
+
+/* 确保固定列也应用高亮样式 */
+:deep(.error-row td) {
+  background-color: #fff2f0 !important;
+}
+
+:deep(.error-row:hover td) {
+  background-color: #ffe7e6 !important;
+}
+
+/* 特别针对固定列 */
+:deep(.ant-table-tbody > tr.error-row > td.ant-table-cell-fix-right) {
+  background-color: #fff2f0 !important;
+}
+
+:deep(.ant-table-tbody > tr.error-row:hover > td.ant-table-cell-fix-right) {
+  background-color: #ffe7e6 !important;
 }
 
 
@@ -369,6 +398,20 @@ export default {
       window.open(url, '_blank');
     };
 
+    // 判断网站是否无法访问的函数
+    const getRowClassName = (record) => {
+      // 如果状态码不是200，或者监控结果显示无法访问，则高亮该行
+      if (record.httpcode !== 200 || 
+          (record.monitoring_result && 
+           (record.monitoring_result.includes('无法访问') || 
+            record.monitoring_result.includes('超时') || 
+            record.monitoring_result.includes('错误') ||
+            record.monitoring_result.includes('失败')))) {
+        return 'error-row';
+      }
+      return '';
+    };
+
     return {
       fileitems,
       visible,
@@ -381,7 +424,8 @@ export default {
       deleteMonitoringUrl,
       newUrl,
       insertMonitoringUrl,
-      openUrl
+      openUrl,
+      getRowClassName
     };
   },
 }

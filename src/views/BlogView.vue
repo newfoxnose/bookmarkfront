@@ -76,7 +76,7 @@
                   showDrawer(
                     item.title,
                     item.id,
-                    formState_inputpassword.password
+                    privateCode
                   )
                 "
               > {{ item.title }}</a
@@ -96,7 +96,7 @@
                 style="margin-left: 20px"
                 @click="
                   showconfirmdelete(
-                    item.id,formState_inputpassword.password
+                    item.id, privateCode
                   )
                 "
                 >删除</a
@@ -115,7 +115,7 @@
             v-model:current="currentpage"
             v-model:pageSize="pagesize"
             :total="total"
-            @change="handleprivatepagechange(formState_inputpassword.password)"
+            @change="handleprivatepagechange(privateCode)"
             show-less-items
           />
         </div>
@@ -170,14 +170,14 @@
           <a-col :span="8" align="right">
             <a-button
               type="primary"
-              @click="save(formState_inputpassword.password)"
+              @click="save(privateCode)"
               :loading="iconLoading"
               >保存并关闭</a-button
             >
             <a-button
               type="primary"
               style="margin-left: 8px"
-              @click="saveOnly(formState_inputpassword.password)"
+              @click="saveOnly(privateCode)"
               :loading="iconLoading"
               >保存（Ctrl+S）</a-button
             >
@@ -233,6 +233,14 @@
       <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
     </template>
   </a-modal>
+
+  <!-- 虚拟数字键盘 -->
+  <VirtualKeyboard 
+    v-model="privateCode"
+    :visible="showKeyboard"
+    @confirm="confirmKeyboardInput"
+    @close="closeKeyboard"
+  />
 </template>
 
 <style lang="less">
@@ -327,6 +335,8 @@ import { useRouter } from "vue-router";
 // 导入md-editor-v3
 import { MdEditor } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
+// 导入虚拟键盘组件
+import VirtualKeyboard from '@/components/VirtualKeyboard.vue';
 
 export default {
   components: {
@@ -337,7 +347,8 @@ export default {
     StarOutlined,
     FormOutlined,
     SearchOutlined,
-    MdEditor
+    MdEditor,
+    VirtualKeyboard
   },
   setup() {
     $cookies.set("selectedkey", "5", "720h");
@@ -387,6 +398,10 @@ export default {
     const saveRetryCount = ref(0);
     const MAX_RETRIES = 3;
 
+    // 虚拟键盘相关状态
+    const showKeyboard = ref(false);
+    const privateCode = ref('');
+
     // Markdown编辑器工具栏配置
     const markdownToolbars = [
       'bold', 'underline', 'italic', 'strikethrough', 'title', 'sub', 'sup', 'quote', 'unordered-list', 'ordered-list', 'task-list', '-',
@@ -397,13 +412,35 @@ export default {
     const clicktab = (key) => {
       currentpage.value=1;
       if (key == -1) {
-        visible_inputpassword.value = true;
+        // 显示虚拟键盘输入私有内容口令
+        showKeyboard.value = true;
+        privateCode.value = '';
       } else {
         show_private.value = false;
         visible_inputpassword.value = false;
         formState_inputpassword.value.password = "";
+        showKeyboard.value = false;
+        privateCode.value = '';
         handlepagechange(1);
       }
+    };
+
+    // 虚拟键盘相关方法
+    const openKeyboard = () => {
+      showKeyboard.value = true;
+    };
+    
+    // 关闭虚拟键盘
+    const closeKeyboard = () => {
+      showKeyboard.value = false;
+    };
+    
+    // 确认虚拟键盘输入
+    const confirmKeyboardInput = (value) => {
+      privateCode.value = value;
+      // 使用虚拟键盘输入的口令调用私有内容加载
+      handleprivatepagechange(value);
+      closeKeyboard();
     };
 
     const showDrawer = (drawerTitle, id, password, isMarkdown) => {
@@ -491,6 +528,8 @@ export default {
       blog_id.value = 0;
       // 重置编辑器模式
       isMarkdownMode.value = false;
+      // 重置虚拟键盘状态
+      showKeyboard.value = false;
     };
 
     onMounted(() => {
@@ -832,7 +871,13 @@ export default {
       saveOnly,
       isSaving,
       saveRetryCount,
-      MAX_RETRIES
+      MAX_RETRIES,
+      // 虚拟键盘相关
+      showKeyboard,
+      privateCode,
+      openKeyboard,
+      closeKeyboard,
+      confirmKeyboardInput
     };
   },
   watch: {
