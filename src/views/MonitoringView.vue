@@ -82,30 +82,30 @@
 
 /* 无法访问的网站行高亮样式 */
 :deep(.error-row) {
-  background-color: #fff2f0 !important;
+  background-color: #ffebe6 !important;
   border-left: 4px solid #ff4d4f;
 }
 
 :deep(.error-row:hover) {
-  background-color: #ffe7e6 !important;
+  background-color: #ffd4cc !important;
 }
 
 /* 确保固定列也应用高亮样式 */
 :deep(.error-row td) {
-  background-color: #fff2f0 !important;
+  background-color: #ffebe6 !important;
 }
 
 :deep(.error-row:hover td) {
-  background-color: #ffe7e6 !important;
+  background-color: #ffd4cc !important;
 }
 
 /* 特别针对固定列 */
 :deep(.ant-table-tbody > tr.error-row > td.ant-table-cell-fix-right) {
-  background-color: #fff2f0 !important;
+  background-color: #ffebe6 !important;
 }
 
 :deep(.ant-table-tbody > tr.error-row:hover > td.ant-table-cell-fix-right) {
-  background-color: #ffe7e6 !important;
+  background-color: #ffd4cc !important;
 }
 
 
@@ -400,8 +400,15 @@ export default {
 
     // 判断网站是否无法访问的函数
     const getRowClassName = (record) => {
+      // 调试信息：打印状态码和类型
+      console.log('状态码:', record.httpcode, '类型:', typeof record.httpcode);
+      
+      // 如果状态码是200（数字或字符串），保持原底色显示
+      if (record.httpcode === 200 || record.httpcode === '200') {
+        return '';
+      }
       // 如果状态码不是200，或者监控结果显示无法访问，则高亮该行
-      if (record.httpcode !== 200 || 
+      if (record.httpcode !== 200 && record.httpcode !== '200' || 
           (record.monitoring_result && 
            (record.monitoring_result.includes('无法访问') || 
             record.monitoring_result.includes('超时') || 
