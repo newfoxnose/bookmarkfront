@@ -1,5 +1,5 @@
 <template>
-  <h3 class="content-title">日历<br><br>
+<h3 style="text-align: center;">
   <a-button type="primary" @click="showDrawer('添加事件', selectedValue)"
     ><form-outlined />添加事件</a-button
   ></h3>

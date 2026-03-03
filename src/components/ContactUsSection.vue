@@ -114,7 +114,8 @@ Object.assign(window, { $: jQuery, jQuery });
 
 export default defineComponent({
   setup() {
-    $cookies.set("selectedkey", "15", "720h");
+    // 登录后跳转 /home，预设菜单高亮为书签（key=1）
+    $cookies.set("selectedkey", "1", "720h");
     $cookies.set("openkey", "");
     const logged = ref(0);
     const activeKey = ref("1");
@@ -187,6 +188,7 @@ export default defineComponent({
           // obj.success ? obj.success(res) : null
           if (res.data.code == "200") {
             $cookies.set("token", res.data.data.token, "720h");
+            $cookies.set("selectedkey", "1", "720h"); // 跳转前设为书签，确保左侧导航正确高亮
             logged.value = 2;
             window.location.href = "/home";
           } else {
@@ -217,6 +219,7 @@ export default defineComponent({
           // obj.success ? obj.success(res) : null
           if (res.data.code == "200") {
             $cookies.set("token", res.data.data.token, "720h");
+            $cookies.set("selectedkey", "1", "720h"); // 跳转前设为书签
             window.location.href = "/home";
           }
         })
@@ -235,6 +238,7 @@ export default defineComponent({
         console.log(folder_res);
         if (folder_res.data.code == "200") {
           //在登陆状态就跳转到home页
+          $cookies.set("selectedkey", "1", "720h"); // 跳转前设为书签
           logged.value = 2;
           window.location.href = "/home";
         } else {

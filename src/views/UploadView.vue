@@ -12,7 +12,6 @@
     />
   </div>
 
-  <h3 class="content-title">导入书签</h3>
   <div class="clearfix" style="text-align: center;padding-top:20px;">
     <a-upload
       :file-list="fileList"

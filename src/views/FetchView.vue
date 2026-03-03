@@ -5,7 +5,6 @@
       '100%': '#87d068',
     }" />
   </div>
-  <h3 class="content-title">数据抓取</h3>
 
   <div class="input-section">
     <a-form layout="vertical">

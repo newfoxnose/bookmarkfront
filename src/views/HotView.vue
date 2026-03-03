@@ -5,7 +5,6 @@
       '100%': '#87d068',
     }" />
  </div>
- <h3 class="content-title">热榜</h3>
 
   <div class="hot-list-container">
 

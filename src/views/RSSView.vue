@@ -5,7 +5,6 @@
       '100%': '#87d068',
     }" />
  </div>
-  <h3 class="content-title">RSS订阅源</h3>
   <a-form :model="formState" name="add" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }" autocomplete="off"
     @finish="onFinish" @finishFailed="onFinishFailed">
     <a-form-item label="地址" name="feed_url" :rules="[{ required:true, message: '地址不能为空' }]">

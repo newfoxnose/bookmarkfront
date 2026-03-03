@@ -8,7 +8,7 @@ import CryptoJS from 'crypto-js';
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 dayjs.locale("zh-cn");
-import { RouterLink, RouterView } from "vue-router";
+import { RouterLink, RouterView, useRoute } from "vue-router";
 import { message, Modal } from "ant-design-vue";
 import { defineComponent, ref, watch, nextTick } from "vue";
 import { onMounted, onUnmounted, reactive, getCurrentInstance, toRefs } from "vue";
@@ -16,6 +16,7 @@ import {
   SearchOutlined,
   CloseOutlined,
   StarOutlined,
+  SyncOutlined,
   FormOutlined,
   DatabaseOutlined,
   CommentOutlined,
@@ -30,6 +31,7 @@ import {
 import md5 from "js-md5";
 import VirtualKeyboard from "./components/VirtualKeyboard.vue";
 import PageLockOverlay from "./components/PageLockOverlay.vue";
+import PageHeader from "./components/PageHeader.vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
 import { provide } from "vue";
@@ -49,11 +51,14 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined,GroupOutlined,
+    SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined,GroupOutlined,
     VirtualKeyboard,
     PageLockOverlay,
+    PageHeader,
   },
   setup() {
+    const route = useRoute();  // 当前路由，用于判断是否缓存
+    const refreshKey = ref(0); // 刷新令牌：递增后强制当前页面重新加载（绕过 keep-alive 缓存）
     const items = ref([]);    // 书签列表
     const loadingdone = ref(false);   //书签列表加载完成
     const logourl = ref("../images/logo-white.png");
@@ -543,8 +548,12 @@ export default defineComponent({
       }
     };
 
+    /** 强制刷新当前路由页面：递增 refreshKey 使组件 key 变化，触发重新挂载 */
+    const refreshPage = () => { refreshKey.value++; };
+
     //搜索结果
     provide("reloadtodo", toggleTodo); //向其他组件提供刷新方法，要在本页函数初始化之后
+    provide("refreshPage", refreshPage); // 供 PageHeader 调用，用于强制重新加载当前页面
     provide('sharedItems', items);
     provide('folder_list', folder_list);
 
@@ -689,6 +698,8 @@ export default defineComponent({
       handleUnlockClick,
       closeUnlockKeyboard,
       verifyAndUnlock,
+      route,
+      refreshKey,
     };
   },
 
@@ -1080,8 +1091,18 @@ export default defineComponent({
             />
           </div>
         </a-layout-sider>
-        <a-layout-content :class="contenttheme" style="padding-bottom: 80px">
-          <RouterView />
+        <a-layout-content :class="[contenttheme, { 'has-page-header': route.meta?.title }]" style="padding-bottom: 80px">
+          <!-- 页面标题栏：标题在左、刷新图标在右，仅对配置了 meta.title 的路由显示 -->
+          <PageHeader v-if="route.meta?.title" :title="route.meta.title" />
+          <!-- 根据路由 meta.keepAlive 决定是否缓存；key 含 refreshKey 以便点击刷新时强制重新挂载 -->
+          <div class="page-content-wrap">
+            <RouterView v-slot="{ Component }">
+              <keep-alive v-if="route.meta?.keepAlive" :max="20">
+                <component :is="Component" :key="`${route.path}_${refreshKey}`" />
+              </keep-alive>
+              <component v-else :is="Component" :key="`${route.path}_${refreshKey}`" />
+            </RouterView>
+          </div>
         </a-layout-content>
       </a-layout>
     </a-layout-content>

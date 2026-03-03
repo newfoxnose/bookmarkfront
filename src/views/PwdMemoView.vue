@@ -5,8 +5,7 @@
       '100%': '#87d068',
     }" />
  </div>
-  <h3 class="content-title">密码管理系统</h3>
-
+  
   <div class="form-container" style="margin: 10px;">
     <a-form layout="vertical">
       <a-row :gutter="[16, 16]">

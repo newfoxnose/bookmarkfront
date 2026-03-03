@@ -5,8 +5,6 @@
       '100%': '#87d068',
     }" />
  </div>
-  <h3 class="content-title">监控网站状态</h3>
-
   <div class="input-section">
     <a-row :gutter="[16, 16]">
       <a-col :xs="24" :sm="24" :md="4">

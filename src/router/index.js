@@ -10,6 +10,7 @@ const router = createRouter({
     {
       path: "/home",
       name: "home",
+      meta: { keepAlive: true, title: "书签" },
       component: () => import("../views/HomeView.vue"),
     },
     {
@@ -23,11 +24,13 @@ const router = createRouter({
     {
       path: "/manage",
       name: "manage",
+      meta: { keepAlive: true, title: "管理目录" },
       component: () => import("../views/ManageView.vue"),
     },
     {
       path: "/upload",
       name: "upload",
+      meta: { keepAlive: true, title: "导入书签" },
       component: () => import("../views/UploadView.vue"),
     },
     {
@@ -38,11 +41,13 @@ const router = createRouter({
     {
       path: "/export",
       name: "export",
+      meta: { keepAlive: true, title: "导出书签至本地" },
       component: () => import("../components/export.vue"),
     },
     {
       path: "/note",
       name: "note",
+      meta: { keepAlive: true, title: "随手记" },
       component: () => import("../views/NoteView.vue"),
     },
     {
@@ -53,16 +58,19 @@ const router = createRouter({
     {
       path: "/file",
       name: "file",
+      meta: { keepAlive: true, title: "文件中转" },
       component: () => import("../views/FileView.vue"),
     },
     {
       path: "/profile",
       name: "profile",
+      meta: { keepAlive: true, title: "个人设置" },
       component: () => import("../views/ProfileView.vue"),
     },
     {
       path: "/email",
       name: "email",
+      meta: { keepAlive: true, title: "发送书签至邮箱" },
       component: () => import("../components/email.vue"),
     },
     {
@@ -83,47 +91,57 @@ const router = createRouter({
     {
       path: "/blog",
       name: "blog",
+      meta: { keepAlive: true, title: "笔记" },
       component: () => import("../views/BlogView.vue"),
-      //meta: { "composetype": "diary" }   //这是另一种传参方法，备用
     },{
       path: "/chat",
       name: "chat",
+      meta: { keepAlive: true, title: "CHATGPT" },
       component: () => import("../views/ChatView.vue"),
     },{
       path: "/calendar",
       name: "calendar",
+      meta: { keepAlive: true, title: "日历" },
       component: () => import("../views/CalendarView.vue"),
     },{
       path: "/rss",
       name: "rss",
+      meta: { keepAlive: true, title: "RSS阅读器" },
       component: () => import("../views/RSSView.vue"),
     },{
       path: "/frame/:id",
       name: "frame",
+      meta: { keepAlive: true, title: "外部链接" },
       component: () => import("../views/FrameView.vue"),
     },{
       path: "/monitoring",
       name: "monitoring",
+      meta: { keepAlive: true, title: "监控网站状态" },
       component: () => import("../views/MonitoringView.vue"),
     },{
       path: "/fetch",
       name: "fetch",
+      meta: { keepAlive: true, title: "数据抓取" },
       component: () => import("../views/FetchView.vue"),
       },{
         path: "/pwdmemo",
         name: "pwdmemo",
+        meta: { keepAlive: true, title: "密码管理" },
         component: () => import("../views/PwdMemoView.vue"),
       },{
         path: "/hot",
         name: "hot",
+        meta: { keepAlive: true, title: "热榜" },
         component: () => import("../views/HotView.vue"),
       },{
         path: "/txtreader",
         name: "txtreader",
+        meta: { keepAlive: true, title: "TXT电子书" },
         component: () => import("../views/TxtReaderView.vue"),
       },{
         path: "/dict",
         name: "dict",
+        meta: { keepAlive: true, title: "词典管理" },
         component: () => import("../views/DictView.vue"),
       },
   ],
