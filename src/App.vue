@@ -11,7 +11,7 @@ dayjs.locale("zh-cn");
 import { RouterLink, RouterView } from "vue-router";
 import { message, Modal } from "ant-design-vue";
 import { defineComponent, ref, watch, nextTick } from "vue";
-import { onMounted, reactive, getCurrentInstance, toRefs } from "vue";
+import { onMounted, onUnmounted, reactive, getCurrentInstance, toRefs } from "vue";
 import {
   SearchOutlined,
   CloseOutlined,
@@ -27,6 +27,9 @@ import {
   CalendarOutlined,
   PlusOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined,GroupOutlined
 } from "@ant-design/icons-vue";
+import md5 from "js-md5";
+import VirtualKeyboard from "./components/VirtualKeyboard.vue";
+import PageLockOverlay from "./components/PageLockOverlay.vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
 import { provide } from "vue";
@@ -46,7 +49,9 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined,GroupOutlined
+    SearchOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined,GroupOutlined,
+    VirtualKeyboard,
+    PageLockOverlay,
   },
   setup() {
     const items = ref([]);    // 书签列表
@@ -542,6 +547,87 @@ export default defineComponent({
     provide("reloadtodo", toggleTodo); //向其他组件提供刷新方法，要在本页函数初始化之后
     provide('sharedItems', items);
     provide('folder_list', folder_list);
+
+    // ========== 页面锁定功能 ==========
+    // 锁定状态：从 localStorage 恢复（刷新后保持锁定）
+    const isPageLocked = ref(Boolean(localStorage.getItem('pageLocked') === '1'));
+    const showUnlockKeyboard = ref(false);
+    const unlockCode = ref('');
+    const unlockLoading = ref(false);
+
+    /** 手动锁定页面 */
+    const lockPage = () => {
+      isPageLocked.value = true;
+      localStorage.setItem('pageLocked', '1');
+    };
+
+    /** 点击壁纸唤起解锁键盘 */
+    const handleUnlockClick = () => {
+      showUnlockKeyboard.value = true;
+      unlockCode.value = '';
+    };
+
+    /** 关闭解锁键盘 */
+    const closeUnlockKeyboard = () => {
+      showUnlockKeyboard.value = false;
+      unlockCode.value = '';
+    };
+
+    /** 验证私有口令并解锁：调用 unlock_screen_ajax 接口 */
+    const verifyAndUnlock = (password) => {
+      if (!password || !String(password).trim()) {
+        message.error('请输入私有口令');
+        return;
+      }
+      unlockLoading.value = true;
+      const params = new URLSearchParams();
+      params.append('timestamp', new Date().getTime());
+      params.append('token', $cookies.get('token'));
+      params.append('password', md5(password));
+      proxy.$http.post('/ajax/unlock_screen_ajax', params).then((res) => {
+        unlockLoading.value = false;
+        if (res.data.code === 200) {
+          isPageLocked.value = false;
+          localStorage.removeItem('pageLocked');
+          closeUnlockKeyboard();
+        } else {
+          message.error('口令错误');
+        }
+      }).catch(() => {
+        unlockLoading.value = false;
+        message.error('验证失败');
+      });
+    };
+
+    /** 闲置自动锁定：超时无操作则锁定 */
+    const LOCK_TIMEOUT_KEY = 'lock_timeout_minutes';
+    const DEFAULT_LOCK_TIMEOUT = 5;
+    const idleTimerRef = { current: null };
+
+    const resetIdleTimer = () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      const minutes = parseInt(localStorage.getItem(LOCK_TIMEOUT_KEY) || String(DEFAULT_LOCK_TIMEOUT), 10);
+      if (minutes <= 0 || isPageLocked.value) return;
+      idleTimerRef.current = setTimeout(() => {
+        isPageLocked.value = true;
+        localStorage.setItem('pageLocked', '1');
+      }, minutes * 60 * 1000);
+    };
+
+    let cleanupIdleLock = null;
+    onMounted(() => {
+      const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+      events.forEach((ev) => window.addEventListener(ev, resetIdleTimer));
+      resetIdleTimer();
+      cleanupIdleLock = () => {
+        events.forEach((ev) => window.removeEventListener(ev, resetIdleTimer));
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      };
+    });
+    onUnmounted(() => {
+      if (typeof cleanupIdleLock === 'function') cleanupIdleLock();
+    });
+
     return {
       ...toRefs(state),
       changeTheme,
@@ -593,7 +679,16 @@ export default defineComponent({
       blog_id,
       valueHtml,
       blogFormState,
-      save
+      save,
+      // 页面锁定
+      isPageLocked,
+      showUnlockKeyboard,
+      unlockCode,
+      unlockLoading,
+      lockPage,
+      handleUnlockClick,
+      closeUnlockKeyboard,
+      verifyAndUnlock,
     };
   },
 
@@ -911,13 +1006,7 @@ export default defineComponent({
                 <RouterLink to="/txtreader" style="padding-left: 8px">TXT电子书</RouterLink>
               </span>
             </a-menu-item>
-            <a-sub-menu key="sub1">
-              <template #title>
-                <span>
-                  <more-outlined />
-                  <span>更多</span>
-                </span>
-              </template>
+         
               <a-menu-item key="4" @click="handleClick">
                 <comment-outlined /><span>
                   <RouterLink to="/chat" style="padding-left: 8px">CHATGPT</RouterLink>
@@ -948,6 +1037,13 @@ export default defineComponent({
                   <RouterLink to="/dict" style="padding-left: 8px">词典管理</RouterLink>
                 </span>
               </a-menu-item>
+              <a-sub-menu key="sub1">
+              <template #title>
+                <span>
+                  <more-outlined />
+                  <span>更多</span>
+                </span>
+              </template>
               <a-menu-item key="8" @click="handleClick">
                 <RouterLink to="/manage">管理目录</RouterLink>
               </a-menu-item>
@@ -975,12 +1071,35 @@ export default defineComponent({
             <a-switch :checked="theme == 'dark'" checked-children="Dark" un-checked-children="Light"
               @change="changeTheme" />
           </div>
+          <div style="text-align: center; padding-top: 12px; padding-bottom: 12px">
+            <a-switch
+              :checked="isPageLocked"
+              checked-children="锁定"
+              un-checked-children="解锁"
+              @change="(checked) => { if (checked) lockPage(); }"
+            />
+          </div>
         </a-layout-sider>
         <a-layout-content :class="contenttheme" style="padding-bottom: 80px">
           <RouterView />
         </a-layout-content>
       </a-layout>
     </a-layout-content>
+    <!-- 页面锁定遮罩：锁定后显示壁纸，点击唤起解锁 -->
+    <page-lock-overlay
+      :locked="isPageLocked"
+      :theme-class="contenttheme"
+      @unlock="handleUnlockClick"
+    />
+    <!-- 解锁用虚拟数字键盘：确认时传递输入值并调用校验接口 -->
+    <virtual-keyboard
+      v-model="unlockCode"
+      :visible="showUnlockKeyboard"
+      title="输入私有口令解锁页面"
+      @confirm="(v) => verifyAndUnlock(v || unlockCode)"
+      @close="closeUnlockKeyboard"
+    />
+
     <a-layout-footer style="text-align: center" :class="contenttheme">
       <div class="search-div" v-if="search == ''">
         <div class="bookmark-search">

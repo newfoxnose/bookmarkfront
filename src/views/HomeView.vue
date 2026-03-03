@@ -549,7 +549,7 @@ export default defineComponent({
       <a-form-item
         label="密码"
         name="password2"
-        :rules="[{ required: true, message: '请输入至少6位密码' }]"
+        :rules="[{ required: true, message: '请输入密码' }]"
       >
         <a-input-password v-model:value="formState_inputpassword.password" />
       </a-form-item>

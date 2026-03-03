@@ -44,12 +44,16 @@
               @click="showconfirmdelete(item.id,  '')"
               >删除</a
             >
+
+            <!--
             <div style="margin-left: 50px"><a-image
               v-for="img in item.img_arr"
               :key="img.label"
               :width="200"
               :src="img"
             /></div>
+            -->
+
           </div>
         </a-image-preview-group>
       </div>
@@ -217,7 +221,7 @@
       <a-form-item
         label="密码"
         name="password2"
-        :rules="[{ required: true, message: '请输入至少6位密码' }]"
+        :rules="[{ required: true, message: '请输入密码' }]"
       >
         <a-input-password v-model:value="formState_inputpassword.password" />
       </a-form-item>

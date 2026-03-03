@@ -2,7 +2,7 @@
   <div v-if="visible" class="virtual-keyboard-overlay" @click="handleOverlayClick">
     <div class="virtual-keyboard" @click.stop>
       <div class="keyboard-header">
-        <span class="keyboard-title">输入私有内容口令</span>
+        <span class="keyboard-title">{{ title }}</span>
         <button class="close-btn" @click="closeKeyboard">×</button>
       </div>
       
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch } from 'vue'
+import { defineComponent, ref, watch, nextTick } from 'vue'
 
 export default defineComponent({
   name: 'VirtualKeyboard',
@@ -48,6 +48,11 @@ export default defineComponent({
     modelValue: {
       type: String,
       default: ''
+    },
+    // 自定义标题，用于不同场景（如页面解锁）
+    title: {
+      type: String,
+      default: '输入私有内容口令'
     }
   },
   emits: ['update:modelValue', 'confirm', 'close'],
@@ -83,10 +88,11 @@ export default defineComponent({
       emit('update:modelValue', inputValue.value)
     }
     
-    // 确认输入
+    // 确认输入：先 emit 让父组件处理，再在 nextTick 中关闭，确保请求能发出
     const confirmInput = () => {
-      emit('confirm', inputValue.value)
-      closeKeyboard()
+      const val = inputValue.value
+      emit('confirm', val)
+      nextTick(() => closeKeyboard())
     }
     
     // 关闭键盘

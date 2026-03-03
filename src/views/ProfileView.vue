@@ -1,6 +1,6 @@
 <script>
 import { message } from 'ant-design-vue';
-import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
+import { onMounted, onUnmounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import md5 from 'js-md5';
 import { CopyOutlined } from '@ant-design/icons-vue';
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue';
@@ -77,6 +77,30 @@ export default defineComponent({
       closeKeyboard();
     };
 
+    // 页面自动锁定时间（分钟），0 表示禁用，存储于 localStorage
+    // 修改后延迟写入，避免每次按键/点击都立即保存
+    const LOCK_TIMEOUT_KEY = 'lock_timeout_minutes';
+    const LOCK_TIMEOUT_DEBOUNCE_MS = 600;
+    const lockTimeoutMinutes = ref(
+      parseInt(localStorage.getItem(LOCK_TIMEOUT_KEY) || '5', 10)
+    );
+    let lockTimeoutSaveTimer = null;
+    const onLockTimeoutChange = (val) => {
+      const num = parseInt(val, 10);
+      if (!isNaN(num) && num >= 0) {
+        lockTimeoutMinutes.value = num;
+        if (lockTimeoutSaveTimer) clearTimeout(lockTimeoutSaveTimer);
+        lockTimeoutSaveTimer = setTimeout(() => {
+          lockTimeoutSaveTimer = null;
+          localStorage.setItem(LOCK_TIMEOUT_KEY, String(num));
+          message.success(`自动锁定已${num === 0 ? '禁用' : '设为 ' + num + ' 分钟'}`);
+        }, LOCK_TIMEOUT_DEBOUNCE_MS);
+      }
+    };
+    onUnmounted(() => {
+      if (lockTimeoutSaveTimer) clearTimeout(lockTimeoutSaveTimer);
+    });
+
     return {
       formState,
       onFinish,
@@ -94,7 +118,9 @@ export default defineComponent({
             message.error('复制失败，请手动复制');
           });
         }
-      }
+      },
+      lockTimeoutMinutes,
+      onLockTimeoutChange,
     };
   },
   data() {
@@ -156,6 +182,7 @@ export default defineComponent({
         style="cursor: pointer;"
       />
     </a-form-item>
+   
 <a-form-item label="新密码（不修改请留空）" name="pwd" :rules="[{ required:false }]">
       <a-input-password v-model:value="formState.pwd"  />
     </a-form-item>
@@ -168,6 +195,22 @@ export default defineComponent({
 
     <a-form-item :wrapper-col="{ offset: 6, span: 16}">
       <a-button type="primary" html-type="submit" :loading="iconLoading">提交</a-button>
+    </a-form-item>
+
+
+
+
+    <h3 class="content-title">页面自动锁定</h3><br>
+    <a-form-item label="多少分钟内无操作" :rules="[{ required:false }]">
+      <a-input-number
+        v-model:value="lockTimeoutMinutes"
+        :min="0"
+        :max="120"
+        placeholder="0=禁用"
+        @change="onLockTimeoutChange"
+        style="width: 120px"
+      />
+      <span style="margin-left: 8px; color: #888">0 表示不自动锁定</span>
     </a-form-item>
   </a-form>
 
