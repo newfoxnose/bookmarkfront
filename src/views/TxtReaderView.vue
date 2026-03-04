@@ -22,16 +22,27 @@
   </div>
   <br>
   <div>
-    <div v-for=" item  in  fileitems " style="margin-bottom:5px;">
+    <div v-for=" item  in  fileitems " :key="item.key" style="margin-bottom:5px;">
       <span style="margin-left:5px;">
         {{ item.displayname }}
       </span>
       <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime)
         }})</span>
-      <a v-if="['txtxx'].indexOf(lcase_ext) !== -1" @click="readBook(item.displayname,item.key, lcase_ext)" style="margin-left:5px; cursor: pointer;">
-        在线阅读
+      <!-- txt 至少有 1 个分片，直接显示分片列表 -->
+      <a style="margin-left:5px; cursor: pointer;" @click="toggleChunkList(item)">
+        {{ expandedChunkKey === item.key ? '收起分片' : '查看分片' }}
       </a>
       <a style="margin-left:20px;" @click="deletefile(item.key)">删除</a>
+      <div v-if="expandedChunkKey === item.key" style="margin-left:25px; margin-top:8px; padding:10px; background:#fafafa; border-radius:4px; display: flex; flex-wrap: wrap; gap: 12px;">
+        <span
+          v-for="(chunk, idx) in getChunkList(item)"
+          :key="chunk.name"
+          @click.stop="readChunk(item.displayname, chunk.path, chunk.displayName)"
+          :class="['chunk-item', { 'chunk-item--last-read': chunk.path === lastReadChunkPath }]"
+        >
+          {{ chunk.displayName }}
+        </span>
+      </div>
     </div>
   </div>
 
@@ -41,6 +52,7 @@
     :visible="visible"
     :title="articletitle"
     :content="articlecontent"
+    :chunk-path="currentChunkPath"
     @close="onClose"
   />
 
@@ -53,6 +65,18 @@
   />
 </template>
 <style scoped>
+/* 分片项样式 */
+.chunk-item {
+  cursor: pointer;
+  color: #1890ff;
+}
+.chunk-item--last-read {
+  font-weight: bold;
+  background: rgba(24, 144, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 .ext {
   text-align: center;
   display: inline-block;
@@ -272,17 +296,105 @@ export default {
     const articlecontent = ref('');
     const isEpub = ref(false);
     const epubFileUrl = ref('');
+    // 当前展开分片列表的文件 key，用于折叠/展开分片列表
+    const expandedChunkKey = ref('');
+    // 上一次阅读的分片路径，用于高亮显示（刷新后从 localStorage 恢复）
+    const LAST_CHUNK_STORAGE_KEY = 'txtreader_last_chunk_path';
+    const lastReadChunkPath = ref(localStorage.getItem(LAST_CHUNK_STORAGE_KEY) || '');
+    // 当前阅读的分片路径，用于阅读器记忆页码
+    const currentChunkPath = ref('');
 
-    const readBook = (displayname,file, ext) => {
-      let params = new URLSearchParams();
+    /** 去掉分片名的 .txt 后缀用于显示 */
+    const stripTxtExt = (name) => (name || '').replace(/\.txt$/i, '');
+
+    /**
+     * 获取分片列表，兼容 chunk_files 与 chunk_paths 两种格式，displayName 不含 .txt
+     * @param {object} item - 文件项
+     * @returns {Array<{name:string, path:string, displayName:string}>}
+     */
+
+    const getChunkList = (item) => {
+      let list = [];
+      if (item.chunk_paths && item.chunk_paths.length > 0) {
+        list = item.chunk_paths.map((path) => ({
+          path,
+          name: path.split('/').pop() || path
+        }));
+      } else if (item.chunk_files && item.chunk_files.length > 0 && item.chunk_paths) {
+        list = item.chunk_files.map((name, idx) => ({
+          name,
+          path: item.chunk_paths[idx] || `${item.chunk_dir || ''}/${name}`.replace(/^\//, '')
+        }));
+      } else if (item.chunk_files && item.chunk_files.length > 0 && item.chunk_dir) {
+        list = item.chunk_files.map((name) => ({
+          name,
+          path: `${item.chunk_dir}/${name}`.replace(/\/\//g, '/')
+        }));
+      }
+      return list.map((chunk) => ({ ...chunk, displayName: stripTxtExt(chunk.name) }));
+    };
+
+    /**
+     * 切换分片列表的展开/收起
+     * @param {object} item - 文件项，需包含 key、chunk_files
+     */
+    const toggleChunkList = (item) => {
+      expandedChunkKey.value = expandedChunkKey.value === item.key ? '' : item.key;
+    };
+
+    /**
+     * 加载并阅读单个分片内容
+     * @param {string} displayname - 书籍显示名
+     * @param {string} chunkPath - 分片完整路径，如 txtreader/xxx/000.txt
+     * @param {string} chunkName - 分片文件名，如 000.txt
+     */
+    const readChunk = (displayname, chunkPath, chunkName) => {
+      if (!chunkPath) {
+        message.error('分片路径无效');
+        return;
+      }
+      isEpub.value = false;
+      articletitle.value = `${displayname} - ${chunkName}`;
+      articlecontent.value = '';
+      visible.value = true;
+
+      const params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
       params.append("timestamp", new Date().getTime());
-      params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
-      
+      params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(chunkPath)));
+
+      proxy.$http.post('/ajax/read_txt_ajax/', params).then(res => {
+        // 兼容 code 为数字 200 或字符串 '200'
+        if (String(res.data.code) === '200') {
+          articlecontent.value = res.data.data || '';
+          lastReadChunkPath.value = chunkPath;
+          currentChunkPath.value = chunkPath;
+          localStorage.setItem(LAST_CHUNK_STORAGE_KEY, chunkPath);
+        } else {
+          message.error(res.data.msg || '加载失败');
+          visible.value = false;
+        }
+      }).catch(error => {
+        console.error('请求错误:', error);
+        message.error('加载失败，请重试');
+        visible.value = false;
+      });
+    };
+
+    /**
+     * 阅读非分片电子书（使用 key 直接请求完整内容）
+     */
+    const readBook = (displayname, file, ext, item) => {
       isEpub.value = false;
       visible.value = true;
       articletitle.value = displayname;
-      
+
+      // 非分片：使用 key 直接请求完整内容
+      const params = new URLSearchParams();
+      params.append("token", $cookies.get('token'));
+      params.append("timestamp", new Date().getTime());
+      params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
+
       proxy.$http.post('/ajax/read_txt_ajax/', params).then(res => {
         if (res.data.code == '200') {
           articlecontent.value = res.data.data;
@@ -307,6 +419,7 @@ export default {
     const onClose = () => {
       visible.value = false;
       articlecontent.value = '';
+      currentChunkPath.value = '';
     };
 
     const closeEpubReader = () => {
@@ -390,6 +503,12 @@ export default {
       defaultPercent,
       loadingdone,
       readBook,
+      readChunk,
+      getChunkList,
+      toggleChunkList,
+      expandedChunkKey,
+      lastReadChunkPath,
+      currentChunkPath,
       readEpubBook,
       visible,
       onClose,

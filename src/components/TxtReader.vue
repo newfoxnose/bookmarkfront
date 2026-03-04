@@ -8,36 +8,51 @@
     @close="onClose"
   >
     <div class="txt-reader">
-      <div class="reader-toolbar">
-        <a-button-group>
-          <a-button @click="prevPage" :disabled="currentPage === 1">
-            <template #icon><left-outlined /></template>
-          </a-button>
-          <a-button @click="nextPage" :disabled="currentPage === totalPages">
-            <template #icon><right-outlined /></template>
-          </a-button>
-        </a-button-group>
-        <div class="page-jump">
-          <span>跳转到</span>
-          <a-input-number 
-            v-model:value="jumpPage" 
-            :min="1" 
-            :max="totalPages"
-            @pressEnter="handlePageJump"
-          />
-          <span>页</span>
-          <a-button type="primary" @click="handlePageJump" style="margin-left: 5px;">确定</a-button>
-        </div>
-        <a-button-group style="margin-left: 10px;">
-          <a-button @click="toggleBookmark" :type="hasBookmark ? 'primary' : 'default'">
-            <template #icon><book-outlined /></template>
-          </a-button>
-        </a-button-group>
-        <span style="margin-left: 10px;">第 {{ currentPage }}/{{ totalPages }} 页</span>
-      </div>
-      <div class="reader-content" ref="readerContent">
+      <div class="reader-content" ref="readerContent" :style="{ fontSize: fontSize + 'px', lineHeight: lineHeight }">
         <div v-if="isContentReady && currentPageContent" v-html="currentPageContent"></div>
         <div v-else class="loading-text">加载中...</div>
+      </div>
+      <div class="reader-toolbar">
+        <div class="reader-settings">
+          <span>字体</span>
+          <a-select v-model:value="fontSize" size="small" style="width: 70px;" @change="onSettingChange">
+            <a-select-option v-for="s in fontSizeOptions" :key="s" :value="s">{{ s }}px</a-select-option>
+          </a-select>
+          <span style="margin-left: 8px;">行距</span>
+          <a-select v-model:value="lineHeight" size="small" style="width: 70px;" @change="onSettingChange">
+            <a-select-option v-for="h in lineHeightOptions" :key="h" :value="h">{{ h }}</a-select-option>
+          </a-select>
+        </div>
+        <div class="reader-toolbar-row">
+         
+          <div class="page-jump">
+            <span>跳转到</span>
+            <a-input-number 
+              v-model:value="jumpPage" 
+              :min="1" 
+              :max="totalPages"
+              @pressEnter="handlePageJump"
+              :controls="false"
+            />
+            <span>页/{{ totalPages }} 页</span>
+            <a-button type="primary" @click="handlePageJump" style="margin-left: 5px;">确定</a-button>
+          </div>
+          <a-button-group>
+            <a-button @click="goToFirstPage" :disabled="currentPage === 1" title="第一页">
+              <template #icon><double-left-outlined /></template>
+            </a-button>
+            <a-button @click="goToLastPage" :disabled="currentPage === totalPages" title="最后一页">
+              <template #icon><double-right-outlined /></template>
+            </a-button>
+            <a-button @click="prevPage" :disabled="currentPage === 1" class="btn-prev-spacing">
+              <template #icon><left-outlined /></template>
+            </a-button>
+            <a-button @click="nextPage" :disabled="currentPage === totalPages">
+              <template #icon><right-outlined /></template>
+            </a-button>
+          </a-button-group>
+        </div>
+     
       </div>
     </div>
   </a-drawer>
@@ -45,15 +60,15 @@
 
 <script>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
-import { message } from 'ant-design-vue';
-import { LeftOutlined, RightOutlined, BookOutlined } from '@ant-design/icons-vue';
+import { DoubleLeftOutlined, LeftOutlined, RightOutlined, DoubleRightOutlined } from '@ant-design/icons-vue';
 
 export default {
   name: 'TxtReader',
   components: {
+    DoubleLeftOutlined,
     LeftOutlined,
     RightOutlined,
-    BookOutlined
+    DoubleRightOutlined
   },
   props: {
     visible: {
@@ -67,6 +82,10 @@ export default {
     content: {
       type: String,
       required: true
+    },
+    chunkPath: {
+      type: String,
+      default: ''
     }
   },
   emits: ['close'],
@@ -74,21 +93,94 @@ export default {
     const currentPage = ref(1);
     const totalPages = ref(1);
     const pageContent = ref([]);
-    const hasBookmark = ref(false);
     const readerContent = ref(null);
     const jumpPage = ref(1);
     const resizeObserver = ref(null);
-    const fontSize = ref(16);
+    const STORAGE_KEY = 'txtreader_settings';
+    const fontSizeOptions = [12, 14, 16, 18, 20, 22, 24];
+    const lineHeightOptions = [1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.5];
+    const fontSize = ref(loadSetting('fontSize', 16));
+    const lineHeight = ref(loadSetting('lineHeight', 1.6));
     const isContentReady = ref(false);
+
+    function loadSetting(key, defaultVal) {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const obj = JSON.parse(saved);
+          const val = obj[key];
+          if (key === 'fontSize' && fontSizeOptions.includes(val)) return val;
+          if (key === 'lineHeight' && lineHeightOptions.includes(val)) return val;
+        }
+      } catch (e) {}
+      return defaultVal;
+    }
+    function saveSettings() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          fontSize: fontSize.value,
+          lineHeight: lineHeight.value
+        }));
+      } catch (e) {}
+    }
+
+    const POSITION_STORAGE_KEY = 'txtreader_positions';
+    function loadPosition(chunkPath) {
+      if (!chunkPath) return null;
+      try {
+        const saved = localStorage.getItem(POSITION_STORAGE_KEY);
+        if (saved) {
+          const obj = JSON.parse(saved);
+          return obj[chunkPath] || null;
+        }
+      } catch (e) {}
+      return null;
+    }
+    function savePosition() {
+      const path = props.chunkPath;
+      if (!path) return;
+      try {
+        const saved = localStorage.getItem(POSITION_STORAGE_KEY);
+        const obj = saved ? JSON.parse(saved) : {};
+        obj[path] = {
+          page: currentPage.value,
+          fontSize: fontSize.value,
+          lineHeight: lineHeight.value
+        };
+        localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(obj));
+      } catch (e) {}
+    }
 
     const currentPageContent = computed(() => {
       return pageContent.value[currentPage.value - 1] || '';
     });
 
-    // 监听content变化
+    // 监听content变化：同分片且未调整字体/行距时恢复上次页码，否则从第一页
     watch(() => props.content, (newContent) => {
       if (newContent && readerContent.value) {
         updateContent();
+        nextTick(() => {
+          const path = props.chunkPath;
+          if (path) {
+            const saved = loadPosition(path);
+            if (saved && saved.fontSize === fontSize.value && saved.lineHeight === lineHeight.value) {
+              const page = Math.min(Math.max(1, saved.page), totalPages.value);
+              if (page >= 1 && page <= totalPages.value) {
+                currentPage.value = page;
+                jumpPage.value = page;
+              } else {
+                currentPage.value = 1;
+                jumpPage.value = 1;
+              }
+            } else {
+              currentPage.value = 1;
+              jumpPage.value = 1;
+            }
+          } else {
+            currentPage.value = 1;
+            jumpPage.value = 1;
+          }
+        });
       }
     });
 
@@ -106,7 +198,7 @@ export default {
         return [];
       }
 
-      const lineHeight = 1.6;
+      const currentLineHeight = lineHeight.value;
       const currentFontSize = fontSize.value;
       const padding = 40;
       const availableWidth = containerWidth - padding;
@@ -118,7 +210,7 @@ export default {
         visibility: hidden;
         width: ${availableWidth}px;
         font-size: ${currentFontSize}px;
-        line-height: ${lineHeight};
+        line-height: ${currentLineHeight};
         white-space: pre-wrap;
         word-wrap: break-word;
       `;
@@ -133,7 +225,7 @@ export default {
       paragraphs.forEach((paragraph, index) => {
         if (paragraph.trim() === '') {
           currentPage.push(paragraph);
-          currentHeight += currentFontSize * lineHeight;
+          currentHeight += currentFontSize * currentLineHeight;
           return;
         }
 
@@ -229,49 +321,53 @@ export default {
       }
     };
 
-    const toggleBookmark = () => {
-      hasBookmark.value = !hasBookmark.value;
-      if (hasBookmark.value) {
-        saveBookmark();
-        message.success('已添加书签');
-      } else {
-        removeBookmark();
-        message.success('已删除书签');
+    /** 跳转到第一页 */
+    const goToFirstPage = () => {
+      if (currentPage.value > 1) {
+        currentPage.value = 1;
+        jumpPage.value = 1;
       }
     };
 
-    const saveBookmark = () => {
-      const bookmark = {
-        page: currentPage.value,
-        totalPages: totalPages.value,
-        title: props.title
-      };
-      localStorage.setItem(`bookmark_${props.title}`, JSON.stringify(bookmark));
-    };
-
-    const removeBookmark = () => {
-      localStorage.removeItem(`bookmark_${props.title}`);
-    };
-
-    const loadBookmark = () => {
-      const bookmarkStr = localStorage.getItem(`bookmark_${props.title}`);
-      if (bookmarkStr) {
-        try {
-          const bookmark = JSON.parse(bookmarkStr);
-          hasBookmark.value = true;
-          currentPage.value = bookmark.page;
-          jumpPage.value = bookmark.page;
-        } catch (error) {
-          console.error('加载书签失败:', error);
-        }
+    /** 跳转到最后一页 */
+    const goToLastPage = () => {
+      if (currentPage.value < totalPages.value && totalPages.value > 0) {
+        currentPage.value = totalPages.value;
+        jumpPage.value = totalPages.value;
       }
+    };
+
+    const onSettingChange = () => {
+      saveSettings();
+      nextTick(() => updateContent());
     };
 
     const onClose = () => {
+      savePosition();
       emit('close');
     };
 
+    /** 键盘翻页：左/上=上一页，右/下=下一页 */
+    const handleKeydown = (e) => {
+      if (!props.visible) return;
+      const tag = (e.target?.tagName || '').toUpperCase();
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+      if (['ArrowLeft', 'ArrowUp'].includes(e.key)) {
+        e.preventDefault();
+        prevPage();
+      } else if (['ArrowRight', 'ArrowDown'].includes(e.key)) {
+        e.preventDefault();
+        nextPage();
+      }
+    };
+
+    // 翻页时保存阅读位置
+    watch(currentPage, () => {
+      savePosition();
+    });
+
     onMounted(() => {
+      window.addEventListener('keydown', handleKeydown);
       if (readerContent.value) {
         resizeObserver.value = new ResizeObserver(() => {
           updateContent();
@@ -282,11 +378,11 @@ export default {
       window.addEventListener('resize', updateContent);
       nextTick(() => {
         updateContent();
-        loadBookmark();
       });
     });
 
     onUnmounted(() => {
+      window.removeEventListener('keydown', handleKeydown);
       if (resizeObserver.value) {
         resizeObserver.value.disconnect();
       }
@@ -298,13 +394,18 @@ export default {
       totalPages,
       currentPageContent,
       readerContent,
-      hasBookmark,
       jumpPage,
       isContentReady,
+      fontSize,
+      fontSizeOptions,
+      lineHeight,
+      lineHeightOptions,
+      onSettingChange,
       prevPage,
       nextPage,
+      goToFirstPage,
+      goToLastPage,
       handlePageJump,
-      toggleBookmark,
       onClose
     };
   }
@@ -320,21 +421,44 @@ export default {
 
 .reader-toolbar {
   padding: 10px;
-  border-bottom: 1px solid #f0f0f0;
+  border-top: 1px solid #f0f0f0;
   background: #fff;
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.page-jump {
-  margin-left: 10px;
+.reader-toolbar-row {
   display: flex;
   align-items: center;
 }
 
-.page-jump input {
-  width: 60px;
+/* 最后一页与上一页按钮之间的间距 */
+.reader-toolbar :deep(.btn-prev-spacing) {
+  margin-left: 12px;
+}
+
+.reader-settings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-jump {
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+}
+
+/* 页码输入框缩小宽度 */
+.page-jump :deep(.ant-input-number) {
+  width: 48px;
+  min-width: 48px;
+}
+.page-jump :deep(.ant-input-number-input) {
+  width: 100%;
+  padding: 0 4px;
   margin: 0 5px;
 }
 
@@ -342,7 +466,6 @@ export default {
   flex: 1;
   padding: 20px;
   overflow: hidden;
-  line-height: 1.6;
   background: #fff;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   margin: 20px;
@@ -350,7 +473,6 @@ export default {
   word-wrap: break-word;
   height: calc(100% - 40px);
   position: relative;
-  font-size: v-bind(fontSize + 'px');
 }
 
 .reader-content > div {
@@ -390,12 +512,12 @@ export default {
 
 .drawer-light-theme .reader-toolbar {
   background: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  border-top: 1px solid #f0f0f0;
 }
 
 .drawer-dark-theme .reader-toolbar {
   background: #1f1f1f;
-  border-bottom: 1px solid #303030;
+  border-top: 1px solid #303030;
 }
 
 .loading-text {
