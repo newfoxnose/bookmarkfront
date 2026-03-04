@@ -26,7 +26,15 @@ import {
   UserAddOutlined,
   LoginOutlined,
   CalendarOutlined,
-  PlusOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined,GroupOutlined
+  PlusOutlined,
+  GlobalOutlined,
+  ApiOutlined,
+  KeyOutlined,
+  FireOutlined,
+  ReadOutlined,
+  GroupOutlined,
+  RightOutlined,
+  DownOutlined,
 } from "@ant-design/icons-vue";
 import md5 from "js-md5";
 import VirtualKeyboard from "./components/VirtualKeyboard.vue";
@@ -35,6 +43,58 @@ import PageHeader from "./components/PageHeader.vue";
 import create from "@ant-design/icons-vue/lib/components/IconFont";
 // 在 App.vue 或父组件中提供刷新方法
 import { provide } from "vue";
+import Sortable from "sortablejs";
+
+// 导航项本地存储 key
+const NAV_ORDER_STORAGE_KEY = "nav_order_config";
+
+// 默认主导航项（可直接显示的菜单）
+const DEFAULT_NAV_MAIN = [
+  { key: "1", icon: "StarOutlined", label: "书签", path: "/home" },
+  { key: "2", icon: "FormOutlined", label: "随手记", path: "/note" },
+  { key: "3", icon: "DatabaseOutlined", label: "文件中转", path: "/file" },
+  { key: "5", icon: "ProfileOutlined", label: "笔记", path: "/blog" },
+  { key: "15", icon: "GlobalOutlined", label: "监控网站状态", path: "/monitoring" },
+  { key: "17", icon: "ApiOutlined", label: "数据抓取", path: "/fetch" },
+  { key: "20", icon: "ReadOutlined", label: "TXT电子书", path: "/txtreader" },
+  { key: "4", icon: "CommentOutlined", label: "CHATGPT", path: "/chat" },
+  { key: "18", icon: "KeyOutlined", label: "密码管理", path: "/pwdmemo" },
+  { key: "6", icon: "WifiOutlined", label: "RSS阅读器", path: "/rss" },
+  { key: "16", icon: "CalendarOutlined", label: "日历", path: "/calendar" },
+  { key: "19", icon: "FireOutlined", label: "热榜", path: "/hot" },
+  { key: "21", icon: "GroupOutlined", label: "词典管理", path: "/dict" },
+];
+
+// 默认「更多」的 key 集合，用于去重
+const DEFAULT_MORE_KEYS = new Set(["8", "9", "10", "11", "12", "13", "14"]);
+
+// 默认「更多」折叠菜单项
+const DEFAULT_NAV_MORE = [
+  { key: "8", icon: null, label: "管理目录", path: "/manage", showIf: null },
+  { key: "9", icon: null, label: "个人设置", path: "/profile", showIf: "useremail" },
+  { key: "10", icon: null, label: "清理七牛云无用图片", path: "/clear", showIf: "never" },
+  { key: "11", icon: null, label: "导入书签", path: "/upload", showIf: null },
+  { key: "12", icon: null, label: "导出书签至本地", path: "/export", showIf: null },
+  { key: "13", icon: null, label: "发送书签至邮箱", path: "/email", showIf: "useremail" },
+  { key: "14", icon: null, label: "退出", path: "/logout", showIf: null },
+];
+
+// 图标名称到组件的映射
+const ICON_MAP = {
+  StarOutlined,
+  FormOutlined,
+  DatabaseOutlined,
+  CommentOutlined,
+  ProfileOutlined,
+  WifiOutlined,
+  GlobalOutlined,
+  ApiOutlined,
+  KeyOutlined,
+  CalendarOutlined,
+  FireOutlined,
+  ReadOutlined,
+  GroupOutlined,
+};
 
 export default defineComponent({
   components: {
@@ -51,7 +111,9 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined,ReadOutlined,GroupOutlined,
+    SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined, ReadOutlined, GroupOutlined,
+    RightOutlined,
+    DownOutlined,
     VirtualKeyboard,
     PageLockOverlay,
     PageHeader,
@@ -78,6 +140,180 @@ export default defineComponent({
     const activeKey = ref(["xx"]);
     const badge_type = ref("#666");
     const breakpoint_active = ref(false);
+
+    // 可拖拽导航：主导航列表与「更多」列表，支持互相拖动
+    const navMain = ref([]);
+    const navMore = ref([]);
+    const navMainListRef = ref(null);
+    const navMoreListRef = ref(null);
+
+    /** 合并本地配置与默认配置：以本地顺序为准，缺失项用默认补齐 */
+    const mergeNavWithDefault = (saved, defaults) => {
+      const defaultMap = new Map(defaults.map((d) => [d.key, d]));
+      const result = [];
+      const seen = new Set();
+      for (const s of saved) {
+        const key = typeof s === "object" ? s.key : s;
+        const def = defaultMap.get(key);
+        if (def) {
+          result.push({ ...def });
+          seen.add(key);
+        } else {
+          result.push(typeof s === "object" ? s : { key, icon: null, label: String(key), path: "/" });
+        }
+      }
+      for (const d of defaults) {
+        if (!seen.has(d.key)) result.push({ ...d });
+      }
+      return result;
+    };
+
+    /** 从本地存储加载导航顺序，若无则使用默认配置（同步执行，确保首屏即有数据） */
+    const loadNavOrder = () => {
+      try {
+        const saved = localStorage.getItem(NAV_ORDER_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed.main) && Array.isArray(parsed.more)) {
+            let main = mergeNavWithDefault(parsed.main, DEFAULT_NAV_MAIN);
+            let more = mergeNavWithDefault(parsed.more, DEFAULT_NAV_MORE);
+            const moreKeys = new Set(more.map((it) => it.key));
+            navMain.value = main.filter((it) => !moreKeys.has(it.key));
+            const mainKeys = new Set(navMain.value.map((it) => it.key));
+            navMore.value = more.filter((it) => !mainKeys.has(it.key));
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("加载导航配置失败，使用默认顺序", e);
+      }
+      navMain.value = [...DEFAULT_NAV_MAIN];
+      navMore.value = [...DEFAULT_NAV_MORE];
+    };
+
+    // 首屏即加载导航配置，避免菜单空白
+    loadNavOrder();
+
+    /** 保存导航顺序到本地存储 */
+    const saveNavOrder = () => {
+      try {
+        const config = {
+          main: navMain.value.map((it) => ({ key: it.key, icon: it.icon, label: it.label, path: it.path })),
+          more: navMore.value.map((it) => ({ key: it.key, icon: it.icon, label: it.label, path: it.path, showIf: it.showIf })),
+        };
+        localStorage.setItem(NAV_ORDER_STORAGE_KEY, JSON.stringify(config));
+      } catch (e) {
+        console.warn("保存导航配置失败", e);
+      }
+    };
+
+    /** 导航顺序变化时保存 */
+    watch([navMain, navMore], () => saveNavOrder(), { deep: true });
+
+    let sortableMainInst = null;
+    let sortableMoreInst = null;
+
+    /** 从 DOM 同步顺序回 navMain/navMore */
+    const syncNavFromDom = () => {
+      const rootUl = navMainListRef.value;
+      if (!rootUl) return;
+      const pathToItem = new Map();
+      for (const it of [...navMain.value, ...navMore.value]) pathToItem.set(it.path, it);
+      const mainItems = [];
+      const moreItems = [];
+      const getItemFromLi = (li) => {
+        const link = li.querySelector("a[href]");
+        if (!link) return null;
+        const path = (link.getAttribute("href") || "").replace(/^#/, "").split("?")[0];
+        return pathToItem.get(path) || [...pathToItem.values()].find((x) => path === x.path || path.endsWith("/" + x.path));
+      };
+      for (const li of Array.from(rootUl.children).filter((n) => n.tagName === "LI")) {
+        const subUl = li.querySelector("ul.ant-menu-sub");
+        if (subUl) {
+          for (const subLi of Array.from(subUl.children).filter((n) => n.tagName === "LI")) {
+            const it = getItemFromLi(subLi);
+            if (it) moreItems.push(it);
+          }
+        } else {
+          const it = getItemFromLi(li);
+          if (it) mainItems.push(it);
+        }
+      }
+      // 去重：每个 key 只能在一个列表中，默认「更多」项优先保留在 more
+      const moreKeys = new Set(moreItems.map((it) => it.key));
+      navMain.value = mainItems.filter((it) => !moreKeys.has(it.key));
+      const mainKeys = new Set(navMain.value.map((it) => it.key));
+      navMore.value = moreItems.filter((it) => !mainKeys.has(it.key));
+    };
+
+    /** 初始化 Sortable */
+    const initSortable = () => {
+      if (sortableMainInst) {
+        sortableMainInst.destroy();
+        sortableMainInst = null;
+      }
+      if (sortableMoreInst) {
+        sortableMoreInst.destroy();
+        sortableMoreInst = null;
+      }
+      const rootUl = navMainListRef.value;
+      if (!rootUl) return;
+      sortableMainInst = Sortable.create(rootUl, {
+        group: "nav",
+        draggable: "li.ant-menu-item",
+        animation: 150,
+        ghostClass: "nav-ghost",
+        chosenClass: "nav-chosen",
+        onEnd: () => {
+          syncNavFromDom();
+          saveNavOrder();
+        },
+      });
+      const moreUl = navMoreListRef.value;
+      if (moreUl) {
+        sortableMoreInst = Sortable.create(moreUl, {
+          group: "nav",
+          animation: 150,
+          ghostClass: "nav-ghost",
+          chosenClass: "nav-chosen",
+          onEnd: () => {
+            syncNavFromDom();
+            saveNavOrder();
+          },
+        });
+      }
+    };
+
+    const isMoreOpen = ref(Boolean(state.openKeys && state.openKeys.includes("sub1")));
+    watch(
+      () => route.path,
+      (path) => {
+        const main = navMain.value.find((it) => it.path === path);
+        const more = navMore.value.find((it) => it.path === path);
+        const key = main?.key || more?.key;
+        if (key) state.selectedKeys = [key];
+      },
+      { immediate: true }
+    );
+    watch(
+      () => state.openKeys,
+      (val) => {
+        isMoreOpen.value = Array.isArray(val) && val.includes("sub1");
+        nextTick(() => initSortable());
+      },
+      { deep: true }
+    );
+    const toggleMoreOpen = () => {
+      isMoreOpen.value = !isMoreOpen.value;
+      if (isMoreOpen.value) {
+        if (!state.openKeys) state.openKeys = [];
+        if (!state.openKeys.includes("sub1")) state.openKeys = [...state.openKeys, "sub1"];
+      } else {
+        state.openKeys = (state.openKeys || []).filter((k) => k !== "sub1");
+      }
+      $cookies.set("openkey", state.openKeys?.[0] || "", "720h");
+    };
+
     watch(state, (val) => {
       if (val.collapsed == true) {
         $cookies.set("collapsed", 1, "720h");
@@ -146,8 +382,8 @@ export default defineComponent({
           }
         });
       }
+      nextTick(() => initSortable());
     });
-
     const home_stream_ajax = (folder_index) => {
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("timestamp", new Date().getTime());
@@ -700,6 +936,15 @@ export default defineComponent({
       verifyAndUnlock,
       route,
       refreshKey,
+      // 可拖拽导航
+      navMain,
+      navMore,
+      ICON_MAP,
+      saveNavOrder,
+      isMoreOpen,
+      toggleMoreOpen,
+      navMainListRef,
+      navMoreListRef,
     };
   },
 
@@ -979,105 +1224,47 @@ export default defineComponent({
             </a-collapse-panel>
 
           </a-collapse>
-          <a-menu v-model:selectedKeys="selectedKeys" mode="inline" :theme="theme" v-model:openKeys="openKeys">
-            <a-menu-item key="1" @click="handleClick">
-              <star-outlined />
-              <span>
-                <RouterLink to="/home" style="padding-left: 8px">书签</RouterLink>
-              </span>
-            </a-menu-item>
-            <a-menu-item key="2" @click="handleClick">
-              <form-outlined /><span>
-                <RouterLink to="/note" style="padding-left: 8px">随手记</RouterLink>
-              </span>
-            </a-menu-item>
-            <a-menu-item key="3" @click="handleClick">
-              <database-outlined /><span>
-                <RouterLink to="/file" style="padding-left: 8px">文件中转</RouterLink>
-              </span>
-            </a-menu-item>
-
-            <a-menu-item key="5" @click="handleClick">
-              <profile-outlined /><span>
-                <RouterLink to="/blog" style="padding-left: 8px">笔记</RouterLink>
-              </span>
-            </a-menu-item>
-            <a-menu-item key="15" @click="handleClick">
-              <global-outlined /><span>
-                <RouterLink to="/monitoring" style="padding-left: 8px">监控网站状态</RouterLink>
-              </span>
-            </a-menu-item>
-            <a-menu-item key="17" @click="handleClick">
-              <api-outlined /><span>
-                <RouterLink to="/fetch" style="padding-left: 8px">数据抓取</RouterLink>
-              </span>
-            </a-menu-item>
-            <a-menu-item key="20" @click="handleClick">
-              <read-outlined /><span>
-                <RouterLink to="/txtreader" style="padding-left: 8px">TXT电子书</RouterLink>
-              </span>
-            </a-menu-item>
-         
-              <a-menu-item key="4" @click="handleClick">
-                <comment-outlined /><span>
-                  <RouterLink to="/chat" style="padding-left: 8px">CHATGPT</RouterLink>
-                </span>
-              </a-menu-item>
-              <a-menu-item key="18" @click="handleClick">
-                <key-outlined /><span>
-                  <RouterLink to="/pwdmemo" style="padding-left: 8px">密码管理</RouterLink>
-                </span>
-              </a-menu-item>
-              <a-menu-item key="6" @click="handleClick">
-                <wifi-outlined /><span>
-                  <RouterLink to="/rss" style="padding-left: 8px">RSS阅读器</RouterLink>
-                </span>
-              </a-menu-item>
-              <a-menu-item key="16" @click="handleClick">
-                <calendar-outlined /><span>
-                  <RouterLink to="/calendar" style="padding-left: 8px">日历</RouterLink>
-                </span>
-              </a-menu-item>
-              <a-menu-item key="19" @click="handleClick">
-                <fire-outlined /><span>
-                  <RouterLink to="/hot" style="padding-left: 8px">热榜</RouterLink>
-                </span>
-              </a-menu-item>
-              <a-menu-item key="21" @click="handleClick">
-                <group-outlined /><span>
-                  <RouterLink to="/dict" style="padding-left: 8px">词典管理</RouterLink>
-                </span>
-              </a-menu-item>
-              <a-sub-menu key="sub1">
-              <template #title>
-                <span>
-                  <more-outlined />
-                  <span>更多</span>
-                </span>
-              </template>
-              <a-menu-item key="8" @click="handleClick">
-                <RouterLink to="/manage">管理目录</RouterLink>
-              </a-menu-item>
-              <a-menu-item key="9" v-if="useremail != 'test@test.com'" @click="handleClick">
-                <RouterLink to="/profile">个人设置</RouterLink>
-              </a-menu-item>
-              <a-menu-item key="10" v-if="1 == 2" @click="handleClick">
-                <RouterLink to="/clear">清理七牛云无用图片</RouterLink>
-              </a-menu-item>
-              <a-menu-item key="11" @click="handleClick">
-                <RouterLink to="/upload">导入书签</RouterLink>
-              </a-menu-item>
-              <a-menu-item key="12" @click="handleClick">
-                <RouterLink to="/export">导出书签至本地</RouterLink>
-              </a-menu-item>
-              <a-menu-item key="13" v-if="useremail != 'test@test.com'" @click="handleClick">
-                <RouterLink to="/email">发送书签至邮箱</RouterLink>
-              </a-menu-item>
-              <a-menu-item key="14">
-                <RouterLink to="/logout">退出</RouterLink>
-              </a-menu-item>
-            </a-sub-menu>
-          </a-menu>
+          <!-- 自定义可拖拽菜单 -->
+          <ul
+            ref="navMainListRef"
+            class="nav-menu-custom ant-menu ant-menu-inline ant-menu-root"
+            :class="theme === 'dark' ? 'ant-menu-dark' : 'ant-menu-light'"
+          >
+            <li
+              v-for="element in navMain"
+              :key="element.key"
+              class="ant-menu-item nav-draggable-item"
+              :class="{ 'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key }"
+              @click="handleClick"
+            >
+              <span class="nav-drag-handle" title="拖动调整顺序">⋮⋮</span>
+              <component v-if="element.icon && ICON_MAP[element.icon]" :is="ICON_MAP[element.icon]" />
+              <RouterLink :to="element.path" style="padding-left: 8px">{{ element.label }}</RouterLink>
+            </li>
+            <li
+              class="ant-menu-submenu"
+              :class="{ 'ant-menu-submenu-open': isMoreOpen }"
+            >
+              <div class="ant-menu-submenu-title" @click="toggleMoreOpen">
+                <right-outlined v-if="!isMoreOpen" class="nav-submenu-arrow" />
+                <down-outlined v-else class="nav-submenu-arrow" />
+                <span>更多</span>
+              </div>
+              <ul ref="navMoreListRef" v-show="isMoreOpen" class="ant-menu-sub">
+                <li
+                  v-for="element in navMore"
+                  v-show="element.showIf === 'never' ? false : (element.showIf === 'useremail' ? useremail != 'test@test.com' : true)"
+                  :key="element.key"
+                  class="ant-menu-item nav-draggable-item"
+                  :class="{ 'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key }"
+                  @click="handleClick"
+                >
+                  <span class="nav-drag-handle" title="拖动调整顺序">⋮⋮</span>
+                  <RouterLink :to="element.path">{{ element.label }}</RouterLink>
+                </li>
+              </ul>
+            </li>
+          </ul>
           <div style="text-align: center; padding-top: 30px">
             <a-switch :checked="theme == 'dark'" checked-children="Dark" un-checked-children="Light"
               @change="changeTheme" />
@@ -1274,6 +1461,73 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.nav-menu-custom {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-right: 1px solid rgba(5, 5, 5, 0.06);
+}
+.nav-menu-custom .ant-menu-item {
+  padding: 0 16px;
+  height: 40px;
+  line-height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.nav-menu-custom.ant-menu-dark .ant-menu-item {
+  color: rgba(255, 255, 255, 0.65);
+}
+.nav-menu-custom.ant-menu-dark .ant-menu-item:hover,
+.nav-menu-custom.ant-menu-dark .ant-menu-item-selected {
+  color: #fff;
+}
+.nav-menu-custom.ant-menu-light .ant-menu-item {
+  color: rgba(0, 0, 0, 0.88);
+}
+.nav-menu-custom.ant-menu-light .ant-menu-item:hover,
+.nav-menu-custom.ant-menu-light .ant-menu-item-selected {
+  color: #1677ff;
+  background: rgba(0, 0, 0, 0.04);
+}
+/* 更多子菜单内的激活状态 */
+.nav-menu-custom.ant-menu-dark .ant-menu-sub .ant-menu-item-selected {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+.nav-menu-custom.ant-menu-light .ant-menu-sub .ant-menu-item-selected {
+  color: #1677ff;
+  background: rgba(0, 0, 0, 0.04);
+}
+.nav-draggable-item {
+  cursor: grab;
+}
+.nav-draggable-item:active {
+  cursor: grabbing;
+}
+.nav-submenu-arrow {
+  font-size: 10px;
+  margin-right: 8px;
+}
+.nav-drag-handle {
+  cursor: grab;
+  margin-right: 4px;
+  opacity: 0.5;
+  user-select: none;
+}
+.nav-drag-handle:hover {
+  opacity: 1;
+}
+.nav-drag-handle:active {
+  cursor: grabbing;
+}
+.nav-ghost {
+  opacity: 0.4;
+}
+.nav-chosen {
+  background: rgba(24, 144, 255, 0.08);
+}
+
 .search-div {
   display: flex;
   flex-direction: column;
