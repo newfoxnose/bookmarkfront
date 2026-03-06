@@ -23,12 +23,23 @@
   </div>
   <br>
   <div>
-    <div v-for=" item  in  fileitems " style="margin-bottom:5px;">
+    <div v-for=" item  in  fileitems " :key="item.id" style="margin-bottom:16px;">
       <span style="margin-left:5px;">
         {{ item.dict_name }}
       </span>
       <span style="margin-left:20px;">(记录数：{{ item.words_amount }} , 创建时间：{{ item.createtime }})</span>
       <a style="margin-left:20px;" @click="deletefile(item.id)">删除</a>
+      <!-- 词典下方展示随机单词卡片，data.word 为单词对象数组 -->
+      <a-card v-if="randomWordsMap[item.id]?.word?.[0]" style="margin-top:8px; margin-left:5px; max-width:400px;" size="small" :title="'随机单词'">
+        <template #extra>
+          <a @click="fetchRandomWord(item.id)">换一个</a>
+        </template>
+        <p><strong>{{ randomWordsMap[item.id].word[0].word }}</strong> <span v-if="randomWordsMap[item.id].word[0].ipa" style="color:#999; font-size:12px;">{{ randomWordsMap[item.id].word[0].ipa }}</span></p>
+        <p style="margin:0; color:#666; white-space:pre-wrap;">{{ randomWordsMap[item.id].word[0].meaning || '-' }}</p>
+      </a-card>
+      <a-card v-else-if="randomWordLoading[item.id]" style="margin-top:8px; margin-left:5px; max-width:400px;" size="small">
+        <a-spin size="small" /> 加载中...
+      </a-card>
     </div>
   </div>
 
@@ -263,6 +274,10 @@ export default {
     const fileitems = ref([])
     const space = ref('');
     const upload_url = ref(proxy.$remoteDomain+"/ajax/import_dict_ajax")
+    // 每个词典的随机单词缓存，key为词典id
+    const randomWordsMap = ref({})
+    // 随机单词加载状态
+    const randomWordLoading = ref({})
 
     const visible = ref(false);
     const articletitle = ref('');
@@ -329,7 +344,8 @@ export default {
         if (res.data.code=="200"){
           fileitems.value = res.data.data.documents
           space.value = res.data.data.space
-        } 
+          fetchAllRandomWords();
+        }
         else{
           message.error(res.data.msg);
         }
@@ -350,6 +366,7 @@ export default {
           message.success(`${info.file.name} 上传成功.`);
           fileitems.value = info.file.response.data.documents;
           space.value = info.file.response.data.space;
+          fetchAllRandomWords();
         }
         else{
           message.error(info.file.response.msg);
@@ -366,6 +383,42 @@ export default {
       params.append("id", id);
       proxy.$http.post('/ajax/delete_dict_ajax/', params).then(res => {
         fileitems.value = res.data.data.documents
+        // 删除后移除该词典的随机单词缓存
+        const newMap = { ...randomWordsMap.value };
+        delete newMap[id];
+        randomWordsMap.value = newMap;
+      });
+    };
+
+    /**
+     * 获取指定词典的随机单词
+     * @param {string|number} dictId - 词典id
+     */
+    const fetchRandomWord = (dictId) => {
+      randomWordLoading.value = { ...randomWordLoading.value, [dictId]: true };
+      const params = new URLSearchParams();
+      params.append("token", $cookies.get('token'));
+      params.append("timestamp", new Date().getTime());
+      params.append("dict_id", dictId);
+      proxy.$http.post('/ajax/random_word_ajax/', params).then(res => {
+        randomWordLoading.value = { ...randomWordLoading.value, [dictId]: false };
+        // data.word 为单词对象数组，code 可能为数字或字符串
+        if ((res.data.code === 200 || res.data.code === '200') && res.data.data?.word?.length) {
+          randomWordsMap.value = { ...randomWordsMap.value, [dictId]: res.data.data };
+        }
+      }).catch(() => {
+        randomWordLoading.value = { ...randomWordLoading.value, [dictId]: false };
+      });
+    };
+
+    /**
+     * 为所有词典获取随机单词
+     */
+    const fetchAllRandomWords = () => {
+      fileitems.value.forEach(item => {
+        if (item.words_amount > 0) {
+          fetchRandomWord(item.id);
+        }
       });
     };
 
@@ -376,6 +429,9 @@ export default {
       file_key,
       fileitems,
       space,
+      randomWordsMap,
+      randomWordLoading,
+      fetchRandomWord,
       handleBeforeUpload,
       handleChange,
       deletefile,
