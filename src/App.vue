@@ -8,7 +8,7 @@ import CryptoJS from 'crypto-js';
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 dayjs.locale("zh-cn");
-import { RouterLink, RouterView, useRoute } from "vue-router";
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { message, Modal } from "ant-design-vue";
 import { defineComponent, ref, watch, nextTick } from "vue";
 import { onMounted, onUnmounted, reactive, getCurrentInstance, toRefs } from "vue";
@@ -119,7 +119,8 @@ export default defineComponent({
     PageHeader,
   },
   setup() {
-    const route = useRoute();  // 当前路由，用于判断是否缓存
+    const route = useRoute();
+    const router = useRouter();
     const refreshKey = ref(0); // 刷新令牌：递增后强制当前页面重新加载（绕过 keep-alive 缓存）
     const items = ref([]);    // 书签列表
     const loadingdone = ref(false);   //书签列表加载完成
@@ -221,10 +222,14 @@ export default defineComponent({
       for (const it of [...navMain.value, ...navMore.value]) pathToItem.set(it.path, it);
       const mainItems = [];
       const moreItems = [];
+      // 支持 data-nav-path（当前 span 点击）或 a[href]（兼容 RouterLink）
       const getItemFromLi = (li) => {
-        const link = li.querySelector("a[href]");
-        if (!link) return null;
-        const path = (link.getAttribute("href") || "").replace(/^#/, "").split("?")[0];
+        const content = li.querySelector("[data-nav-path]") || li.querySelector("a[href]");
+        if (!content) return null;
+        const path =
+          (content.getAttribute("data-nav-path") || content.getAttribute("href") || "")
+            .replace(/^#/, "")
+            .split("?")[0];
         return pathToItem.get(path) || [...pathToItem.values()].find((x) => path === x.path || path.endsWith("/" + x.path));
       };
       for (const li of Array.from(rootUl.children).filter((n) => n.tagName === "LI")) {
@@ -261,9 +266,12 @@ export default defineComponent({
       sortableMainInst = Sortable.create(rootUl, {
         group: "nav",
         draggable: "li.ant-menu-item",
+        handle: ".nav-drag-handle",
         animation: 150,
         ghostClass: "nav-ghost",
         chosenClass: "nav-chosen",
+        delay: 150,
+        delayOnTouchOnly: true,
         onEnd: () => {
           syncNavFromDom();
           saveNavOrder();
@@ -273,9 +281,12 @@ export default defineComponent({
       if (moreUl) {
         sortableMoreInst = Sortable.create(moreUl, {
           group: "nav",
+          handle: ".nav-drag-handle",
           animation: 150,
           ghostClass: "nav-ghost",
           chosenClass: "nav-chosen",
+          delay: 150,
+          delayOnTouchOnly: true,
           onEnd: () => {
             syncNavFromDom();
             saveNavOrder();
@@ -481,10 +492,14 @@ export default defineComponent({
       breakpoint_active.value = broken;
     };
     const handleClick = () => {
-      console.log("ddd");
       if (breakpoint_active.value == true) {
         state.collapsed = true;
       }
+    };
+    /** 点击菜单项：导航 + 收起侧栏（移动端） */
+    const navTo = (path) => {
+      handleClick();
+      router.push(path);
     };
     //弹出编辑书签抽屉
     const drawerclass = ref("");
@@ -888,6 +903,7 @@ export default defineComponent({
       badge_type,
       useremail,
       handleClick,
+      navTo,
       onBreakpoint,
       breakpoint_active,
       showDrawer,
@@ -1235,11 +1251,13 @@ export default defineComponent({
               :key="element.key"
               class="ant-menu-item nav-draggable-item"
               :class="{ 'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key }"
-              @click="handleClick"
+              @click="navTo(element.path)"
             >
-              <span class="nav-drag-handle" title="拖动调整顺序">⋮⋮</span>
-              <component v-if="element.icon && ICON_MAP[element.icon]" :is="ICON_MAP[element.icon]" />
-              <RouterLink :to="element.path" style="padding-left: 8px">{{ element.label }}</RouterLink>
+              <span class="nav-drag-handle" title="拖动此处调整顺序" @click.stop>⋮⋮</span>
+              <span class="nav-menu-item-content" :data-nav-path="element.path">
+                <component v-if="element.icon && ICON_MAP[element.icon]" :is="ICON_MAP[element.icon]" />
+                <span class="nav-menu-label">{{ element.label }}</span>
+              </span>
             </li>
             <li
               class="ant-menu-submenu"
@@ -1257,10 +1275,12 @@ export default defineComponent({
                   :key="element.key"
                   class="ant-menu-item nav-draggable-item"
                   :class="{ 'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key }"
-                  @click="handleClick"
+                  @click="navTo(element.path)"
                 >
-                  <span class="nav-drag-handle" title="拖动调整顺序">⋮⋮</span>
-                  <RouterLink :to="element.path">{{ element.label }}</RouterLink>
+                  <span class="nav-drag-handle" title="拖动此处调整顺序" @click.stop>⋮⋮</span>
+                  <span class="nav-menu-item-content" :data-nav-path="element.path">
+                    <span class="nav-menu-label">{{ element.label }}</span>
+                  </span>
                 </li>
               </ul>
             </li>
@@ -1278,7 +1298,7 @@ export default defineComponent({
             />
           </div>
         </a-layout-sider>
-        <a-layout-content :class="[contenttheme, { 'has-page-header': route.meta?.title }]" style="padding-bottom: 80px">
+        <a-layout-content :class="[contenttheme, { 'has-page-header': route.meta?.title }]" style="padding-bottom: 80px;padding-right:10px;">
           <!-- 页面标题栏：标题在左、刷新图标在右，仅对配置了 meta.title 的路由显示 -->
           <PageHeader v-if="route.meta?.title" :title="route.meta.title" />
           <!-- 根据路由 meta.keepAlive 决定是否缓存；key 含 refreshKey 以便点击刷新时强制重新挂载 -->
@@ -1303,7 +1323,8 @@ export default defineComponent({
     <virtual-keyboard
       v-model="unlockCode"
       :visible="showUnlockKeyboard"
-      title="输入私有口令解锁页面"
+      :dark="contenttheme && contenttheme.includes('dark')"
+      title="解锁页面"
       @confirm="(v) => verifyAndUnlock(v || unlockCode)"
       @close="closeUnlockKeyboard"
     />
@@ -1474,6 +1495,29 @@ export default defineComponent({
   cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 0;
+  overflow: visible;
+  position: relative;
+}
+/* 菜单内容区：整个区域可点击 */
+.nav-menu-item-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  position: relative;
+  z-index: 1;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  align-self: stretch;
+}
+.nav-menu-item-content:hover {
+  color: inherit;
+}
+.nav-menu-label {
+  padding-left: 8px;
 }
 .nav-menu-custom.ant-menu-dark .ant-menu-item {
   color: rgba(255, 255, 255, 0.65);
@@ -1499,27 +1543,33 @@ export default defineComponent({
   color: #1677ff;
   background: rgba(0, 0, 0, 0.04);
 }
-.nav-draggable-item {
-  cursor: grab;
-}
-.nav-draggable-item:active {
-  cursor: grabbing;
-}
 .nav-submenu-arrow {
   font-size: 10px;
   margin-right: 8px;
 }
+.nav-draggable-item{
+  padding-left: 0 !important;
+}
+/* 拖动手柄：提升层级避免被 ant-menu-item 覆盖，确保可接收鼠标事件 */
 .nav-drag-handle {
-  cursor: grab;
-  margin-right: 4px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  cursor: move;
+  padding-right: 10px;
+  padding-left: 10px;
   opacity: 0.5;
   user-select: none;
+  pointer-events: auto;
+  -webkit-user-select: none;
 }
 .nav-drag-handle:hover {
   opacity: 1;
+  cursor: move;
+  background: rgba(0, 0, 0, 0.06);
 }
-.nav-drag-handle:active {
-  cursor: grabbing;
+.nav-menu-custom.ant-menu-dark .nav-drag-handle:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 .nav-ghost {
   opacity: 0.4;

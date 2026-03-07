@@ -763,9 +763,10 @@ export default defineComponent({
   </a-drawer>
 
   <!-- 虚拟数字键盘 -->
-  <VirtualKeyboard 
+  <VirtualKeyboard
     v-model="privateCode"
     :visible="showKeyboard"
+    :dark="$cookies.get('theme') === 'dark'"
     @confirm="confirmKeyboardInput"
     @close="closeKeyboard"
   />

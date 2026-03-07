@@ -214,9 +214,10 @@ export default defineComponent({
   </a-form>
 
   <!-- 虚拟数字键盘 -->
-  <VirtualKeyboard 
+  <VirtualKeyboard
     v-model="formState.private_code"
     :visible="showKeyboard"
+    :dark="$cookies.get('theme') === 'dark'"
     @confirm="confirmKeyboardInput"
     @close="closeKeyboard"
   />

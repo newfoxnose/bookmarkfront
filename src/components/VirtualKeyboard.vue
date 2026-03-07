@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="virtual-keyboard-overlay" @click="handleOverlayClick">
-    <div class="virtual-keyboard" @click.stop>
+    <div class="virtual-keyboard" :class="{ 'keyboard-dark': dark }" @click.stop>
       <div class="keyboard-header">
         <span class="keyboard-title">{{ title }}</span>
         <button class="close-btn" @click="closeKeyboard">×</button>
@@ -53,6 +53,11 @@ export default defineComponent({
     title: {
       type: String,
       default: '输入私有内容口令'
+    },
+    // 是否使用黑暗配色
+    dark: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:modelValue', 'confirm', 'close'],
@@ -277,6 +282,84 @@ export default defineComponent({
 }
 
 .confirm-key:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* 黑暗配色 */
+.virtual-keyboard.keyboard-dark {
+  background: #1e1e1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.keyboard-dark .keyboard-header {
+  border-bottom-color: #404040;
+}
+
+.keyboard-dark .keyboard-title {
+  color: #e0e0e0;
+}
+
+.keyboard-dark .close-btn {
+  color: #999;
+}
+
+.keyboard-dark .close-btn:hover {
+  background-color: #333;
+}
+
+.keyboard-dark .display-input {
+  border-color: #404040;
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.keyboard-dark .display-input::placeholder {
+  color: #666;
+}
+
+.keyboard-dark .display-input:focus {
+  border-color: #1890ff;
+}
+
+.keyboard-dark .clear-btn {
+  color: #1890ff;
+}
+
+.keyboard-dark .clear-btn:hover {
+  background-color: rgba(24, 144, 255, 0.15);
+}
+
+.keyboard-dark .keyboard-key {
+  border-color: #404040;
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.keyboard-dark .keyboard-key:hover {
+  background-color: #404040;
+  border-color: #1890ff;
+}
+
+.keyboard-dark .keyboard-key:active {
+  background-color: rgba(24, 144, 255, 0.2);
+}
+
+.keyboard-dark .number-key {
+  color: #e0e0e0;
+}
+
+.keyboard-dark .action-key {
+  color: #b0b0b0;
+}
+
+.keyboard-dark .confirm-key {
+  background-color: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+}
+
+.keyboard-dark .confirm-key:hover {
   background-color: #40a9ff;
   border-color: #40a9ff;
 }

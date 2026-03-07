@@ -18,31 +18,59 @@
         每次只能上传一个文件，且文件大小不能超过20M，支持如下格式pdf|xls|xlsx|doc|docx|ppt|pptx|zip|rar|7z|txt|jpg|png|gif|webp|bmp|jpeg|mp3|mp4|wav|epub，空间容量100MB。
       </p>
     </a-upload-dragger>
-    已使用空间：{{ space }}
+    <div class="space-info">已使用空间：<strong>{{ space }}</strong> / 100MB</div>
   </div>
   <br>
-  <div>
-    <div v-for=" item  in  fileitems " style="margin-bottom:5px;">
-      <span class="ext">{{ lcase_ext= item.key.split('.').pop().toLowerCase() }}</span>
-      <a-image v-if="['jpg','jpeg','png','gif','bmp','webp'].indexOf(lcase_ext) !== -1" :href=" item.path  + item.key " style="max-height:50px;margin-left:5px;"
-        :src=" item.path + item.key "
-      />
-      <a v-else target="_blank" :href=" item.path + item.key " style="margin-left:5px;">
-        {{ item.displayname }}
-      </a>
-      <span style="margin-left:20px;">({{ $func.formatterSizeUnit(item.fsize) }} , {{ $func.timeFormat(item.putTime)
-        }})</span>
-      <a v-if="['xls','xlsx','doc','docx','ppt','pptx'].indexOf(lcase_ext) !== -1" target="_blank" :href="'https://view.officeapps.live.com/op/view.aspx?src='+ encodeURIComponent(item.path  + item.key) " style="margin-left:5px;">
-        在线查看
-      </a>
-      <a v-else-if="['txt'].indexOf(lcase_ext) !== -1" @click="readBook(item.displayname,item.key, lcase_ext)" style="margin-left:5px; cursor: pointer;">
-        在线阅读
-      </a>
-      <a v-else-if="['epub'].indexOf(lcase_ext) !== -1" @click="readEpubBook(item.displayname,item.path + item.key, lcase_ext)" style="margin-left:5px; cursor: pointer;">
-        在线阅读
-      </a>
-      <a style="margin-left:20px;" @click="deletefile(item.key)">删除</a>
-    </div>
+  <!-- 文件列表：卡片式布局 -->
+  <div class="file-list">
+    <a-row :gutter="[16, 16]">
+      <a-col v-for="item in fileitems" :key="item.key" :xs="24" :sm="12" :md="12" :lg="12">
+        <div class="file-item">
+          <!-- 左侧：扩展名标签 / 图片预览 -->
+          <div class="file-item-preview">
+            <a-image
+              v-if="['jpg','jpeg','png','gif','bmp','webp'].indexOf((item.key.split('.').pop()||'').toLowerCase()) !== -1"
+              :href="item.path + item.key"
+              class="file-thumb"
+              :src="item.path + item.key"
+            />
+            <span v-else class="file-ext" :class="'ext-' + ((item.key.split('.').pop()||'').toLowerCase())">
+              {{ (item.key.split('.').pop() || 'file').toLowerCase() }}
+            </span>
+          </div>
+          <!-- 右侧：文件名与操作 -->
+          <div class="file-item-body">
+            <div class="file-item-name">
+              <a target="_blank" :href="item.path + item.key" class="file-link">{{ item.displayname }}</a>
+            </div>
+            <div class="file-item-meta">
+              {{ $func.formatterSizeUnit(item.fsize) }} · {{ $func.timeFormat(item.putTime) }}
+            </div>
+            <div class="file-item-actions">
+              <div class="file-item-actions-left">
+                <a v-if="['xls','xlsx','doc','docx','ppt','pptx'].indexOf((item.key.split('.').pop()||'').toLowerCase()) !== -1"
+                  target="_blank"
+                  :href="'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(item.path + item.key)"
+                  class="file-action"
+                >在线查看</a>
+                <a v-else-if="['txt'].indexOf((item.key.split('.').pop()||'').toLowerCase()) !== -1"
+                  @click="readBook(item.displayname, item.key, (item.key.split('.').pop()||'').toLowerCase())"
+                  class="file-action"
+                >在线阅读</a>
+                <a v-else-if="['epub'].indexOf((item.key.split('.').pop()||'').toLowerCase()) !== -1"
+                  @click="readEpubBook(item.displayname, item.path + item.key, (item.key.split('.').pop()||'').toLowerCase())"
+                  class="file-action"
+                >在线阅读</a>
+                <a target="_blank" :href="item.path + item.key" class="file-action">下载</a>
+              </div>
+              <a class="file-action file-action-danger file-action-delete" @click="showConfirmDelete(item.key, item.displayname)">删除</a>
+            </div>
+          </div>
+        </div>
+      </a-col>
+    </a-row>
+    <!-- 空状态 -->
+    <a-empty v-if="fileitems.length === 0 && loadingdone" description="暂无文件，上传后即可在此查看" />
   </div>
 
   <!-- 使用TXT阅读器组件 -->
@@ -63,18 +91,220 @@
   />
 </template>
 <style scoped>
-.ext {
-  text-align: center;
-  display: inline-block;
-  width: 40px;
-  margin-right: 3px;
-  color: coral;
-  font-weight: bold;
-  border-style: solid;
-  border-width: thin;
-  border-color: crimson;
-  padding: 2px;
-  margin: 3px;
+/* 已使用空间提示 */
+.space-info {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.space-info strong {
+  color: #1e293b;
+}
+
+.content-dark-theme .space-info {
+  color: #94a3b8;
+}
+
+.content-dark-theme .space-info strong {
+  color: #e2e8f0;
+}
+
+/* 文件列表区域 */
+.file-list {
+}
+
+/* 单个文件卡片 */
+.file-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 4px 0 0 4px;
+}
+
+.file-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+/* 左侧预览区：扩展名标签 / 图片缩略图 */
+.file-item-preview {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.file-thumb {
+  max-width: 64px !important;
+  max-height: 64px !important;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.file-ext {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 6px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* 按扩展名区分颜色 */
+.file-ext.ext-pdf { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+.file-ext.ext-doc, .file-ext.ext-docx { color: #2563eb; border-color: #bfdbfe; background: #eff6ff; }
+.file-ext.ext-xls, .file-ext.ext-xlsx { color: #16a34a; border-color: #bbf7d0; background: #f0fdf4; }
+.file-ext.ext-ppt, .file-ext.ext-pptx { color: #ea580c; border-color: #fed7aa; background: #fff7ed; }
+.file-ext.ext-txt { color: #475569; border-color: #cbd5e1; background: #f8fafc; }
+.file-ext.ext-epub { color: #7c3aed; border-color: #ddd6fe; background: #f5f3ff; }
+.file-ext.ext-zip, .file-ext.ext-rar, .file-ext.ext-7z { color: #0891b2; border-color: #a5f3fc; background: #ecfeff; }
+.file-ext.ext-mp3, .file-ext.ext-mp4, .file-ext.ext-wav { color: #be185d; border-color: #fbcfe8; background: #fdf2f8; }
+
+/* 右侧内容区 */
+.file-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-item-name {
+  margin-bottom: 4px;
+}
+
+.file-link {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1e293b;
+  text-decoration: none;
+  transition: color 0.2s;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-link:hover {
+  color: #3b82f6;
+}
+
+.file-item-meta {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+/* 操作按钮组：左侧查看/下载，右侧删除 */
+.file-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.file-item-actions-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.file-action-delete {
+  margin-left: auto;
+}
+
+.file-action {
+  font-size: 12px;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.file-action:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.file-action-danger {
+  color: #dc2626;
+}
+
+.file-action-danger:hover {
+  color: #b91c1c;
+}
+
+/* 深色主题下文件列表样式 */
+.content-dark-theme .file-item {
+  background: #1f1f1f;
+  border-color: #303030;
+}
+
+.content-dark-theme .file-item:hover {
+  border-color: #404040;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.content-dark-theme .file-item-preview {
+  background: linear-gradient(135deg, #2d2d2d 0%, #252525 100%);
+}
+
+.content-dark-theme .file-ext {
+  color: #94a3b8;
+  border-color: #404040;
+  background: #252525;
+}
+
+.content-dark-theme .file-link {
+  color: #e2e8f0;
+}
+
+.content-dark-theme .file-link:hover {
+  color: #60a5fa;
+}
+
+.content-dark-theme .file-item-meta {
+  color: #64748b;
+}
+
+.content-dark-theme .file-action {
+  color: #60a5fa;
+}
+
+.content-dark-theme .file-action:hover {
+  color: #93c5fd;
+}
+
+.content-dark-theme .file-action-danger {
+  color: #f87171;
+}
+
+.content-dark-theme .file-action-danger:hover {
+  color: #fca5a5;
 }
 
 .loadingbar {
@@ -250,7 +480,7 @@
 }
 </style>
 <script>
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
 import { InboxOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import { Base64 } from "js-base64";
@@ -372,6 +602,7 @@ export default {
       }
     };
 
+    /** 执行删除文件的请求 */
     const deletefile = (file) => {
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
@@ -380,6 +611,20 @@ export default {
       proxy.$http.post('/ajax/delete_file_ajax/', params).then(res => {
         fileitems.value = res.data.data.documents
         space.value = res.data.data.space
+      });
+    };
+
+    /** 显示删除确认弹窗，确认后再调用 deletefile */
+    const showConfirmDelete = (fileKey, displayName) => {
+      Modal.confirm({
+        title: '确认删除',
+        content: `确定要删除文件「${displayName}」吗？删除后无法恢复。`,
+        okText: '确定',
+        cancelText: '取消',
+        okType: 'danger',
+        onOk() {
+          deletefile(fileKey);
+        },
       });
     };
 
@@ -392,7 +637,7 @@ export default {
       space,
       handleBeforeUpload,
       handleChange,
-      deletefile,
+      showConfirmDelete,
       fileList: ref([]),
       handleDrop: e => {
         console.log(e);

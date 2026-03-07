@@ -6,7 +6,7 @@
     }" />
  </div>
   
-  <div class="form-container" style="margin: 10px;">
+  <div class="form-container" style="margin-bottom: 0;padding-bottom: 0;">
     <a-form layout="vertical">
       <a-row :gutter="[16, 16]">
         <a-col :xs="24" :sm="24" :md="24" :lg="2" style="display: flex; align-items: center;">

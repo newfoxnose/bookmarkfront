@@ -16,51 +16,216 @@
       </p>
       <p class="ant-upload-text">点击或拖放excel文件到此处进行上传</p>
       <p class="ant-upload-hint">
-        每次只能上传一个文件，仅支持xls、xlsx格式，且文件大小不能超过5M，空间容量30MB，上传的文件会被自动分割。
+        每次只能上传一个文件，仅支持xls、xlsx格式，且文件大小不能超过5M。
       </p>
     </a-upload-dragger>
-    已使用空间：{{ space }}
   </div>
   <br>
-  <div>
-    <div v-for=" item  in  fileitems " :key="item.id" style="margin-bottom:16px;">
-      <span style="margin-left:5px;">
-        {{ item.dict_name }}
-      </span>
-      <span style="margin-left:20px;">(记录数：{{ item.words_amount }} , 创建时间：{{ item.createtime }})</span>
-      <a style="margin-left:20px;" @click="deletefile(item.id)">删除</a>
-      <!-- 词典下方展示随机单词卡片，data.word 为单词对象数组 -->
-      <a-card v-if="randomWordsMap[item.id]?.word?.[0]" style="margin-top:8px; margin-left:5px; max-width:400px;" size="small" :title="'随机单词'">
-        <template #extra>
-          <a @click="fetchRandomWord(item.id)">换一个</a>
-        </template>
-        <p><strong>{{ randomWordsMap[item.id].word[0].word }}</strong> <span v-if="randomWordsMap[item.id].word[0].ipa" style="color:#999; font-size:12px;">{{ randomWordsMap[item.id].word[0].ipa }}</span></p>
-        <p style="margin:0; color:#666; white-space:pre-wrap;">{{ randomWordsMap[item.id].word[0].meaning || '-' }}</p>
-      </a-card>
-      <a-card v-else-if="randomWordLoading[item.id]" style="margin-top:8px; margin-left:5px; max-width:400px;" size="small">
+  <a-row :gutter="[16, 16]">
+    <a-col v-for=" item  in  fileitems " :key="item.id" :xs="24" :sm="24" :md="12" :lg="12">
+      <div class="dict-item">
+        <div class="dict-item-header">
+          <span class="dict-item-name">{{ item.dict_name }}</span>
+          <a class="dict-item-delete" @click="deletefile(item.id)">删除</a>
+        </div>
+        <div class="dict-item-meta">记录数 {{ item.words_amount }} · {{ item.createtime }}</div>
+      <!-- 词典下方展示随机单词卡片：仅 body 区域点击可切换隐藏/换一个 -->
+      <div v-if="randomWordsMap[item.id]?.word?.[0]" class="word-card">
+        <div class="word-card-header">
+          <a class="word-card-hide-btn" @click.stop="hideWord(item.id)">不再出现该单词</a>
+          <div class="word-card-actions" @click.stop>
+            <a-tooltip title="复制">
+              <span class="word-card-btn" @click="copyWord(item.id)"><copy-outlined /></span>
+            </a-tooltip>
+            <a-tooltip title="朗读">
+              <span class="word-card-btn" @click="speakWord(item.id)"><sound-outlined /></span>
+            </a-tooltip>
+            <a-tooltip :title="hiddenType[item.id] ? '显示' : '已全部显示'">
+              <span class="word-card-btn" @click="revealContent(item.id)">
+                <eye-outlined v-if="!hiddenType[item.id]" />
+                <eye-invisible-outlined v-else />
+              </span>
+            </a-tooltip>
+            <a-tooltip title="换一个">
+              <span class="word-card-btn" @click="fetchRandomWord(item.id)"><reload-outlined /></span>
+            </a-tooltip>
+          </div>
+        </div>
+        <div class="word-card-body word-card-clickable" @click="handleCardClick(item.id)">
+          <!-- 单词区：hiddenType 为 'word' 时隐藏 -->
+          <div class="word-card-main">
+            <span v-show="hiddenType[item.id] !== 'word'" class="word-card-text">{{ randomWordsMap[item.id].word[0].word }}</span>
+            <span v-show="hiddenType[item.id] !== 'word' && randomWordsMap[item.id].word[0].ipa" class="word-card-ipa">{{ randomWordsMap[item.id].word[0].ipa }}</span>
+            <div v-if="hiddenType[item.id] === 'word'" class="word-card-hint">点击显示单词</div>
+          </div>
+          <!-- 释义区：hiddenType 为 'meaning' 时隐藏 -->
+          <div v-show="hiddenType[item.id] !== 'meaning'" class="word-card-meaning">
+            {{ randomWordsMap[item.id].word[0].meaning || '-' }}
+          </div>
+          <div v-if="hiddenType[item.id] === 'meaning'" class="word-card-hint">点击显示释义</div>
+        </div>
+      </div>
+      <div v-else-if="randomWordLoading[item.id]" class="word-card word-card-loading">
         <a-spin size="small" /> 加载中...
-      </a-card>
-    </div>
-  </div>
-
-  <!-- 使用TXT阅读器组件 -->
-  <txt-reader
-    v-if="!isEpub"
-    :visible="visible"
-    :title="articletitle"
-    :content="articlecontent"
-    @close="onClose"
-  />
-
-  <!-- 使用EPUB阅读器组件 -->
-  <epub-reader
-    v-if="isEpub"
-    :file-url="epubFileUrl"
-    :title="articletitle"
-    @close="closeEpubReader"
-  />
+      </div>
+      </div>
+    </a-col>
+  </a-row>
 </template>
 <style scoped>
+/* 词典列表项容器 */
+.dict-item {
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+.dict-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 4px 0 0 4px;
+}
+.dict-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+.dict-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.dict-item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dict-item-delete {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+.dict-item-delete:hover {
+  color: #ef4444;
+}
+.dict-item-meta {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* 单词卡片样式 */
+.word-card {
+  margin-top: 12px;
+  max-width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+.word-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.word-card-clickable {
+  cursor: pointer;
+}
+.word-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.word-card-hide-btn {
+  font-size: 12px;
+  color: #94a3b8;
+  cursor: pointer;
+}
+.word-card-hide-btn:hover {
+  color: #1890ff;
+}
+.word-card-actions {
+  display: flex;
+  gap: 4px;
+}
+.word-card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.word-card-btn:hover {
+  color: #1890ff;
+  background: rgba(24, 144, 255, 0.08);
+}
+.word-card-body {
+  padding: 12px 2px 0;
+  text-align: center;
+}
+.word-card-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.word-card-text {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: 0.5px;
+}
+.word-card-ipa {
+  font-size: 14px;
+  color: #94a3b8;
+  font-style: italic;
+}
+.word-card-meaning {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #475569;
+  white-space: pre-wrap;
+  text-align: center;
+}
+.word-card-hint {
+  font-size: 13px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 8px 0;
+  user-select: none;
+}
+.word-card-hint:hover {
+  color: #1890ff;
+}
+.word-card-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+}
+
 .ext {
   text-align: center;
   display: inline-block;
@@ -82,184 +247,20 @@
   transform: translate(-50%, -50%);
   z-index: 10;
 }
-
-.epub-reader-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #fff;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
-
-.epub-reader-header {
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-}
-
-.epub-reader-title {
-  flex: 1;
-  margin-right: 20px;
-}
-
-.epub-reader-controls {
-  display: flex;
-  align-items: center;
-}
-
-.epub-viewer {
-  flex: 1;
-  width: 100%;
-  height: calc(100% - 64px);
-  overflow: hidden;
-}
-
-.txt-reader {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.reader-toolbar {
-  padding: 10px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fff;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.page-jump {
-  margin-left: 10px;
-  display: flex;
-  align-items: center;
-}
-
-.page-jump input {
-  width: 60px;
-  margin: 0 5px;
-}
-
-.reader-content {
-  flex: 1;
-  padding: 20px;
-  overflow: hidden;
-  line-height: 1.6;
-  background: #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  margin: 20px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  height: calc(100% - 40px);
-  position: relative;
-  font-size: v-bind(fontSize + 'px');
-}
-
-.reader-content > div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 20px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  box-sizing: border-box;
-  height: 100%;
-}
-
-.drawer-light-theme {
-  background: #fff;
-  color: #000;
-}
-
-.drawer-dark-theme {
-  background: #1f1f1f;
-  color: #fff;
-}
-
-.drawer-light-theme .reader-content {
-  background: #fff;
-  color: #000;
-}
-
-.drawer-dark-theme .reader-content {
-  background: #1f1f1f;
-  color: #fff;
-}
-
-.drawer-light-theme .reader-toolbar {
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.drawer-dark-theme .reader-toolbar {
-  background: #1f1f1f;
-  border-bottom: 1px solid #303030;
-}
-
-.dark-theme .epub-reader-container {
-  background: #1f1f1f;
-  color: #fff;
-}
-
-.dark-theme .epub-reader-header {
-  background: #1f1f1f;
-  border-bottom-color: #303030;
-}
-
-.epub-reader-container :deep(.ant-drawer-content-wrapper) {
-  background: #fff;
-}
-
-.dark-theme .epub-reader-container :deep(.ant-drawer-content-wrapper) {
-  background: #1f1f1f;
-}
-
-.epub-reader-container :deep(.ant-menu) {
-  border-right: none;
-}
-
-.dark-theme .epub-reader-container :deep(.ant-menu) {
-  background: #1f1f1f;
-  color: #fff;
-}
-
-.dark-theme .epub-reader-container :deep(.ant-menu-item) {
-  color: #fff;
-}
-
-.dark-theme .epub-reader-container :deep(.ant-menu-item-selected) {
-  background: #1890ff;
-  color: #fff;
-}
-
-.dark-theme .epub-reader-container :deep(.ant-menu-item:hover) {
-  color: #1890ff;
-}
 </style>
 <script>
 import { message } from 'ant-design-vue';
-import { InboxOutlined } from '@ant-design/icons-vue';
-import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
-import { Base64 } from "js-base64";
-import TxtReader from '../components/TxtReader.vue';
-import EpubReader from '../components/EpubReader.vue';
+import { InboxOutlined, CopyOutlined, SoundOutlined, EyeOutlined, EyeInvisibleOutlined, ReloadOutlined } from '@ant-design/icons-vue';
+import { onMounted, getCurrentInstance, ref } from 'vue';
 
 export default {
   components: {
     InboxOutlined,
-    TxtReader,
-    EpubReader
+    CopyOutlined,
+    SoundOutlined,
+    EyeOutlined,
+    EyeInvisibleOutlined,
+    ReloadOutlined
   },
   setup() {
     $cookies.set('selectedkey','21',"720h") 
@@ -272,61 +273,19 @@ export default {
     const bbb=ref();
     const file_key = ref('')
     const fileitems = ref([])
-    const space = ref('');
     const upload_url = ref(proxy.$remoteDomain+"/ajax/import_dict_ajax")
     // 每个词典的随机单词缓存，key为词典id
     const randomWordsMap = ref({})
     // 随机单词加载状态
     const randomWordLoading = ref({})
-
-    const visible = ref(false);
-    const articletitle = ref('');
-    const articlecontent = ref('');
-    const isEpub = ref(false);
-    const epubFileUrl = ref('');
-
-    const readBook = (displayname,file, ext) => {
-      let params = new URLSearchParams();
-      params.append("token", $cookies.get('token'));
-      params.append("timestamp", new Date().getTime());
-      params.append("file_b64", proxy.$func.urlsafe_b64encode(Base64.encode(file)));
-      
-      isEpub.value = false;
-      visible.value = true;
-      articletitle.value = displayname;
-      
-      proxy.$http.post('/ajax/read_txt_ajax/', params).then(res => {
-        if (res.data.code == '200') {
-          articlecontent.value = res.data.data;
-        } else {
-          message.error(res.data.msg || '加载失败');
-          visible.value = false;
-        }
-      }).catch(error => {
-        console.error('请求错误:', error);
-        message.error('加载失败，请重试');
-        visible.value = false;
-      });
-    };
-
-    const readEpubBook = (displayname,fileUrl, ext) => {
-      isEpub.value = true;
-      visible.value = false;
-      articletitle.value = displayname;
-      epubFileUrl.value = fileUrl;
-    };
-
-    const onClose = () => {
-      visible.value = false;
-      articlecontent.value = '';
-    };
-
-    const closeEpubReader = () => {
-      isEpub.value = false;
-      epubFileUrl.value = '';
-    };
+    // 默认随机隐藏单词或释义，key为词典id，值为 'word'|'meaning'|null（null=已全部显示）
+    const hiddenType = ref({})
 
     onMounted(() => {
+      // 触发 Chrome 预加载 TTS 语音列表，避免首次朗读失败
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+      }
       const interval=setInterval(() => {
         const percent = defaultPercent.value + Math.round(Math.random()*7+2);
         defaultPercent.value = percent > 95 ? 95 : percent;
@@ -343,7 +302,6 @@ export default {
         }
         if (res.data.code=="200"){
           fileitems.value = res.data.data.documents
-          space.value = res.data.data.space
           fetchAllRandomWords();
         }
         else{
@@ -359,16 +317,34 @@ export default {
       file_key.value = "dict/"+file.name;
     }
 
-    const handleChange = info => {
-      const status = info.file.status;    
-      if (status === 'done') {
-        if (info.file.response.code=="200"){
-          message.success(`${info.file.name} 上传成功.`);
-          fileitems.value = info.file.response.data.documents;
-          space.value = info.file.response.data.space;
-          fetchAllRandomWords();
+    /**
+     * 刷新词典列表，从服务端获取最新数据
+     */
+    const refreshDictList = () => {
+      const params = new URLSearchParams();
+      params.append("token", $cookies.get('token'));
+      params.append("timestamp", new Date().getTime());
+      proxy.$http.post('/ajax/list_dict_ajax/', params).then(res => {
+        if (res.data.code === '401') {
+          window.location.href = "/";
         }
-        else{
+        if (res.data.code === "200") {
+          fileitems.value = res.data.data.documents;
+          fetchAllRandomWords();
+        } else {
+          message.error(res.data.msg);
+        }
+      });
+    };
+
+    const handleChange = info => {
+      const status = info.file.status;
+      if (status === 'done') {
+        if (info.file.response.code == "200") {
+          message.success(`${info.file.name} 上传成功.`);
+          refreshDictList();
+        }
+        else {
           message.error(info.file.response.msg);
         }
       } else if (status === 'error') {
@@ -383,10 +359,13 @@ export default {
       params.append("id", id);
       proxy.$http.post('/ajax/delete_dict_ajax/', params).then(res => {
         fileitems.value = res.data.data.documents
-        // 删除后移除该词典的随机单词缓存
+        // 删除后移除该词典的随机单词及显隐状态缓存
         const newMap = { ...randomWordsMap.value };
         delete newMap[id];
         randomWordsMap.value = newMap;
+        const newHidden = { ...hiddenType.value };
+        delete newHidden[id];
+        hiddenType.value = newHidden;
       });
     };
 
@@ -405,6 +384,86 @@ export default {
         // data.word 为单词对象数组，code 可能为数字或字符串
         if ((res.data.code === 200 || res.data.code === '200') && res.data.data?.word?.length) {
           randomWordsMap.value = { ...randomWordsMap.value, [dictId]: res.data.data };
+          // 随机隐藏单词或释义二者之一
+          hiddenType.value = { ...hiddenType.value, [dictId]: Math.random() < 0.5 ? 'word' : 'meaning' };
+        }
+      }).catch(() => {
+        randomWordLoading.value = { ...randomWordLoading.value, [dictId]: false };
+      });
+    };
+
+    /**
+     * 点击显示图标后，展示被隐藏的单词或释义
+     */
+    const revealContent = (dictId) => {
+      if (hiddenType.value[dictId]) {
+        hiddenType.value = { ...hiddenType.value, [dictId]: null };
+      }
+    };
+
+    /**
+     * 卡片点击：有隐藏项时显示，全部显示时换一个
+     */
+    const handleCardClick = (dictId) => {
+      if (hiddenType.value[dictId]) {
+        revealContent(dictId);
+      } else {
+        fetchRandomWord(dictId);
+      }
+    };
+
+    /**
+     * 复制单词及释义到剪贴板
+     */
+    const copyWord = (dictId) => {
+      const data = randomWordsMap.value[dictId]?.word?.[0];
+      if (!data) return;
+      const text = `${data.word}${data.ipa ? ' ' + data.ipa : ''}\n${data.meaning || ''}`;
+      navigator.clipboard?.writeText(text).then(() => {
+        message.success('已复制到剪贴板');
+      }).catch(() => message.error('复制失败'));
+    };
+
+    /**
+     * 朗读单词，使用浏览器 TTS
+     * Chrome：需在用户点击后调用；先 cancel 再 speak 可避免卡住
+     */
+    const speakWord = (dictId) => {
+      const word = randomWordsMap.value[dictId]?.word?.[0]?.word;
+      if (!word) return;
+      if (!('speechSynthesis' in window)) {
+        message.warning('当前浏览器不支持语音朗读');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      utterance.rate = 1;
+      utterance.volume = 1;
+      const voices = window.speechSynthesis.getVoices();
+      const enVoice = voices.find(v => v.lang.startsWith('en'));
+      if (enVoice) utterance.voice = enVoice;
+      window.speechSynthesis.speak(utterance);
+    };
+
+    /**
+     * 不再显示当前单词：标记隐藏后获取新单词
+     */
+    const hideWord = (dictId) => {
+      const wordId = randomWordsMap.value[dictId]?.word?.[0]?.id;
+      if (!wordId) return;
+      randomWordLoading.value = { ...randomWordLoading.value, [dictId]: true };
+      const params = new URLSearchParams();
+      params.append("token", $cookies.get('token'));
+      params.append("timestamp", new Date().getTime());
+      params.append("hidden", "1");
+      params.append("word_id", wordId);
+      params.append("dict_id", dictId);
+      proxy.$http.post('/ajax/update_word_status_ajax/', params).then(res => {
+        randomWordLoading.value = { ...randomWordLoading.value, [dictId]: false };
+        if ((res.data.code === 200 || res.data.code === '200') && res.data.data?.word?.length) {
+          randomWordsMap.value = { ...randomWordsMap.value, [dictId]: res.data.data };
+          hiddenType.value = { ...hiddenType.value, [dictId]: Math.random() < 0.5 ? 'word' : 'meaning' };
         }
       }).catch(() => {
         randomWordLoading.value = { ...randomWordLoading.value, [dictId]: false };
@@ -428,10 +487,15 @@ export default {
       upload_url,
       file_key,
       fileitems,
-      space,
       randomWordsMap,
       randomWordLoading,
+      hiddenType,
       fetchRandomWord,
+      revealContent,
+      handleCardClick,
+      hideWord,
+      copyWord,
+      speakWord,
       handleBeforeUpload,
       handleChange,
       deletefile,
@@ -440,16 +504,7 @@ export default {
         console.log(e);
       },
       defaultPercent,
-      loadingdone,
-      readBook,
-      readEpubBook,
-      visible,
-      onClose,
-      articletitle,
-      articlecontent,
-      isEpub,
-      epubFileUrl,
-      closeEpubReader
+      loadingdone
     };
   },
 }

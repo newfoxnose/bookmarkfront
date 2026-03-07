@@ -131,20 +131,15 @@
       <a-form-item
         label="提醒"
         name="alert"
-        :rules="[{ required: true, message: '提醒' }]"
+        :rules="[{ required: true, message: '请选择提醒时间' }]"
       >
         <a-select
           v-model:value="formState.alert"
           mode="multiple"
+          placeholder="可多选，选择「不提醒」将清除其它选项"
           style="width: 100%"
-          :options="[
-            { value: '0', label: '不提醒' },
-            { value: '10', label: '提前10分钟' },
-            { value: '15', label: '提前15分钟' },
-            { value: '30', label: '提前30分钟' },
-            { value: '60', label: '提前1小时' },
-            { value: '1440', label: '提前1天' },
-          ]"
+          :options="ALERT_OPTIONS"
+          @change="onAlertChange"
         ></a-select>
       </a-form-item>
 
@@ -185,9 +180,99 @@ import {
   FormOutlined,
 } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
-import { defineComponent, ref, onMounted, getCurrentInstance } from "vue";
+import { defineComponent, ref, reactive, onMounted, onUnmounted, getCurrentInstance } from "vue";
 // 在子组件中注入刷新方法
 import { inject } from 'vue';
+
+// 提醒选项配置：value 为分钟数，0 表示不提醒
+const ALERT_OPTIONS = [
+  { value: "0", label: "不提醒" },
+  { value: "5", label: "提前5分钟" },
+  { value: "10", label: "提前10分钟" },
+  { value: "15", label: "提前15分钟" },
+  { value: "30", label: "提前30分钟" },
+  { value: "60", label: "提前1小时" },
+  { value: "120", label: "提前2小时" },
+  { value: "1440", label: "提前1天" },
+];
+
+// 本地存储 key：待触发的提醒
+const REMINDERS_STORAGE_KEY = "calendar_pending_reminders";
+
+/** 将后端返回的 alert 规范化为字符串数组，供多选框使用 */
+function normalizeAlertToArray(alert) {
+  if (!alert) return ["0"];
+  if (Array.isArray(alert)) return alert.map(String).filter(Boolean);
+  if (typeof alert === "string") {
+    const trimmed = alert.trim();
+    if (trimmed.startsWith("[")) {
+      try {
+        const arr = JSON.parse(trimmed);
+        return Array.isArray(arr) ? arr.map(String).filter(Boolean) : ["0"];
+      } catch {
+        // 解析失败则按逗号分割
+      }
+    }
+    const parts = trimmed.split(/[,，]/).map((s) => s.trim()).filter(Boolean);
+    return parts.length > 0 ? parts : ["0"];
+  }
+  return ["0"];
+}
+
+/** 从本地存储读取待提醒列表 */
+function loadRemindersFromStorage() {
+  try {
+    const raw = localStorage.getItem(REMINDERS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** 保存单个事件的提醒到本地存储 */
+function saveRemindersToStorage(eventId, { summary, start_time, alert, repetition }) {
+  if (!eventId || !summary || !start_time || !alert?.length) return;
+  const map = loadRemindersFromStorage();
+  map[String(eventId)] = { summary, start_time, alert, repetition };
+  localStorage.setItem(REMINDERS_STORAGE_KEY, JSON.stringify(map));
+}
+
+/** 从本地存储移除指定事件的提醒 */
+function removeRemindersFromStorage(eventId) {
+  if (!eventId) return;
+  const map = loadRemindersFromStorage();
+  delete map[String(eventId)];
+  localStorage.setItem(REMINDERS_STORAGE_KEY, JSON.stringify(map));
+}
+
+/** 请求浏览器通知权限 */
+function requestNotificationPermission() {
+  if (!("Notification" in window)) return false;
+  if (Notification.permission === "granted") return true;
+  if (Notification.permission !== "denied") {
+    Notification.requestPermission();
+  }
+  return false;
+}
+
+/** 显示浏览器桌面通知 */
+function showReminderNotification(title, body) {
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  try {
+    const n = new Notification(title, {
+      body,
+      icon: "/favicon.ico",
+      tag: "calendar-reminder",
+    });
+    n.onclick = () => {
+      window.focus();
+      n.close();
+    };
+    setTimeout(() => n.close(), 8000);
+  } catch (e) {
+    console.warn("桌面通知失败:", e);
+  }
+}
 
 export default defineComponent({
   components: {
@@ -200,14 +285,20 @@ export default defineComponent({
   setup() {
     $cookies.set("selectedkey", "16", "720h");
     $cookies.set("openkey", "");
-    const formState = ref([]);
-    formState.value.summary = "";
-    formState.value.location = "";
-    formState.value.badge_type = "#666";
-    formState.value.repetition = ref("onetime");
-    formState.value.alert = ref(["0"]);
-    formState.value.is_private = false;
-    formState.value.is_recommend = false;
+    // 使用 reactive 确保表单正确响应式，避免嵌套 ref
+    const formState = reactive({
+      event_id: "",
+      summary: "",
+      location: "",
+      badge_type: "#666",
+      repetition: "onetime",
+      alert: ["0"],
+      is_private: false,
+      is_recommend: false,
+      start_time: null,
+      end_time: null,
+      remark: "",
+    });
 
     const { proxy } = getCurrentInstance();
     const updatedDrawerTitle = ref(String);
@@ -217,6 +308,8 @@ export default defineComponent({
     const iconLoading = ref(false);
     const datetimeformat = ref("YYYY-MM-DD HH:mm:ss");
     const eventList = ref([]);
+    /** 记录上一次提醒选择，用于判断用户最后点击的是「不提醒」还是具体提醒 */
+    const prevAlert = ref([]);
 
     const reloadtodo = inject('reloadtodo');   //注入刷新方法
 
@@ -234,31 +327,27 @@ export default defineComponent({
         proxy.$http.post("/ajax/get_event_ajax/", params).then((res) => {
           console.log(res.data.data);
           let event = res.data.data.event;
-          formState.value.event_id = event.id;
-          formState.value.summary = event.summary;
-          formState.value.badge_type = event.badge_type;
-          formState.value.start_time = ref(
-            dayjs(event.start_time, "YYYY-MM-DD HH:mm:ss")
-          );
-          formState.value.end_time = ref(
-            dayjs(event.end_time, "YYYY-MM-DD HH:mm:ss")
-          );
-          formState.value.repetition = event.repetition;
-          formState.value.location = event.location;
-          formState.value.alert = event.alert;
-          formState.value.remark = event.remark;
+          formState.event_id = event.id;
+          formState.summary = event.summary;
+          formState.badge_type = event.badge_type;
+          formState.start_time = dayjs(event.start_time, "YYYY-MM-DD HH:mm:ss");
+          formState.end_time = dayjs(event.end_time, "YYYY-MM-DD HH:mm:ss");
+          formState.repetition = event.repetition;
+          formState.location = event.location || "";
+          // 规范化 alert：后端可能返回字符串 "10,30" 或数组
+          formState.alert = normalizeAlertToArray(event.alert);
+          formState.remark = event.remark || "";
+          prevAlert.value = [...formState.alert];
         });
       } else {
-        formState.value.event_id = "";
-        formState.value.start_time = ref(
-          dayjs(selectedValue, "YYYY-MM-DD HH:mm:ss")
-        );
-        formState.value.end_time = ref(
-          dayjs(selectedValue, "YYYY-MM-DD HH:mm:ss")
-        );
-        formState.value.summary = "";
-        formState.value.is_private = false;
-        formState.value.is_recommend = false;
+        formState.event_id = "";
+        formState.start_time = dayjs(selectedValue);
+        formState.end_time = dayjs(selectedValue);
+        formState.summary = "";
+        formState.alert = ["0"];
+        formState.is_private = false;
+        formState.is_recommend = false;
+        prevAlert.value = ["0"];
       }
     };
 
@@ -273,6 +362,21 @@ export default defineComponent({
         onCancel() {},
       });
     };
+    /** 提醒选择变化：选「不提醒」时清除所有提醒；已选不提醒时再选其它提醒则自动去除不提醒 */
+    const onAlertChange = (val) => {
+      if (!Array.isArray(val)) return;
+      const prev = prevAlert.value;
+      if (val.includes("0") && val.length > 1) {
+        const justAddedZero = !prev.includes("0") && val.includes("0");
+        formState.alert = justAddedZero ? ["0"] : val.filter((v) => v !== "0");
+      } else if (val.includes("0")) {
+        formState.alert = ["0"];
+      } else {
+        formState.alert = val;
+      }
+      prevAlert.value = [...formState.alert];
+    };
+
     const onClose = () => {
       iconLoading.value = false;
       visible.value = false;
@@ -299,8 +403,45 @@ export default defineComponent({
         //getListData(value)
       });
     };
+    /** 检查并触发到期的提醒，每分钟执行一次 */
+    const checkAndFireReminders = () => {
+      const map = loadRemindersFromStorage();
+      const now = dayjs();
+      const toRemove = [];
+      const toNotify = [];
+      for (const [eid, data] of Object.entries(map)) {
+        const start = dayjs(data.start_time);
+        const remaining = [];
+        for (const minutes of data.alert || []) {
+          const remindAt = start.subtract(minutes, "minute");
+          if (now.isAfter(remindAt) || now.isSame(remindAt, "minute")) {
+            toNotify.push({ summary: data.summary, start });
+          } else {
+            remaining.push(minutes);
+          }
+        }
+        if (remaining.length === 0) {
+          toRemove.push(eid);
+        } else {
+          map[eid] = { ...data, alert: remaining };
+        }
+      }
+      toRemove.forEach((eid) => delete map[eid]);
+      localStorage.setItem(REMINDERS_STORAGE_KEY, JSON.stringify(map));
+      toNotify.forEach(({ summary, start }) =>
+        showReminderNotification("日历提醒", `${summary}\n开始时间：${start.format("YYYY-MM-DD HH:mm")}`)
+      );
+    };
+
+    let reminderTimer = null;
     onMounted(() => {
       onPanelChange(selectedValue.value);
+      requestNotificationPermission();
+      checkAndFireReminders();
+      reminderTimer = setInterval(checkAndFireReminders, 60 * 1000); // 每 60 秒检查一次
+    });
+    onUnmounted(() => {
+      if (reminderTimer) clearInterval(reminderTimer);
     });
     const getListData = (value) => {
       console.log("事件数量：" + eventList.value.length);
@@ -326,32 +467,55 @@ export default defineComponent({
     const save = () => {
       iconLoading.value = true;
       if (
-        proxy.$func.getVarType(formState.value.summary) == "undefined" ||
-        formState.value.summary == ""
+        proxy.$func.getVarType(formState.summary) == "undefined" ||
+        formState.summary == ""
       ) {
         message.info("标题不能为空");
         iconLoading.value = false;
       } else {
+        // 格式化时间：dayjs 对象转为字符串
+        const startStr = dayjs.isDayjs(formState.start_time)
+          ? formState.start_time.format("YYYY-MM-DD HH:mm:ss")
+          : String(formState.start_time || "");
+        const endStr = dayjs.isDayjs(formState.end_time)
+          ? formState.end_time.format("YYYY-MM-DD HH:mm:ss")
+          : String(formState.end_time || "");
+        // 过滤掉 "0"（不提醒），若仅剩 0 则传 ["0"]
+        const alertArr = Array.isArray(formState.alert) ? formState.alert : [formState.alert];
+        const alertFiltered = alertArr.filter((a) => a !== "0" && a !== "");
+        const alertToSend = alertFiltered.length > 0 ? alertFiltered : ["0"];
+
         let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
         params.append("token", $cookies.get("token"));
         params.append("timestamp", new Date().getTime());
-        params.append("event_id", formState.value.event_id);
-        params.append("remark", formState.value.remark);
-        params.append("summary", formState.value.summary);
-        params.append("badge_type", formState.value.badge_type);
-        params.append("start_time", formState.value.start_time);
-        params.append("end_time", formState.value.end_time);
-        params.append("repetition", formState.value.repetition);
-        params.append("alert", formState.value.alert);
-        params.append("location", formState.value.location);
+        params.append("event_id", formState.event_id);
+        params.append("remark", formState.remark || "");
+        params.append("summary", formState.summary);
+        params.append("badge_type", formState.badge_type);
+        params.append("start_time", startStr);
+        params.append("end_time", endStr);
+        params.append("repetition", formState.repetition);
+        // 后端通常接收逗号分隔字符串，如 "10,30,60"
+        params.append("alert", alertToSend.join(","));
+        params.append("location", formState.location || "");
 
         proxy.$http
           .post("/ajax/save_event_ajax/", params)
           .then((res) => {
-            //console.log(res.data.msg);
+            // 保存成功后，将有效提醒写入本地，供定时器触发浏览器通知
+            const savedEventId = formState.event_id || res.data?.data?.event_id || res.data?.event_id;
+            if (alertToSend.length > 0 && alertToSend[0] !== "0" && savedEventId) {
+              saveRemindersToStorage(savedEventId, {
+                summary: formState.summary,
+                start_time: startStr,
+                alert: alertToSend.map(Number),
+                repetition: formState.repetition,
+              });
+            } else if (savedEventId) {
+              removeRemindersFromStorage(savedEventId);
+            }
             if (res.data.msg == "新建成功") {
-              //这条提示如果改的话要和后端一起改
-              message.info("添加事件成功"); //看不到效果
+              message.info("添加事件成功");
               iconLoading.value = false;
             } else {
               message.info(res.data.msg);
@@ -376,10 +540,10 @@ export default defineComponent({
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
       params.append("event_id", formState.value.event_id);
-      proxy.$http
+        proxy.$http
         .post("/ajax/delete_event_ajax/", params)
         .then((res) => {
-          //console.log(res.data.msg);
+          removeRemindersFromStorage(formState.event_id);
           message.info(res.data.msg);
           iconLoading.value = false;
           onClose();
@@ -413,6 +577,8 @@ export default defineComponent({
       save,
       eventList,
       deleteEvent,
+      ALERT_OPTIONS,
+      onAlertChange,
     };
   },
 });
