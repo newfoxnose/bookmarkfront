@@ -1291,7 +1291,7 @@ export default defineComponent({
               </ul>
             </li>
           </ul>
-          <div style="text-align: center; padding-top: 30px">
+          <div style="text-align: center; padding-top: 10px">
             <a-switch :checked="theme == 'dark'" checked-children="Dark" un-checked-children="Light"
               @change="changeTheme" />
           </div>
@@ -1303,13 +1303,13 @@ export default defineComponent({
               @change="(checked) => { if (checked) lockPage(); }"
             />
           </div>
-          <!-- 方形自适应 -->
-          <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-6721623848988004"
-            data-ad-slot="4514191664"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
+          <!-- 160x600 广告位居中 -->
+          <div style="text-align: center; padding-top: 12px;">
+            <ins class="adsbygoogle"
+              style="display:inline-block;width:160px;height:600px"
+              data-ad-client="ca-pub-6721623848988004"
+              data-ad-slot="9050778722"></ins>
+          </div>
         </a-layout-sider>
         <a-layout-content :class="[contenttheme, { 'has-page-header': route.meta?.title }]" style="padding-bottom: 80px;padding-right:10px;">
           <!-- 页面标题栏：标题在左、刷新图标在右，仅对配置了 meta.title 的路由显示 -->
