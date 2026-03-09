@@ -30,7 +30,8 @@ export default {
     <a :href=" go_url+id+'/'+url" :title="title" target="_blank">
       {{ short_title }}
     </a>
-    <a :href="'/frame/'+id"><border-outlined style="margin-left:3px;" /></a>
+    <!-- 在 frame 中打开书签的链接，鼠标悬停显示提示和放大效果 -->
+    <RouterLink class="frame-open-link" :to="{ path: '/frame/' + id, query: { title: title } }" title="在frame中打开"><border-outlined style="margin-left:8px;" /></RouterLink>
     <eye-invisible-two-tone v-if="is_private == '1'" style="margin-left:3px;" />
     <RouterLink :to="'/editpost/'+id" v-if="is_published == '1'"><appstore-two-tone style="margin-left:3px;" /></RouterLink>
     <like-two-tone  v-if="is_recommend == '1'" style="margin-left:3px;" />
@@ -40,6 +41,15 @@ export default {
 </template>
 
 <style scoped>
+/* 鼠标悬停时放大 border-outlined 图标 */
+.frame-open-link {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.frame-open-link:hover {
+  transform: scale(1.25);
+}
+
 .http_code {
   transform: rotate(-5deg) ;
   display:inline-block;

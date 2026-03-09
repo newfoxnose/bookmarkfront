@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 //import bookmarkitem from './bookmarkitem.vue';     //不能再导入组件了，netlify不支持3层，本地可以
 import {
   EyeInvisibleTwoTone,
@@ -155,7 +155,7 @@ export default {
       <a :href="go_url+bookmarkitem.id+'/'+bookmarkitem.url" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
         {{ bookmarkitem.short_title }}
       </a>
-      <a :href="'/frame/'+bookmarkitem.id"><border-outlined style="margin-left:3px;" /></a>
+      <RouterLink :to="{ path: '/frame/' + bookmarkitem.id, query: { title: bookmarkitem.title } }"><border-outlined style="margin-left:3px;" /></RouterLink>
       <eye-invisible-two-tone
         v-if="bookmarkitem.is_private == '1'"
         style="margin-left: 3px"

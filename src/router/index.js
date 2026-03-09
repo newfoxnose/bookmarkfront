@@ -11,7 +11,7 @@ const router = createRouter({
       path: "/home",
       name: "home",
       meta: { keepAlive: true, title: "书签" },
-      component: () => import("../views/HomeView.vue"),
+      component: () => import("../views/FrameView.vue"),
     },
     {
       path: "/logout",
