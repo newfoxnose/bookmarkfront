@@ -1,9 +1,12 @@
 <script>
-import { getCurrentInstance, ref, watch } from "vue";
+import { getCurrentInstance, ref, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { CloseOutlined } from "@ant-design/icons-vue";
 import { frameTabsStore, BOOKMARKS_TAB_ID } from "@/stores/frameTabs";
 import HomeView from "@/views/HomeView.vue";
+
+/** 无法获取内容高度时的 fallback 高度（px） */
+const FALLBACK_HEIGHT = 600;
 
 export default {
   components: {
@@ -19,10 +22,34 @@ export default {
 
     /** 当前激活标签对应的 iframe src，书签页时为 null */
     const activeFrameSrc = ref("");
-    /** iframe 元素引用，用于自适应高度 */
+    /** iframe 元素引用 */
     const iframeRef = ref(null);
-    /** iframe 动态高度（px），null 时使用 100% 填满容器 */
+    /** 书签内容区 ref，用于测量高度 */
+    const bookmarksContentRef = ref(null);
+    /** iframe 内容高度（px），null 表示无法获取，用 fallback */
     const iframeHeight = ref(null);
+    /** 书签页内容高度（px），null 表示无法获取，用 fallback */
+    const bookmarksContentHeight = ref(null);
+
+    /** 测量书签页内容高度（同源可直接测量） */
+    const measureBookmarksContent = () => {
+      const el = bookmarksContentRef.value;
+      if (!el) return;
+      const height = el.scrollHeight || el.offsetHeight || 0;
+      bookmarksContentHeight.value = height > 0 ? height : null;
+    };
+
+    /** ResizeObserver 监听书签内容变化，内容增删时重新测量 */
+    let resizeObserver = null;
+    const setupBookmarksResizeObserver = () => {
+      resizeObserver?.disconnect();
+      const el = bookmarksContentRef.value;
+      if (!el) return;
+      resizeObserver = new ResizeObserver(() => {
+        measureBookmarksContent();
+      });
+      resizeObserver.observe(el);
+    };
 
     /** 根据 route 同步 store 并更新 iframe src（/home 与 /frame/__bookmarks__ 均视为书签页） */
     const syncFromRoute = () => {
@@ -32,13 +59,14 @@ export default {
       frameTabsStore.addTab(id, title);
       if (id === BOOKMARKS_TAB_ID) {
         activeFrameSrc.value = "";
+        bookmarksContentHeight.value = null; // 切换回书签页时重新测量
       } else {
         activeFrameSrc.value = proxy.$remoteDomain + "/go/" + id;
-        iframeHeight.value = null; // 重置高度，等待 onload 重新计算
+        iframeHeight.value = null;
       }
     };
 
-    /** 根据 iframe 内部文档高度自适应，消除 iframe 内部滚动条（仅同源有效） */
+    /** 根据 iframe 内部文档高度自适应（仅同源有效） */
     const resizeIframeToContent = () => {
       const el = iframeRef.value;
       if (!el || !el.contentDocument) return;
@@ -56,18 +84,17 @@ export default {
           iframeHeight.value = height;
         }
       } catch {
-        // 跨域无法访问 contentDocument，保持默认高度
+        // 跨域无法访问，保持 null，使用 fallback
       }
     };
 
-    /** iframe 加载完成后尝试自适应高度，并延迟重试以适配异步渲染 */
+    /** iframe 加载完成后尝试获取内容高度 */
     const onIframeLoad = () => {
       resizeIframeToContent();
       setTimeout(resizeIframeToContent, 500);
       setTimeout(resizeIframeToContent, 1500);
     };
 
-    // 首次挂载及路由变化时同步（/home 与 /frame/:id 均需处理）
     syncFromRoute();
     watch(
       () => [route.path, route.params.id, route.query.title],
@@ -75,7 +102,43 @@ export default {
       { immediate: false }
     );
 
-    /** 切换到指定标签：书签页用 /home，frame 页用 /frame/:id */
+    /** 书签页激活时测量内容高度，延迟重试以适配异步渲染 */
+    const scheduleBookmarksMeasure = () => {
+      nextTick(measureBookmarksContent);
+      setTimeout(measureBookmarksContent, 300);
+      setTimeout(measureBookmarksContent, 1000);
+    };
+
+    watch(
+      () => frameTabsStore.activeId === BOOKMARKS_TAB_ID,
+      (isBookmarks) => {
+        if (isBookmarks) {
+          nextTick(() => {
+            scheduleBookmarksMeasure();
+            setupBookmarksResizeObserver();
+          });
+        } else {
+          resizeObserver?.disconnect();
+          resizeObserver = null;
+        }
+      },
+      { immediate: true }
+    );
+
+    onMounted(() => {
+      if (frameTabsStore.activeId === BOOKMARKS_TAB_ID) {
+        nextTick(() => {
+          scheduleBookmarksMeasure();
+          setupBookmarksResizeObserver();
+        });
+      }
+    });
+
+    onUnmounted(() => {
+      resizeObserver?.disconnect();
+    });
+
+    /** 切换到指定标签 */
     const switchTab = (id) => {
       frameTabsStore.setActive(id);
       router.push(id === BOOKMARKS_TAB_ID ? { path: "/home" } : { path: "/frame/" + id });
@@ -98,6 +161,9 @@ export default {
       activeFrameSrc,
       iframeRef,
       iframeHeight,
+      bookmarksContentRef,
+      bookmarksContentHeight,
+      FALLBACK_HEIGHT,
       onIframeLoad,
       switchTab,
       closeTab,
@@ -128,32 +194,57 @@ export default {
         </span>
       </div>
     </div>
-    <!-- 内容区：书签页显示 HomeView，其余显示 iframe -->
-    <div class="frame-content">
-      <HomeView v-if="frameTabsStore.activeId === BOOKMARKS_TAB_ID" />
-      <iframe
-        v-else-if="activeFrameSrc"
-        ref="iframeRef"
-        :src="activeFrameSrc"
-        :style="iframeHeight ? { height: iframeHeight + 'px' } : {}"
-        title="External Content"
-        frameborder="0"
-        allowfullscreen
-        @load="onIframeLoad"
+    <!-- 内容区：书签页或 iframe，有内容高度则完整显示（无滚动条），否则 600px（显示滚动条） -->
+    <div
+      class="frame-content"
+      :class="{
+        'frame-content-grows': frameTabsStore.activeId === BOOKMARKS_TAB_ID && bookmarksContentHeight
+      }"
+    >
+      <!-- 书签页 -->
+      <div
+        v-if="frameTabsStore.activeId === BOOKMARKS_TAB_ID"
+        ref="bookmarksContentRef"
+        class="frame-content-inner frame-content-bookmarks"
+        :style="{
+          height: bookmarksContentHeight ? bookmarksContentHeight + 'px' : FALLBACK_HEIGHT + 'px',
+          overflow: bookmarksContentHeight ? 'visible' : 'auto'
+        }"
       >
-      </iframe>
+        <HomeView />
+      </div>
+      <!-- iframe -->
+      <div
+        v-else-if="activeFrameSrc"
+        class="frame-content-inner frame-content-iframe"
+        :style="{
+          height: iframeHeight ? iframeHeight + 'px' : FALLBACK_HEIGHT + 'px',
+          overflow: iframeHeight ? 'visible' : 'auto'
+        }"
+      >
+        <iframe
+          ref="iframeRef"
+          :src="activeFrameSrc"
+          :style="iframeHeight ? { height: iframeHeight + 'px' } : { height: FALLBACK_HEIGHT + 'px' }"
+          title="External Content"
+          frameborder="0"
+          allowfullscreen
+          @load="onIframeLoad"
+        >
+        </iframe>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 整体容器 */
+/* 整体容器：iframe 时固定高度填满视口，书签有测量高度时允许延伸 */
 .frame-view-root {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100vh - 180px);
-  min-height: 300px;
+  min-height: calc(100vh - 180px);
+  overflow: visible;
 }
 
 /* 顶部标签栏：仅允许横向滚动，禁止纵向滚动条 */
@@ -218,17 +309,27 @@ export default {
   background: rgba(0, 0, 0, 0.06);
 }
 
-/* 内容区：书签页或 iframe */
+/* 内容区：默认占满剩余空间 */
 .frame-content {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow: visible;
+  width: 100%;
 }
 
-/* iframe：宽度 100%，高度由 JS 自适应或默认填满 */
-.frame-content iframe {
+/* 书签页有测量高度时，内容区随内容延伸，由页面滚动 */
+.frame-content.frame-content-grows {
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
+/* 内容区内层：书签或 iframe 容器 */
+.frame-content-inner {
   width: 100%;
-  min-height: 100%;
+}
+
+.frame-content-iframe iframe {
+  width: 100%;
   border: none;
   display: block;
 }
