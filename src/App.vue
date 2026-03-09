@@ -357,6 +357,12 @@ export default defineComponent({
       } else {
         changeTheme(false);
       }
+      // 方形自适应广告加载
+      nextTick(() => {
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
+      });
 
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
@@ -1297,6 +1303,13 @@ export default defineComponent({
               @change="(checked) => { if (checked) lockPage(); }"
             />
           </div>
+          <!-- 方形自适应 -->
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-6721623848988004"
+            data-ad-slot="4514191664"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
         </a-layout-sider>
         <a-layout-content :class="[contenttheme, { 'has-page-header': route.meta?.title }]" style="padding-bottom: 80px;padding-right:10px;">
           <!-- 页面标题栏：标题在左、刷新图标在右，仅对配置了 meta.title 的路由显示 -->
