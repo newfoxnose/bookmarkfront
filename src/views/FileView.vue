@@ -15,10 +15,10 @@
       </p>
       <p class="ant-upload-text">点击或拖放文件到此处进行上传</p>
       <p class="ant-upload-hint">
-        每次只能上传一个文件，且文件大小不能超过20M，支持如下格式pdf|xls|xlsx|doc|docx|ppt|pptx|zip|rar|7z|txt|jpg|png|gif|webp|bmp|jpeg|mp3|mp4|wav|epub，空间容量100MB。
+        每次只能上传一个文件，且文件大小不能超过20M，支持如下格式pdf|xls|xlsx|doc|docx|ppt|pptx|zip|rar|7z|txt|jpg|png|gif|webp|bmp|jpeg|mp3|mp4|wav|epub，用户总空间容量100MB。
       </p>
     </a-upload-dragger>
-    <div class="space-info">已使用空间：<strong>{{ space }}</strong> / 100MB</div>
+    <div class="space-info">用户空间：<strong>{{ space }}</strong> / 100MB（已使用/总空间）</div>
   </div>
   <br>
   <!-- 文件列表：卡片式布局 -->

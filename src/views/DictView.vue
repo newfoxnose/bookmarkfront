@@ -16,10 +16,13 @@
       </p>
       <p class="ant-upload-text">点击或拖放excel文件到此处进行上传</p>
       <p class="ant-upload-hint">
-        每次只能上传一个文件，仅支持xls、xlsx格式，且文件大小不能超过5M。
+        每次只能上传一个文件，仅支持xls、xlsx格式，且文件大小不能超过5M，最多导入10个词典。
       </p>
     </a-upload-dragger>
   </div>
+  <br>
+  <a href="/template/dict.xlsx" target="_blank">词典模板下载</a>
+  <br>
   <br>
   <a-row :gutter="[16, 16]">
     <a-col v-for=" item  in  fileitems " :key="item.id" :xs="24" :sm="24" :md="12" :lg="12">
@@ -29,8 +32,8 @@
           <a class="dict-item-delete" @click="deletefile(item.id)">删除</a>
         </div>
         <div class="dict-item-meta">记录数 {{ item.words_amount }} · {{ item.createtime }}</div>
-      <!-- 词典下方展示随机单词卡片：仅 body 区域点击可切换隐藏/换一个 -->
-      <div v-if="randomWordsMap[item.id]?.word?.[0]" class="word-card">
+      <!-- 词典下方展示随机单词卡片：单词数量大于0时才显示 -->
+      <div v-if="item.words_amount > 0 && randomWordsMap[item.id]?.word?.[0]" class="word-card">
         <div class="word-card-header">
           <a class="word-card-hide-btn" @click.stop="hideWord(item.id)">不再出现该单词</a>
           <div class="word-card-actions" @click.stop>
@@ -62,10 +65,17 @@
           <div v-show="hiddenType[item.id] !== 'meaning'" class="word-card-meaning">
             {{ randomWordsMap[item.id].word[0].meaning || '-' }}
           </div>
+          <!-- 备注区：remarks 为 JSON 格式，不为空时展示 -->
+          <div v-if="hiddenType[item.id] !== 'meaning' && getParsedRemarks(randomWordsMap[item.id].word[0].remarks)" class="word-card-remarks">
+            <div v-for="(val, key) in getParsedRemarks(randomWordsMap[item.id].word[0].remarks)" :key="key" class="word-card-remark-item">
+              <span class="word-card-remark-label">{{ key }}：</span>
+              <span class="word-card-remark-value">{{ val }}</span>
+            </div>
+          </div>
           <div v-if="hiddenType[item.id] === 'meaning'" class="word-card-hint">点击显示释义</div>
         </div>
       </div>
-      <div v-else-if="randomWordLoading[item.id]" class="word-card word-card-loading">
+      <div v-else-if="item.words_amount > 0 && randomWordLoading[item.id]" class="word-card word-card-loading">
         <a-spin size="small" /> 加载中...
       </div>
       </div>
@@ -82,16 +92,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
-}
-.dict-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
-  border-radius: 4px 0 0 4px;
 }
 .dict-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -219,6 +219,25 @@
 .word-card-hint:hover {
   color: #1890ff;
 }
+/* 备注区样式 */
+.word-card-remarks {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #e2e8f0;
+  text-align: center;
+}
+.word-card-remark-item {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.6;
+}
+.word-card-remark-label {
+  font-weight: 500;
+  color: #94a3b8;
+}
+.word-card-remark-value {
+  color: #475569;
+}
 .word-card-loading {
   display: flex;
   align-items: center;
@@ -342,7 +361,8 @@ export default {
       if (status === 'done') {
         if (info.file.response.code == "200") {
           message.success(`${info.file.name} 上传成功.`);
-          refreshDictList();
+          fileitems.value = info.file.response.data.documents;
+          fetchAllRandomWords();
         }
         else {
           message.error(info.file.response.msg);
@@ -471,6 +491,22 @@ export default {
     };
 
     /**
+     * 解析 remarks 字段（JSON 格式），为空时返回 null
+     * @param {string} remarks - 单词的 remarks 字符串，如 {"美音":"[ˌreɪdioʊˈæktɪv]"}
+     * @returns {Object|null} 解析后的键值对对象，或 null
+     */
+    const getParsedRemarks = (remarks) => {
+      if (!remarks || (typeof remarks === 'string' && remarks.trim() === '')) return null;
+      try {
+        const parsed = typeof remarks === 'string' ? JSON.parse(remarks) : remarks;
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) return parsed;
+        return null;
+      } catch {
+        return null;
+      }
+    };
+
+    /**
      * 为所有词典获取随机单词
      */
     const fetchAllRandomWords = () => {
@@ -490,6 +526,7 @@ export default {
       randomWordsMap,
       randomWordLoading,
       hiddenType,
+      getParsedRemarks,
       fetchRandomWord,
       revealContent,
       handleCardClick,

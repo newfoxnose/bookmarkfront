@@ -15,10 +15,10 @@
       </p>
       <p class="ant-upload-text">点击或拖放txt文件到此处进行上传</p>
       <p class="ant-upload-hint">
-        每次只能上传一个文件，仅支持txt格式，且文件大小不能超过5M，空间容量30MB，上传的文件会被自动分割。
+        每次只能上传一个文件，仅支持txt格式，且文件大小不能超过5M，用户总空间容量100MB，上传的文件会被自动分割。
       </p>
     </a-upload-dragger>
-    <div class="space-info">已使用空间：<strong>{{ space }}</strong> / 30MB</div>
+    <div class="space-info">用户空间：<strong>{{ space }}</strong> / 100MB（已使用/总空间）</div>
   </div>
   <br>
   <!-- 文件列表：卡片式布局 -->
