@@ -22,7 +22,7 @@
             <template #icon><sync-outlined /></template>
           </a-button>
         </div>
-        <div class="hot-list">
+        <div class="hot-list" :ref="(el) => setHotListRef(platform.key, el)">
           <div v-for="(item, index) in platform.items" :key="index" class="hot-item">
             <div class="rank" :class="{ 'top-rank': index < 3 }">{{ index + 1 }}</div>
             <div class="content">
@@ -346,7 +346,7 @@
 <script>
 import { message } from 'ant-design-vue';
 import { SyncOutlined } from '@ant-design/icons-vue';
-import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
+import { onMounted, getCurrentInstance, defineComponent, ref, nextTick } from 'vue';
 
 export default {
   components: {
@@ -359,6 +359,28 @@ export default {
     const loadingdone = ref(false);
 
     const { proxy } = getCurrentInstance()
+
+    /** 各平台卡片内 .hot-list 的 DOM 引用，用于刷新后滚回顶部 */
+    const hotListRefMap = ref({});
+
+    /**
+     * Vue 在 v-for 中绑定的函数 ref：挂载时写入，卸载时清掉，避免悬空引用。
+     */
+    const setHotListRef = (key, el) => {
+      if (el) {
+        hotListRefMap.value[key] = el;
+      } else {
+        delete hotListRefMap.value[key];
+      }
+    };
+
+    /** 将指定平台卡片列表的竖直滚动条恢复到顶部 */
+    const scrollPlatformHotListToTop = (platformKey) => {
+      const el = hotListRefMap.value[platformKey];
+      if (el) {
+        el.scrollTop = 0;
+      }
+    };
 
     const platforms = ref([
      
@@ -806,6 +828,9 @@ export default {
         return;
       }
 
+      // 点击刷新时立刻滚到顶部；数据返回后再 nextTick 一次，确保重渲染后仍在顶部
+      scrollPlatformHotListToTop(platformKey);
+
       switch (platformKey) {
         case 'bilibili':
           await fetchBilibiliData();
@@ -843,6 +868,9 @@ export default {
         default:
           message.info('该平台数据获取功能开发中...');
       }
+
+      await nextTick();
+      scrollPlatformHotListToTop(platformKey);
     };
 
     const getPlatformIcon = (key) => {
@@ -910,6 +938,7 @@ export default {
       loadingdone,
       platforms,
       refreshPlatform,
+      setHotListRef,
       getPlatformIcon,
       getTimeAgo
     };
