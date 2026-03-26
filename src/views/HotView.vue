@@ -828,9 +828,6 @@ export default {
         return;
       }
 
-      // 点击刷新时立刻滚到顶部；数据返回后再 nextTick 一次，确保重渲染后仍在顶部
-      scrollPlatformHotListToTop(platformKey);
-
       switch (platformKey) {
         case 'bilibili':
           await fetchBilibiliData();
@@ -869,6 +866,7 @@ export default {
           message.info('该平台数据获取功能开发中...');
       }
 
+      // 数据拉取完毕、DOM 更新后再把该卡片列表滚到顶部
       await nextTick();
       scrollPlatformHotListToTop(platformKey);
     };
