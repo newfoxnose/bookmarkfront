@@ -57,7 +57,7 @@ const DEFAULT_NAV_MAIN = [
   { key: "15", icon: "GlobalOutlined", label: "监控网站状态", path: "/monitoring" },
   { key: "17", icon: "ApiOutlined", label: "数据抓取", path: "/fetch" },
   { key: "20", icon: "ReadOutlined", label: "TXT电子书", path: "/txtreader" },
-  { key: "4", icon: "CommentOutlined", label: "CHATGPT", path: "/chat" },
+ // { key: "4", icon: "CommentOutlined", label: "CHATGPT", path: "/chat" },
   { key: "18", icon: "KeyOutlined", label: "密码管理", path: "/pwdmemo" },
   { key: "6", icon: "WifiOutlined", label: "RSS阅读器", path: "/rss" },
   { key: "16", icon: "CalendarOutlined", label: "日历", path: "/calendar" },
