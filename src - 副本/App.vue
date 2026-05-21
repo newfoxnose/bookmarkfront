@@ -35,7 +35,6 @@ import {
   GroupOutlined,
   RightOutlined,
   DownOutlined,
-  AppstoreOutlined,
 } from "@ant-design/icons-vue";
 import md5 from "js-md5";
 import VirtualKeyboard from "./components/VirtualKeyboard.vue";
@@ -52,23 +51,18 @@ const NAV_ORDER_STORAGE_KEY = "nav_order_config";
 // 默认主导航项（可直接显示的菜单）
 const DEFAULT_NAV_MAIN = [
   { key: "1", icon: "StarOutlined", label: "书签", path: "/home" },
- // { key: "4", icon: "CommentOutlined", label: "CHATGPT", path: "/chat" },
-  { key: "22", icon: "AppstoreOutlined", label: "插件广场", path: "/plugins" },
-];
-
-// 插件广场中的功能列表
-const PLUGIN_ITEMS = [
   { key: "2", icon: "FormOutlined", label: "随手记", path: "/note" },
   { key: "3", icon: "DatabaseOutlined", label: "文件中转", path: "/file" },
   { key: "5", icon: "ProfileOutlined", label: "笔记", path: "/blog" },
-  { key: "18", icon: "KeyOutlined", label: "密码管理", path: "/pwdmemo" },
   { key: "15", icon: "GlobalOutlined", label: "监控网站状态", path: "/monitoring" },
   { key: "17", icon: "ApiOutlined", label: "数据抓取", path: "/fetch" },
   { key: "20", icon: "ReadOutlined", label: "TXT电子书", path: "/txtreader" },
-  { key: "19", icon: "FireOutlined", label: "热榜", path: "/hot" },
-  { key: "21", icon: "GroupOutlined", label: "词典管理", path: "/dict" },
+ // { key: "4", icon: "CommentOutlined", label: "CHATGPT", path: "/chat" },
+  { key: "18", icon: "KeyOutlined", label: "密码管理", path: "/pwdmemo" },
   { key: "6", icon: "WifiOutlined", label: "RSS阅读器", path: "/rss" },
   { key: "16", icon: "CalendarOutlined", label: "日历", path: "/calendar" },
+  { key: "19", icon: "FireOutlined", label: "热榜", path: "/hot" },
+  { key: "21", icon: "GroupOutlined", label: "词典管理", path: "/dict" },
 ];
 
 // 默认「更多」的 key 集合，用于去重
@@ -100,7 +94,6 @@ const ICON_MAP = {
   FireOutlined,
   ReadOutlined,
   GroupOutlined,
-  AppstoreOutlined,
 };
 
 export default defineComponent({
@@ -121,7 +114,6 @@ export default defineComponent({
     SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined, ReadOutlined, GroupOutlined,
     RightOutlined,
     DownOutlined,
-    AppstoreOutlined,
     VirtualKeyboard,
     PageLockOverlay,
     PageHeader,
@@ -359,24 +351,7 @@ export default defineComponent({
         onCancel() { },
       });
     };
-    /** 监听 localStorage 变化，实现导航菜单实时更新 */
-    const handleStorageChange = (e) => {
-      if (e.key === NAV_ORDER_STORAGE_KEY) {
-        loadNavOrder();
-      }
-    };
-
-    /** 监听插件广场的导航配置变更事件 */
-    const handleNavConfigChanged = () => {
-      loadNavOrder();
-    };
-
     onMounted(() => {
-      // 监听 localStorage 变化（跨标签页）
-      window.addEventListener("storage", handleStorageChange);
-      // 监听自定义事件（同标签页）
-      window.addEventListener("navConfigChanged", handleNavConfigChanged);
-
       if (state.theme == "dark") {
         changeTheme(true);
       } else {
@@ -917,10 +892,6 @@ export default defineComponent({
     });
     onUnmounted(() => {
       if (typeof cleanupIdleLock === 'function') cleanupIdleLock();
-      // 移除 localStorage 监听器
-      window.removeEventListener("storage", handleStorageChange);
-      // 移除自定义事件监听器
-      window.removeEventListener("navConfigChanged", handleNavConfigChanged);
     });
 
     return {

@@ -144,12 +144,6 @@ const router = createRouter({
         meta: { keepAlive: true, title: "词典管理" },
         component: () => import("../views/DictView.vue"),
       },
-      {
-        path: "/plugins",
-        name: "plugins",
-        meta: { keepAlive: true, title: "插件广场" },
-        component: () => import("../views/PluginMarketView.vue"),
-      },
   ],
 });
 
