@@ -24,8 +24,8 @@ const app = createApp(App);
 registerPlugins(app)   //vuetify插件注册
 
 /* 配置请求的根路径，远程后端 */
-//axios.defaults.baseURL = "https://bm.gm.ws";
-axios.defaults.baseURL = "http://bookmark.com";
+axios.defaults.baseURL = "https://bm.gm.ws";
+//axios.defaults.baseURL = "http://bookmark.com";
 
 axios.defaults.timeout = 120000;   //axios全局超时时间，单位毫秒，120000等于2分钟
 
