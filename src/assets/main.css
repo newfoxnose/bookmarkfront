@@ -41,10 +41,24 @@
   text-align: center;
 }
 
+.ant-layout-content {
+  padding-left: 0 !important;
+}
+
+.ant-layout-sider{
+  width: 234px !important;
+  min-width: 234px !important;
+  max-width: 234px !important;
+}
+
 /* 侧边栏样式 */
 .ant-layout-sider-dark .ant-layout-sider-zero-width-trigger {
   background-color: #1890FF;
   top: 0;
+}
+
+.page-content-wrap {
+  padding-left: 10px !important;
 }
 
 /* 内容区域主题样式，这个不能删除 */
