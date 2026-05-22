@@ -101,6 +101,15 @@ export default defineComponent({
       if (lockTimeoutSaveTimer) clearTimeout(lockTimeoutSaveTimer);
     });
 
+    const SHOW_TODO_KEY = 'show_todo_in_sidebar';
+    const showTodoInSidebar = ref(localStorage.getItem(SHOW_TODO_KEY) !== 'false');
+    const onShowTodoChange = (checked) => {
+      showTodoInSidebar.value = checked;
+      localStorage.setItem(SHOW_TODO_KEY, String(checked));
+      window.dispatchEvent(new CustomEvent('showTodoInSidebarChanged'));
+      message.success(`左边栏待办已${checked ? '显示' : '隐藏'}`);
+    };
+
     return {
       formState,
       onFinish,
@@ -121,6 +130,8 @@ export default defineComponent({
       },
       lockTimeoutMinutes,
       onLockTimeoutChange,
+      showTodoInSidebar,
+      onShowTodoChange,
     };
   },
   data() {
@@ -199,8 +210,8 @@ export default defineComponent({
 
 
 
-    <h3 class="content-title">页面自动锁定</h3><br>
-    <a-form-item label="多少分钟内无操作" :rules="[{ required:false }]">
+    <h3 class="content-title">其他设置</h3><br>
+    <a-form-item label="多少分钟内无操作自动锁定" :rules="[{ required:false }]">
       <a-input-number
         v-model:value="lockTimeoutMinutes"
         :min="0"
@@ -210,6 +221,9 @@ export default defineComponent({
         style="width: 120px"
       />
       <span style="margin-left: 8px; color: #888">0 表示不自动锁定</span>
+    </a-form-item>
+    <a-form-item label="左边栏显示待办">
+      <a-switch v-model:checked="showTodoInSidebar" @change="onShowTodoChange" />
     </a-form-item>
   </a-form>
 

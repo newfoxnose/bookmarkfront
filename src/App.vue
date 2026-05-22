@@ -149,6 +149,7 @@ export default defineComponent({
     const activeKey = ref(["xx"]);
     const badge_type = ref("#666");
     const breakpoint_active = ref(false);
+    const showTodoInSidebar = ref(localStorage.getItem('show_todo_in_sidebar') !== 'false');
 
     // 可拖拽导航：主导航列表与「更多」列表，支持互相拖动
     const navMain = ref([]);
@@ -371,11 +372,16 @@ export default defineComponent({
       loadNavOrder();
     };
 
+    const handleShowTodoChanged = () => {
+      showTodoInSidebar.value = localStorage.getItem('show_todo_in_sidebar') !== 'false';
+    };
+
     onMounted(() => {
       // 监听 localStorage 变化（跨标签页）
       window.addEventListener("storage", handleStorageChange);
       // 监听自定义事件（同标签页）
       window.addEventListener("navConfigChanged", handleNavConfigChanged);
+      window.addEventListener("showTodoInSidebarChanged", handleShowTodoChanged);
 
       if (state.theme == "dark") {
         changeTheme(true);
@@ -921,6 +927,7 @@ export default defineComponent({
       window.removeEventListener("storage", handleStorageChange);
       // 移除自定义事件监听器
       window.removeEventListener("navConfigChanged", handleNavConfigChanged);
+      window.removeEventListener("showTodoInSidebarChanged", handleShowTodoChanged);
     });
 
     return {
@@ -931,6 +938,7 @@ export default defineComponent({
       footertheme,
       collapsetheme,
       todo_items,
+      showTodoInSidebar,
       toggleTodo,
       newtodosummary,
       createTodo,
@@ -1244,7 +1252,7 @@ export default defineComponent({
           <div class="logo" :theme="theme">
             <img :src="logourl" height="30" />
           </div>
-          <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed == false">
+          <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed == false && showTodoInSidebar">
             <a-collapse-panel key="xx" header="待办">
               <p v-for="item in todo_items">
                 <a-checkbox v-if="item.is_done == 0" @change="toggleTodo(item.id)" v-model:checked="item.is_done"><span
@@ -1335,7 +1343,7 @@ export default defineComponent({
           <!-- 160x600 广告位居中 -->
           <div style="text-align: center; padding-top: 12px;">
             <ins class="adsbygoogle"
-              style="display:inline-block;width:160px;height:600px"
+              style="display:inline-block;width:234px;height:60px"
               data-ad-client="ca-pub-6721623848988004"
               data-ad-slot="9050778722"></ins>
           </div>
