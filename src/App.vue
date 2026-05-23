@@ -1254,10 +1254,10 @@ export default defineComponent({
           </div>
                     <!-- 160x600 广告位居中 -->
           <div style="text-align: center; padding-top: 12px;">
-            <ins class="adsbygoogle"
-              style="display:inline-block;width:234px;height:60px"
-              data-ad-client="ca-pub-6721623848988004"
-              data-ad-slot="9050778722"></ins>
+           <ins class="adsbygoogle"
+     style="display:inline-block;width:200px;height:200px"
+     data-ad-client="ca-pub-6721623848988004"
+     data-ad-slot="3001409339"></ins>
           </div>
           <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed == false && showTodoInSidebar">
             <a-collapse-panel key="xx" header="待办">
