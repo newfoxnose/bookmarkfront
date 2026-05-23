@@ -46,9 +46,9 @@
 }
 
 .ant-layout-sider{
-  width: 234px !important;
-  min-width: 234px !important;
-  max-width: 234px !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
 }
 
 /* 侧边栏样式 */

@@ -1253,7 +1253,7 @@ export default defineComponent({
             <img :src="logourl" height="30" />
           </div>
                     <!-- 160x600 广告位居中 -->
-          <div style="text-align: center; padding-top: 12px;">
+          <div style="text-align: center; padding-top: 0;">
            <ins class="adsbygoogle"
      style="display:inline-block;width:200px;height:200px"
      data-ad-client="ca-pub-6721623848988004"
