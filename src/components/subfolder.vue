@@ -173,7 +173,7 @@ export default {
           )
         "
       />
-      <a :href="go_url+bookmarkitem.id+'/'+bookmarkitem.url" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
+      <a :href="go_url+bookmarkitem.id" :title="bookmarkitem.title" :pinyin="bookmarkitem.pinyin" target="_blank">
         {{ bookmarkitem.short_title }}
       </a>
       <RouterLink :to="{ path: '/frame/' + bookmarkitem.id, query: { title: bookmarkitem.title } }"><border-outlined style="margin-left:3px;" /></RouterLink>

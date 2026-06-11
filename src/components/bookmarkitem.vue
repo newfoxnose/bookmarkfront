@@ -27,7 +27,7 @@ export default {
     <img v-if="editable == 'yes'" :src="icon" style="width:16px;height:16px;margin-right:3px;"
       @click="$emit('editbookmark', '编辑书签', id, url, title, folder_id, is_private, is_published,is_recommend,is_friendlink)">
     <img v-else :src="icon" style="width:16px;height:16px;">
-    <a :href=" go_url+id+'/'+url" :title="title" target="_blank">
+    <a :href=" go_url+id" :title="title" target="_blank">
       {{ short_title }}
     </a>
     <!-- 在 frame 中打开书签的链接，鼠标悬停显示提示和放大效果 -->
