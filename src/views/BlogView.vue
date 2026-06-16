@@ -12,7 +12,7 @@
     />
   </div>
   <h3 style="text-align: center;">
-    <a-button type="primary" @click="showDrawer('新建笔记', 0, '', false)"><form-outlined />新建</a-button>
+    <a-button style="display: none" type="primary" @click="showDrawer('新建笔记', 0, '', false)"><form-outlined />新建</a-button>
     <a-button type="primary" style="margin-left: 8px" @click="showDrawer('新建笔记（MarkDown）', 0, '', true)"><form-outlined />新建（MarkDown）</a-button>
   </h3>
 
