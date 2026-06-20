@@ -44,11 +44,11 @@
 
 <script setup>
   const customize = [
-  {
-      icon: './assets/icons/chatgpt.png',
-      title: 'ChatGPT集成',
+    {
+      icon: './assets/icons/notepad.png',
+      title: 'Markdown 笔记',
       subtitle:
-        '随时问答，提供智能化建议和辅助，提升工作效率。',
+        '基于 Markdown 编辑，支持实时预览与代码高亮，随时记录灵感。',
     },
     {
       icon: './assets/icons/todo.png',
@@ -57,9 +57,9 @@
         '待办事项标记，设定重复任务，高效管理时间。',
     },
     {
-      icon: './assets/icons/notepad.png',
-      title: '记事本',
+      icon: './assets/icons/cards.png',
+      title: '卡片记忆学习',
       subtitle:
-        '随时记录灵感，富文本编辑器，快捷键保存。',
+        '简单高效，支持各种适合对照记忆的学习内容。',
     },
   ]; </script>

@@ -8,12 +8,11 @@
       <v-row class="d-flex align-center">
         <v-col cols="12" md="5">
           <div class="text-h4 font-weight-bold">
-            Great pricing plans tailored to your needs.
+            完全免费
           </div>
 
           <div class="text-body-1 text-medium-emphasis mt-5">
-            Quis autem velis ets reprehender net etid quiste voluptate. Utise wisi
-            enim minim veniam, quis et stationes nets.
+            所有基础功能完全免费使用，无需付费即可享受书签管理、Markdown笔记、RSS阅读、文件中转等便捷服务。
           </div>
         </v-col>
 
@@ -23,15 +22,15 @@
             elevation="5"
           >
             <div class="text-h6 font-weight-bold">
-              MONTHLY
+              基础版
             </div>
 
             <div class="text-h2 font-weight-bold">
-              $19
+              免费
             </div>
 
             <div class="text-body-1 text-medium-emphasis">
-              Per Month
+              永久使用
             </div>
 
             <v-btn
@@ -39,12 +38,13 @@
               color="surface-variant"
               flat
               rounded
-              text="GET STARTED"
+              text="开始使用"
             />
 
             <div class="text-center text-body-1 text-medium-emphasis">
-              First two weeks free. <br>
-              Amazing features.
+              书签管理<br>
+              Markdown笔记<br>
+              RSS阅读
             </div>
           </v-card>
         </v-col>
@@ -56,15 +56,15 @@
             elevation="5"
           >
             <div class="text-h6 font-weight-bold">
-              ANNUALY
+              进阶版
             </div>
 
             <div class="text-h2 font-weight-bold">
-              $29
+              免费
             </div>
 
             <div class="text-body-1 text-white">
-              Per Month
+              永久使用
             </div>
 
             <v-btn
@@ -73,12 +73,13 @@
               flat
               height="55"
               rounded
-              text="GET IN TOUCH"
+              text="立即体验"
             />
 
             <div class="text-center text-body-1">
-              First two weeks free. <br>
-              Save 45% with this plan<br>Amazing features.
+              全部基础功能<br>
+              文件中转<br>
+              卡片记忆学习
             </div>
           </v-card>
         </v-col>

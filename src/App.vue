@@ -872,10 +872,11 @@ export default defineComponent({
 
     /** 验证私有口令并解锁：调用 unlock_screen_ajax 接口 */
     const verifyAndUnlock = (password) => {
-      if (!password || !String(password).trim()) {
-        message.error('请输入私有口令');
-        return;
-      }
+      //允许口令为空
+      //if (!password || !String(password).trim()) {
+      //  message.error('请输入私有口令');
+      //  return;
+      //}
       unlockLoading.value = true;
       const params = new URLSearchParams();
       params.append('timestamp', new Date().getTime());
