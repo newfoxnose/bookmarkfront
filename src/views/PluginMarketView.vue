@@ -75,6 +75,7 @@ import {
   DatabaseOutlined,
   ProfileOutlined,
   KeyOutlined,
+  ScanOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
@@ -97,6 +98,7 @@ export default defineComponent({
     DatabaseOutlined,
     ProfileOutlined,
     KeyOutlined,
+    ScanOutlined,
   },
   setup() {
     const router = useRouter();
@@ -178,6 +180,13 @@ export default defineComponent({
         label: "日历",
         path: "/calendar",
         description: "个人日历管理，支持日程提醒和事件记录",
+      },
+      {
+        key: "23",
+        icon: "ScanOutlined",
+        label: "OCR识别",
+        path: "/ocr",
+        description: "图片文字识别，支持多种语言，快速提取图片中的文字内容",
       },
     ]);
 
@@ -290,6 +299,7 @@ export default defineComponent({
       DatabaseOutlined,
       ProfileOutlined,
       KeyOutlined,
+      ScanOutlined,
     };
 
     const getIcon = (iconName) => {

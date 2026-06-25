@@ -36,6 +36,7 @@ import {
   RightOutlined,
   DownOutlined,
   AppstoreOutlined,
+  ScanOutlined,
 } from "@ant-design/icons-vue";
 import md5 from "js-md5";
 import VirtualKeyboard from "./components/VirtualKeyboard.vue";
@@ -69,6 +70,7 @@ const PLUGIN_ITEMS = [
   { key: "21", icon: "GroupOutlined", label: "词典管理", path: "/dict" },
   { key: "6", icon: "WifiOutlined", label: "RSS阅读器", path: "/rss" },
   { key: "16", icon: "CalendarOutlined", label: "日历", path: "/calendar" },
+  { key: "23", icon: "ScanOutlined", label: "OCR识别", path: "/ocr" },
 ];
 
 // 默认「更多」的 key 集合，用于去重
@@ -101,6 +103,7 @@ const ICON_MAP = {
   ReadOutlined,
   GroupOutlined,
   AppstoreOutlined,
+  ScanOutlined,
 };
 
 export default defineComponent({
@@ -118,7 +121,7 @@ export default defineComponent({
     CalendarOutlined,
     PlusOutlined,
     CloseOutlined,
-    SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined, ReadOutlined, GroupOutlined,
+    SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined, ReadOutlined, GroupOutlined, ScanOutlined,
     RightOutlined,
     DownOutlined,
     AppstoreOutlined,
