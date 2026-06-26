@@ -76,6 +76,7 @@ import {
   ProfileOutlined,
   KeyOutlined,
   ScanOutlined,
+  BookOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
@@ -99,6 +100,7 @@ export default defineComponent({
     ProfileOutlined,
     KeyOutlined,
     ScanOutlined,
+    BookOutlined,
   },
   setup() {
     const router = useRouter();
@@ -187,6 +189,13 @@ export default defineComponent({
         label: "OCR识别",
         path: "/ocr",
         description: "图片文字识别，支持多种语言，快速提取图片中的文字内容",
+      },
+      {
+        key: "24",
+        icon: "BookOutlined",
+        label: "成语词典",
+        path: "/idiom",
+        description: "输入关键词查询成语词典，快速获取成语解释和详细信息",
       },
     ]);
 
@@ -300,6 +309,7 @@ export default defineComponent({
       ProfileOutlined,
       KeyOutlined,
       ScanOutlined,
+      BookOutlined,
     };
 
     const getIcon = (iconName) => {

@@ -143,11 +143,17 @@ const router = createRouter({
         name: "dict",
         meta: { keepAlive: true, title: "词典管理" },
         component: () => import("../views/DictView.vue"),
-      },{
+      }, {
         path: "/ocr",
         name: "ocr",
         meta: { keepAlive: true, title: "OCR识别" },
         component: () => import("../views/OCRView.vue"),
+      },
+      {
+        path: "/idiom",
+        name: "idiom",
+        meta: { keepAlive: true, title: "成语词典" },
+        component: () => import("../views/IdiomView.vue"),
       },
       {
         path: "/plugins",
