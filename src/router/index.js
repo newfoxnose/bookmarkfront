@@ -139,10 +139,10 @@ const router = createRouter({
         meta: { keepAlive: true, title: "TXT电子书" },
         component: () => import("../views/TxtReaderView.vue"),
       },{
-        path: "/dict",
-        name: "dict",
-        meta: { keepAlive: true, title: "词典管理" },
-        component: () => import("../views/DictView.vue"),
+        path: "/flashcard",
+        name: "flashcard",
+        meta: { keepAlive: true, title: "卡片管理" },
+        component: () => import("../views/FlashcardView.vue"),
       }, {
         path: "/ocr",
         name: "ocr",
@@ -153,7 +153,19 @@ const router = createRouter({
         path: "/idiom",
         name: "idiom",
         meta: { keepAlive: true, title: "成语词典" },
-        component: () => import("../views/IdiomView.vue"),
+        component: () => import("../views/DictView.vue"),
+      },
+      {
+        path: "/ecdict",
+        name: "ecdict",
+        meta: { keepAlive: true, title: "英汉词典" },
+        component: () => import("../views/DictView.vue"),
+      },
+      {
+        path: "/cedict",
+        name: "cedict",
+        meta: { keepAlive: true, title: "汉英词典" },
+        component: () => import("../views/DictView.vue"),
       },
       {
         path: "/plugins",

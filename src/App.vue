@@ -37,6 +37,9 @@ import {
   DownOutlined,
   AppstoreOutlined,
   ScanOutlined,
+  BookOutlined,
+  TranslationOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons-vue";
 import md5 from "js-md5";
 import VirtualKeyboard from "./components/VirtualKeyboard.vue";
@@ -67,7 +70,7 @@ const PLUGIN_ITEMS = [
   { key: "17", icon: "ApiOutlined", label: "数据抓取", path: "/fetch" },
   { key: "20", icon: "ReadOutlined", label: "TXT电子书", path: "/txtreader" },
   { key: "19", icon: "FireOutlined", label: "热榜", path: "/hot" },
-  { key: "21", icon: "GroupOutlined", label: "词典管理", path: "/dict" },
+  { key: "21", icon: "GroupOutlined", label: "单词卡", path: "/flashcard" },
   { key: "6", icon: "WifiOutlined", label: "RSS阅读器", path: "/rss" },
   { key: "16", icon: "CalendarOutlined", label: "日历", path: "/calendar" },
   { key: "23", icon: "ScanOutlined", label: "OCR识别", path: "/ocr" },
@@ -104,6 +107,9 @@ const ICON_MAP = {
   GroupOutlined,
   AppstoreOutlined,
   ScanOutlined,
+  BookOutlined,
+  TranslationOutlined,
+  FileTextOutlined,
 };
 
 export default defineComponent({
@@ -122,6 +128,7 @@ export default defineComponent({
     PlusOutlined,
     CloseOutlined,
     SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined, ReadOutlined, GroupOutlined, ScanOutlined,
+    BookOutlined, TranslationOutlined, FileTextOutlined,
     RightOutlined,
     DownOutlined,
     AppstoreOutlined,

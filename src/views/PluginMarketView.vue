@@ -77,6 +77,8 @@ import {
   KeyOutlined,
   ScanOutlined,
   BookOutlined,
+  TranslationOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
@@ -101,6 +103,8 @@ export default defineComponent({
     KeyOutlined,
     ScanOutlined,
     BookOutlined,
+    TranslationOutlined,
+    FileTextOutlined,
   },
   setup() {
     const router = useRouter();
@@ -165,9 +169,9 @@ export default defineComponent({
       {
         key: "21",
         icon: "GroupOutlined",
-        label: "词典管理",
-        path: "/dict",
-        description: "管理个人词典，支持单词收藏和记忆",
+        label: "单词卡",
+        path: "/flashcard",
+        description: "管理个人单词卡，支持单词收藏和记忆",
       },
       {
         key: "6",
@@ -196,6 +200,20 @@ export default defineComponent({
         label: "成语词典",
         path: "/idiom",
         description: "输入关键词查询成语词典，快速获取成语解释和详细信息",
+      },
+      {
+        key: "25",
+        icon: "TranslationOutlined",
+        label: "英汉词典",
+        path: "/ecdict",
+        description: "输入英文单词查询释义，支持分页浏览",
+      },
+      {
+        key: "26",
+        icon: "FileTextOutlined",
+        label: "汉英词典",
+        path: "/cedict",
+        description: "输入中文查询释义，支持分页浏览，支持分页浏览",
       },
     ]);
 
@@ -310,6 +328,8 @@ export default defineComponent({
       KeyOutlined,
       ScanOutlined,
       BookOutlined,
+      TranslationOutlined,
+      FileTextOutlined,
     };
 
     const getIcon = (iconName) => {
