@@ -173,7 +173,7 @@ const search = async () => {
     if (data.result && data.result.data) {
       results.value = data.result.data.filter(item => item && item.display).map(item => ({
         ...item,
-        display: item.display || ''
+        display: (item.display || '').replace(/\r?\n/g, '<br>')
       }));
       pagination.value = {
         page: data.result.pagination?.page || 1,
