@@ -156,6 +156,12 @@ const router = createRouter({
         component: () => import("../views/DictView.vue"),
       },
       {
+        path: "/saying",
+        name: "saying",
+        meta: { keepAlive: true, title: "俗语" },
+        component: () => import("../views/SayingView.vue"),
+      },
+      {
         path: "/plugins",
         name: "plugins",
         meta: { keepAlive: true, title: "插件广场" },

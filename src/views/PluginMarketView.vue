@@ -78,6 +78,7 @@ import {
   ScanOutlined,
   BookOutlined,
   TranslationOutlined,
+  MessageOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
@@ -103,6 +104,7 @@ export default defineComponent({
     ScanOutlined,
     BookOutlined,
     TranslationOutlined,
+    MessageOutlined,
   },
   setup() {
     const router = useRouter();
@@ -198,6 +200,13 @@ export default defineComponent({
         label: "词典大全",
         path: "/dict",
         description: "集成成语词典、英汉词典、汉英词典、新华字典、辞海、古诗词等，支持下拉切换",
+      },
+      {
+        key: "25",
+        icon: "MessageOutlined",
+        label: "俗语",
+        path: "/saying",
+        description: "包含谜语、歇后语、脑筋急转弯，点击刷新随机显示一条",
       },
     ]);
 
@@ -313,6 +322,7 @@ export default defineComponent({
       ScanOutlined,
       BookOutlined,
       TranslationOutlined,
+      MessageOutlined,
     };
 
     const getIcon = (iconName) => {
