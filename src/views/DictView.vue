@@ -2,19 +2,31 @@
   <div class="dict-container">
     <a-card :bordered="false">
       <div class="search-section">
+        <a-select
+          v-model:value="selectedDictionary"
+          style="width: 150px; margin-right: 8px"
+          size="large"
+        >
+         <a-select-option value="新华字典">新华字典</a-select-option>
+          <a-select-option value="成语词典">成语词典</a-select-option>
+          <a-select-option value="英汉词典">英汉词典</a-select-option>
+          <a-select-option value="汉英词典">汉英词典</a-select-option>
+          <a-select-option value="辞海">辞海</a-select-option>
+           <a-select-option value="古诗词">古诗词</a-select-option>
+        </a-select>
         <a-input-search
           v-model:value="keyword"
-          :placeholder="config.placeholder"
-          :enter-button="config.buttonText"
+          :placeholder="placeholder"
+          :enter-button="buttonText"
           size="large"
           :loading="loading"
           @search="search"
-          style="width: 500px"
+          style="width: 350px"
         />
       </div>
 
       <div v-if="results.length > 0" class="result-section">
-        <a-divider>{{ config.resultTitle }} (共 {{ pagination.total }} 条)</a-divider>
+        <a-divider>{{ resultTitle }} (共 {{ pagination.total }} 条)</a-divider>
         <div class="result-list">
           <div
             v-for="(item, index) in results"
@@ -37,7 +49,7 @@
       </div>
 
       <div v-else-if="!loading && hasSearched && results.length === 0" class="empty-section">
-        <a-empty :description="config.emptyText" />
+        <a-empty :description="emptyText" />
       </div>
 
       <a-alert
@@ -52,54 +64,22 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, watch, onMounted } from 'vue';
 import { message } from 'ant-design-vue';
-
-const route = useRoute();
 
 const apiBaseUrl = 'https://express.o-oo.net.cn';
 const apiUrl = `${apiBaseUrl}/api/chaxun`;
 const TOKEN_KEY = 'dict_token';
 
-const dictConfig = {
-  idiom: {
-    dictionary: '成语词典',
-    placeholder: '请输入成语关键词进行搜索',
-    buttonText: '搜索',
-    resultTitle: '搜索结果',
-    emptyText: '未找到相关成语',
-    notFoundMessage: '未找到相关成语',
-    searchError: '搜索失败'
-  },
-  ecdict: {
-    dictionary: '英汉词典',
-    placeholder: '请输入英文单词进行查询',
-    buttonText: '查询',
-    resultTitle: '查询结果',
-    emptyText: '未找到相关单词',
-    notFoundMessage: '未找到相关单词',
-    searchError: '查询失败'
-  },
-  cedict: {
-    dictionary: '汉英词典',
-    placeholder: '请输入中文进行查询',
-    buttonText: '查询',
-    resultTitle: '查询结果',
-    emptyText: '未找到相关单词',
-    notFoundMessage: '未找到相关单词',
-    searchError: '查询失败'
-  }
-};
+// 统一的显示配置
+const placeholder = '请输入关键词';
+const buttonText = '查询';
+const resultTitle = '查询结果';
+const emptyText = '未找到相关内容';
+const notFoundMessage = '未找到相关内容';
+const searchError = '查询失败';
 
-const currentType = computed(() => {
-  return route.params.type || route.name;
-});
-
-const config = computed(() => {
-  return dictConfig[currentType.value] || dictConfig.idiom;
-});
-
+const selectedDictionary = ref('成语词典');
 const keyword = ref('');
 const loading = ref(false);
 const error = ref('');
@@ -114,6 +94,7 @@ const pagination = ref({
 
 const token = ref('');
 const lastKeyword = ref('');
+const lastDictionary = ref('');
 
 const getToken = async () => {
   try {
@@ -142,9 +123,10 @@ const search = async () => {
     return;
   }
 
-  if (keyword.value.trim() !== lastKeyword.value) {
+  if (keyword.value.trim() !== lastKeyword.value || selectedDictionary.value !== lastDictionary.value) {
     pagination.value.page = 1;
     lastKeyword.value = keyword.value.trim();
+    lastDictionary.value = selectedDictionary.value;
   }
 
   if (!token.value) {
@@ -166,7 +148,7 @@ const search = async () => {
       },
       body: JSON.stringify({
         keyword: keyword.value.trim(),
-        dictionary: config.value.dictionary,
+        dictionary: selectedDictionary.value,
         page: pagination.value.page,
         pageSize: pagination.value.pageSize
       })
@@ -181,11 +163,11 @@ const search = async () => {
         if (!token.value) return;
         return search();
       }
-      throw new Error(data.msg || config.value.searchError);
+      throw new Error(data.msg || searchError);
     }
 
     if (data.success !== 'ok') {
-      throw new Error(data.msg || config.value.searchError);
+      throw new Error(data.msg || searchError);
     }
 
     if (data.result && data.result.data) {
@@ -205,12 +187,12 @@ const search = async () => {
     }
 
     if (results.value.length === 0) {
-      message.info(config.value.notFoundMessage);
+      message.info(notFoundMessage);
     }
 
   } catch (err) {
     error.value = err.message;
-    message.error(config.value.searchError + ': ' + err.message);
+    message.error(searchError + ': ' + err.message);
   } finally {
     loading.value = false;
   }
@@ -239,12 +221,23 @@ const resetState = () => {
     totalPages: 0
   };
   lastKeyword.value = '';
+  lastDictionary.value = '';
   error.value = '';
 };
 
-watch(() => route.name, () => {
-  loadToken();
-  resetState();
+watch(selectedDictionary, () => {
+  // 切换词典时保留关键词，只清除搜索结果
+  results.value = [];
+  hasSearched.value = false;
+  pagination.value = {
+    page: 1,
+    pageSize: 15,
+    total: 0,
+    totalPages: 0
+  };
+  lastKeyword.value = '';
+  lastDictionary.value = '';
+  error.value = '';
 });
 
 onMounted(() => {

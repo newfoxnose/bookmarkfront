@@ -150,21 +150,9 @@ const router = createRouter({
         component: () => import("../views/OCRView.vue"),
       },
       {
-        path: "/idiom",
-        name: "idiom",
-        meta: { keepAlive: true, title: "成语词典" },
-        component: () => import("../views/DictView.vue"),
-      },
-      {
-        path: "/ecdict",
-        name: "ecdict",
-        meta: { keepAlive: true, title: "英汉词典" },
-        component: () => import("../views/DictView.vue"),
-      },
-      {
-        path: "/cedict",
-        name: "cedict",
-        meta: { keepAlive: true, title: "汉英词典" },
+        path: "/dict",
+        name: "dict",
+        meta: { keepAlive: true, title: "词典大全" },
         component: () => import("../views/DictView.vue"),
       },
       {
