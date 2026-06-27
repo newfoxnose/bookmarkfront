@@ -77,6 +77,7 @@ import {
   KeyOutlined,
   ScanOutlined,
   BookOutlined,
+  TranslationOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
@@ -101,6 +102,7 @@ export default defineComponent({
     KeyOutlined,
     ScanOutlined,
     BookOutlined,
+    TranslationOutlined,
   },
   setup() {
     const router = useRouter();
@@ -192,10 +194,10 @@ export default defineComponent({
       },
       {
         key: "24",
-        icon: "BookOutlined",
+        icon: "TranslationOutlined",
         label: "词典大全",
         path: "/dict",
-        description: "集成成语词典、英汉词典、汉英词典、新华字典、辞海，支持下拉切换",
+        description: "集成成语词典、英汉词典、汉英词典、新华字典、辞海、古诗词等，支持下拉切换",
       },
     ]);
 
@@ -310,6 +312,7 @@ export default defineComponent({
       KeyOutlined,
       ScanOutlined,
       BookOutlined,
+      TranslationOutlined,
     };
 
     const getIcon = (iconName) => {

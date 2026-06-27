@@ -37,7 +37,7 @@ import {
   DownOutlined,
   AppstoreOutlined,
   ScanOutlined,
-  BookOutlined,
+  TranslationOutlined,
 } from "@ant-design/icons-vue";
 import md5 from "js-md5";
 import VirtualKeyboard from "./components/VirtualKeyboard.vue";
@@ -105,7 +105,7 @@ const ICON_MAP = {
   GroupOutlined,
   AppstoreOutlined,
   ScanOutlined,
-  BookOutlined,
+  TranslationOutlined,
 };
 
 export default defineComponent({
@@ -124,7 +124,7 @@ export default defineComponent({
     PlusOutlined,
     CloseOutlined,
     SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined, ReadOutlined, GroupOutlined, ScanOutlined,
-    BookOutlined,
+    TranslationOutlined,
     RightOutlined,
     DownOutlined,
     AppstoreOutlined,
