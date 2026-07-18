@@ -1261,13 +1261,7 @@ export default defineComponent({
           <div class="logo" :theme="theme" style="display:none">
             <img :src="logourl" height="30" />
           </div>
-                    <!-- 160x600 广告位居中 -->
-          <div style="text-align: center; padding-top: 0;">
-           <ins class="adsbygoogle"
-     style="display:inline-block;width:200px;height:200px"
-     data-ad-client="ca-pub-6721623848988004"
-     data-ad-slot="3001409339"></ins>
-          </div>
+                  
           <a-collapse v-model:activeKey="activeKey" :class="collapsetheme" v-if="collapsed == false && showTodoInSidebar">
             <a-collapse-panel key="xx" header="待办">
               <p v-for="item in todo_items">
