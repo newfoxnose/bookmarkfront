@@ -6,6 +6,15 @@
     }" />
   </div>
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
+  <div class="url-form">
+    <a-input-search
+      v-model:value="urlInput"
+      placeholder="粘贴网页 URL，将正文转为 txt 电子书"
+      enter-button="转码"
+      :loading="urlSubmitting"
+      @search="submitUrl"
+    />
+  </div>
   <div>
     <a-upload-dragger v-model:fileList="fileList" name="file" :multiple="false" :action=upload_url
       :data={token:aaa,timestamp:bbb,key:file_key} @change=" handleChange " :before-upload=" handleBeforeUpload "
@@ -80,6 +89,10 @@
   />
 </template>
 <style scoped>
+/* URL转码表单 */
+.url-form {
+  margin-bottom: 16px;
+}
 /* 已使用空间提示 */
 .space-info {
   margin-top: 12px;
@@ -512,6 +525,9 @@ export default {
     const space = ref('');
     const upload_url = ref(proxy.$remoteDomain+"/ajax/upload_txt_ajax")
 
+    const urlInput = ref('');
+    const urlSubmitting = ref(false);
+
     const visible = ref(false);
     const articletitle = ref('');
     const articlecontent = ref('');
@@ -696,6 +712,36 @@ export default {
       }
     };
 
+    const submitUrl = () => {
+      if (!urlInput.value || !urlInput.value.match(/^https?:\/\//i)) {
+        message.error('请输入有效的 URL');
+        return;
+      }
+      urlSubmitting.value = true;
+      let params = new URLSearchParams();
+      params.append('token', $cookies.get('token'));
+      params.append('timestamp', new Date().getTime());
+      params.append('url', urlInput.value);
+      proxy.$http.post('/ajax/url_to_txt_ajax/', params).then(res => {
+        if (res.data.code == '401') {
+          window.location.href = '/';
+          return;
+        }
+        if (res.data.code == '200') {
+          message.success('转换成功');
+          fileitems.value = res.data.data.documents;
+          space.value = res.data.data.space;
+          urlInput.value = '';
+        } else {
+          message.error(res.data.msg || '转换失败');
+        }
+      }).catch(() => {
+        message.error('网络请求失败');
+      }).finally(() => {
+        urlSubmitting.value = false;
+      });
+    };
+
     const deletefile = (file) => {
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
@@ -716,6 +762,9 @@ export default {
       space,
       handleBeforeUpload,
       handleChange,
+      urlInput,
+      urlSubmitting,
+      submitUrl,
       deletefile,
       fileList: ref([]),
       handleDrop: e => {
