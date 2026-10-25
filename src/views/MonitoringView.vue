@@ -78,32 +78,9 @@
   text-align: center;
 }
 
-/* 无法访问的网站行高亮样式 */
+/* 无法访问的网站行标识（仅左边框，不使用粉色背景） */
 :deep(.error-row) {
-  background-color: #ffebe6 !important;
   border-left: 4px solid #ff4d4f;
-}
-
-:deep(.error-row:hover) {
-  background-color: #ffd4cc !important;
-}
-
-/* 确保固定列也应用高亮样式 */
-:deep(.error-row td) {
-  background-color: #ffebe6 !important;
-}
-
-:deep(.error-row:hover td) {
-  background-color: #ffd4cc !important;
-}
-
-/* 特别针对固定列 */
-:deep(.ant-table-tbody > tr.error-row > td.ant-table-cell-fix-right) {
-  background-color: #ffebe6 !important;
-}
-
-:deep(.ant-table-tbody > tr.error-row:hover > td.ant-table-cell-fix-right) {
-  background-color: #ffd4cc !important;
 }
 
 

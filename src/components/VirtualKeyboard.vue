@@ -7,29 +7,45 @@
       </div>
       
       <div class="keyboard-display">
-        <input 
+        <input
           ref="displayInput"
-          v-model="inputValue" 
-          type="password" 
+          v-model="inputValue"
+          type="password"
           class="display-input"
+          :class="{ 'input-error': errorMessage }"
           readonly
           placeholder="请输入口令"
         />
-        <button class="clear-btn" @click="clearInput" v-if="inputValue">清空</button>
+        <button class="clear-btn" @click="clearInput" v-if="inputValue && !loading">清空</button>
       </div>
-      
-      <div class="keyboard-grid">
-        <button 
-          v-for="number in numbers" 
+
+      <!-- 错误提示：直接在键盘内展示，确保用户可见 -->
+      <div v-if="errorMessage" class="keyboard-error">
+        <span class="error-icon">!</span>
+        <span class="error-text">{{ errorMessage }}</span>
+      </div>
+
+      <div class="keyboard-grid" :class="{ 'grid-disabled': loading }">
+        <button
+          v-for="number in numbers"
           :key="number"
           class="keyboard-key number-key"
+          :disabled="loading"
           @click="addNumber(number)"
         >
           {{ number }}
         </button>
-        <button class="keyboard-key action-key" @click="deleteLast">删除</button>
-        <button class="keyboard-key action-key" @click="clearInput">清空</button>
-        <button class="keyboard-key action-key confirm-key" @click="confirmInput">确认</button>
+        <button class="keyboard-key action-key" :disabled="loading" @click="deleteLast">删除</button>
+        <button class="keyboard-key action-key" :disabled="loading" @click="clearInput">清空</button>
+        <button
+          class="keyboard-key action-key confirm-key"
+          :class="{ 'confirm-loading': loading }"
+          :disabled="loading"
+          @click="confirmInput"
+        >
+          <span v-if="loading" class="confirm-spinner"></span>
+          <span v-else>确认</span>
+        </button>
       </div>
     </div>
   </div>
@@ -58,6 +74,16 @@ export default defineComponent({
     dark: {
       type: Boolean,
       default: false
+    },
+    // 确认中加载状态：按钮显示 spinner，禁用所有按键防止重复提交
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    // 错误提示文本：非空时在键盘内显示，便于用户区分密码错误/网络异常
+    errorMessage: {
+      type: String,
+      default: ''
     }
   },
   emits: ['update:modelValue', 'confirm', 'close'],
@@ -93,11 +119,12 @@ export default defineComponent({
       emit('update:modelValue', inputValue.value)
     }
     
-    // 确认输入：先 emit 让父组件处理，再在 nextTick 中关闭，确保请求能发出
+    // 确认输入：仅 emit，由父组件根据验证结果决定是否关闭键盘
+    // 密码错误时父组件可保留键盘并显示错误，避免用户需重新唤起
     const confirmInput = () => {
+      if (props.loading) return
       const val = inputValue.value
       emit('confirm', val)
-      nextTick(() => closeKeyboard())
     }
     
     // 关闭键盘
@@ -142,7 +169,7 @@ export default defineComponent({
 
 /* 键盘容器 */
 .virtual-keyboard {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   padding: 20px;
@@ -158,20 +185,20 @@ export default defineComponent({
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .keyboard-title {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .close-btn {
   background: none;
   border: none;
   font-size: 24px;
-  color: #999;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
   width: 30px;
@@ -184,7 +211,7 @@ export default defineComponent({
 }
 
 .close-btn:hover {
-  background-color: #f5f5f5;
+  background-color: var(--hover-bg);
 }
 
 /* 显示区域 */
@@ -196,19 +223,53 @@ export default defineComponent({
 .display-input {
   width: 100%;
   height: 50px;
-  border: 2px solid #d9d9d9;
+  border: 2px solid var(--input-border);
   border-radius: 8px;
   padding: 0 15px;
   font-size: 18px;
   text-align: center;
   letter-spacing: 2px;
-  background-color: #fafafa;
+  background-color: var(--input-bg);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .display-input:focus {
   border-color: #1890ff;
+}
+
+/* 输入框错误态：红色边框提示 */
+.display-input.input-error {
+  border-color: #ff4d4f;
+  background-color: #fff1f0;
+}
+
+/* 错误提示行 */
+.keyboard-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -8px 0 16px 0;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #ff4d4f;
+  background-color: #fff1f0;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+.keyboard-error .error-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #ff4d4f;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 12px;
 }
 
 .clear-btn {
@@ -240,9 +301,9 @@ export default defineComponent({
 /* 键盘按键 */
 .keyboard-key {
   height: 50px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  background: #fff;
+  background: var(--card-bg);
   font-size: 18px;
   font-weight: 500;
   cursor: pointer;
@@ -254,7 +315,7 @@ export default defineComponent({
 }
 
 .keyboard-key:hover {
-  background-color: #f5f5f5;
+  background-color: var(--hover-bg);
   border-color: #40a9ff;
 }
 
@@ -265,19 +326,19 @@ export default defineComponent({
 
 /* 数字键样式 */
 .number-key {
-  color: #333;
+  color: var(--text-primary);
 }
 
 /* 功能键样式 */
 .action-key {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 
 /* 确认键特殊样式 */
 .confirm-key {
   background-color: #1890ff;
-  color: #fff;
+  color: var(--text-primary);
   border-color: #1890ff;
 }
 
@@ -286,40 +347,83 @@ export default defineComponent({
   border-color: #40a9ff;
 }
 
+/* 确认键加载态：保持蓝色背景，居中显示 spinner */
+.confirm-key.confirm-loading {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.confirm-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 加载中禁用所有按键 */
+.grid-disabled button {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.grid-disabled button:hover {
+  background-color: inherit;
+  border-color: inherit;
+}
+
 /* 黑暗配色 */
 .virtual-keyboard.keyboard-dark {
-  background: #1e1e1e;
+  background: var(--card-bg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 .keyboard-dark .keyboard-header {
-  border-bottom-color: #404040;
+  border-bottom-color: var(--border-color);
 }
 
 .keyboard-dark .keyboard-title {
-  color: #e0e0e0;
+  color: var(--text-primary);
 }
 
 .keyboard-dark .close-btn {
-  color: #999;
+  color: var(--text-secondary);
 }
 
 .keyboard-dark .close-btn:hover {
-  background-color: #333;
+  background-color: var(--text-primary);
 }
 
 .keyboard-dark .display-input {
-  border-color: #404040;
-  background-color: #2d2d2d;
-  color: #e0e0e0;
+  border-color: var(--border-color);
+  background-color: var(--panel-bg);
+  color: var(--text-primary);
 }
 
 .keyboard-dark .display-input::placeholder {
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .keyboard-dark .display-input:focus {
   border-color: #1890ff;
+}
+
+.keyboard-dark .display-input.input-error {
+  border-color: #ff4d4f;
+  background-color: #2a1215;
+}
+
+.keyboard-dark .keyboard-error {
+  color: #ff7875;
+  background-color: #2a1215;
 }
 
 .keyboard-dark .clear-btn {
@@ -331,13 +435,13 @@ export default defineComponent({
 }
 
 .keyboard-dark .keyboard-key {
-  border-color: #404040;
-  background: #2d2d2d;
-  color: #e0e0e0;
+  border-color: var(--border-color);
+  background: var(--panel-bg);
+  color: var(--text-primary);
 }
 
 .keyboard-dark .keyboard-key:hover {
-  background-color: #404040;
+  background-color: var(--border-color);
   border-color: #1890ff;
 }
 
@@ -346,16 +450,16 @@ export default defineComponent({
 }
 
 .keyboard-dark .number-key {
-  color: #e0e0e0;
+  color: var(--text-primary);
 }
 
 .keyboard-dark .action-key {
-  color: #b0b0b0;
+  color: var(--text-secondary);
 }
 
 .keyboard-dark .confirm-key {
   background-color: #1890ff;
-  color: #fff;
+  color: var(--text-primary);
   border-color: #1890ff;
 }
 

@@ -58,14 +58,14 @@
   margin: 0 auto;
   max-width: 1200px;
   width: 100%;
-  background: #eee;
+  background: var(--panel-bg);
   padding: 20px;
   border-radius: 8px;
 }
 
 
 .platform-card {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(18, 18, 18, 0.1);
   overflow: hidden;
@@ -84,31 +84,31 @@
 }
 /* 深色主题下的样式 */
 .content-dark-theme .platform-grid {
-  background-color: #1a1a1a !important;
-  color: #e0e0e0;
-  border-color: #333;
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 .content-dark-theme .platform-card {
-  background-color: #2a2a2a !important;
-  color: #e0e0e0;
-  border: 1px solid #3a3a3a;
+  background-color: var(--panel-bg) !important;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 .content-dark-theme .platform-header {
-  background-color: #2a2a2a !important;
-  color: #e0e0e0;
-  border-bottom: 1px solid #3a3a3a;
+  background-color: var(--panel-bg) !important;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
 }
 .content-dark-theme .platform-header h4 {
-  color: #fff;
+  color: var(--text-primary);
 }
 .platform-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fff;
+  border-bottom: 1px solid var(--border-color-light);
+  background: var(--card-bg);
 
   .refresh-btn {
     opacity: 0;
@@ -128,7 +128,7 @@
   line-height: 20px;
   text-align: center;
   border-radius: 4px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 12px;
   font-weight: bold;
 
@@ -170,12 +170,12 @@
 .platform-header h4 {
   margin: 0;
   font-size: 14px;
-  color: #121212;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .update-time {
-  color: #8590a6;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -206,7 +206,7 @@
   }
 
   &:hover::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--hover-bg);
   }
 
   &:hover::-webkit-scrollbar-thumb {
@@ -226,7 +226,7 @@
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #f7f8fa;
+    background-color: var(--panel-bg);
   }
 }
 
@@ -237,7 +237,7 @@
   text-align: center;
   font-size: 13px;
   font-weight: 500;
-  color: #8590a6;
+  color: var(--text-secondary);
   margin-right: 8px;
   flex-shrink: 0;
 }
@@ -257,7 +257,7 @@
 }
 
 .title {
-  color: #121212;
+  color: var(--text-primary);
   font-size: 16px;
   text-decoration: none;
   display: block;
@@ -274,7 +274,7 @@
 }
 
 .heat {
-  color: #8590a6;
+  color: var(--text-secondary);
   font-size: 12px;
   white-space: nowrap;
 }
@@ -282,12 +282,12 @@
 /* 深色主题下的样式 */
 .content-dark-theme .hot-item {
   &:hover {
-    background-color: #3a3a3a;
+    background-color: var(--border-color);
   }
 }
 
 .content-dark-theme .title {
-  color: #e0e0e0;
+  color: var(--text-primary);
   
   &:hover {
     color: #1890ff;
@@ -295,7 +295,7 @@
 }
 
 .content-dark-theme .rank {
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .content-dark-theme .top-rank {
@@ -303,7 +303,7 @@
 }
 
 .content-dark-theme .update-time {
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .content-dark-theme .platform-icon {

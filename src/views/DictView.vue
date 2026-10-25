@@ -270,14 +270,14 @@ onMounted(() => {
 
 .result-item {
   padding: 16px;
-  background: #fafafa;
+  background: var(--panel-bg);
   border-radius: 8px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--border-color-light);
   transition: all 0.3s;
 }
 
 .result-item:hover {
-  background: #fff;
+  background: var(--card-bg);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 

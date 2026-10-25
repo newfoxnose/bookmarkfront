@@ -10,18 +10,18 @@
 </template>
 <style scoped>
   .content-dark-theme ul{
-    background: #002140;
+    background: var(--card-bg);
   }
   .content-light-theme ul{
-    background: #fff;
+    background: var(--card-bg);
   }
-  
+
 
 .content {
   list-style: none;
   height: 400px;
   margin: 0;
-  border: 1px dotted #d1d3d6;
+  border: 1px dotted var(--border-color);
   overflow-y: scroll;
   padding: 0;
 }

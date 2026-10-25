@@ -173,15 +173,15 @@ onMounted(() => {
 
 .saying-card {
   padding: 24px;
-  background: #fafafa;
+  background: var(--panel-bg);
   border-radius: 8px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--border-color-light);
 }
 
 .saying-question {
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px dashed #e8e8e8;
+  border-bottom: 1px dashed var(--border-color-light);
 }
 
 .saying-question div,

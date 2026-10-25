@@ -253,8 +253,8 @@ export default {
   flex-wrap: nowrap;
   gap: 2px;
   padding: 6px 0 0 0;
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border-color-light);
   overflow-x: auto;
   overflow-y: hidden;
   flex-shrink: 0;
@@ -269,17 +269,17 @@ export default {
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   white-space: nowrap;
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--hover-bg);
   transition: background 0.2s;
 }
 
 .frame-tab-item:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--active-bg);
 }
 
 .frame-tab-item.active {
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color-light);
   border-bottom-color: transparent;
   margin-bottom: -1px;
   cursor: default;
@@ -287,7 +287,7 @@ export default {
 
 .frame-tab-title {
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--text-primary);
 }
 
 .frame-tab-close {
@@ -299,14 +299,14 @@ export default {
   font-size: 14px;
   min-width: 20px;
   min-height: 20px;
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text-tertiary);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .frame-tab-close:hover {
-  color: rgba(0, 0, 0, 0.85);
-  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+  background: var(--hover-bg);
 }
 
 /* 内容区：默认占满剩余空间 */

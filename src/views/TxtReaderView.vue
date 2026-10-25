@@ -97,10 +97,10 @@
 .space-info {
   margin-top: 12px;
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-tertiary);
 }
 .space-info strong {
-  color: #1e293b;
+  color: var(--text-primary);
 }
 
 /* 文件列表区域 */
@@ -114,9 +114,9 @@
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
@@ -134,7 +134,7 @@
 }
 .file-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  border-color: #cbd5e1;
+  border-color: var(--border-color);
 }
 
 /* 左侧预览区：TXT 扩展名标签 */
@@ -146,7 +146,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #f1f5f9 0%, var(--text-primary) 100%);
 }
 .file-ext {
   font-size: 11px;
@@ -158,9 +158,9 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .file-ext.ext-txt {
-  color: #475569;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  background: var(--panel-bg);
 }
 
 /* 右侧内容区 */
@@ -171,7 +171,7 @@
 .file-item-name {
   font-size: 15px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -179,7 +179,7 @@
 }
 .file-item-meta {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   margin-bottom: 10px;
 }
 
@@ -201,7 +201,7 @@
   color: #2563eb;
 }
 .file-action-danger {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .file-action-danger:hover {
   color: #ef4444;
@@ -213,8 +213,8 @@
   width: 100%;
   margin-top: 4px;
   padding: 12px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, var(--panel-bg) 0%, #f1f5f9 100%);
+  border: 1px solid var(--text-primary);
   border-radius: 8px;
   display: flex;
   flex-wrap: wrap;
@@ -227,8 +227,8 @@
   color: #3b82f6;
   font-size: 13px;
   padding: 6px 12px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--card-bg);
+  border: 1px solid var(--text-primary);
   border-radius: 6px;
   transition: all 0.2s ease;
 }
@@ -249,32 +249,32 @@
 
 /* 深色主题下文件列表样式 */
 .content-dark-theme .space-info {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .content-dark-theme .space-info strong {
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 .content-dark-theme .file-item {
-  background: #1f1f1f;
-  border-color: #303030;
+  background: var(--card-bg);
+  border-color: var(--border-color);
 }
 .content-dark-theme .file-item:hover {
-  border-color: #404040;
+  border-color: var(--border-color);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .content-dark-theme .file-item-preview {
-  background: linear-gradient(135deg, #2d2d2d 0%, #252525 100%);
+  background: linear-gradient(135deg, #2d2d2d 0%, var(--panel-bg) 100%);
 }
 .content-dark-theme .file-ext.ext-txt {
-  color: #94a3b8;
-  border-color: #404040;
-  background: #252525;
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+  background: var(--panel-bg);
 }
 .content-dark-theme .file-item-name {
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 .content-dark-theme .file-item-meta {
-  color: #64748b;
+  color: var(--text-tertiary);
 }
 .content-dark-theme .file-action {
   color: #60a5fa;
@@ -283,19 +283,19 @@
   color: #93c5fd;
 }
 .content-dark-theme .file-action-danger {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .content-dark-theme .file-action-danger:hover {
   color: #f87171;
 }
 .content-dark-theme .chunk-list {
-  background: linear-gradient(135deg, #252525 0%, #1f1f1f 100%);
-  border-color: #303030;
+  background: linear-gradient(135deg, var(--panel-bg) 0%, var(--card-bg) 100%);
+  border-color: var(--border-color);
 }
 .content-dark-theme .chunk-item {
   color: #60a5fa;
-  background: #1f1f1f;
-  border-color: #404040;
+  background: var(--card-bg);
+  border-color: var(--border-color);
 }
 .content-dark-theme .chunk-item:hover {
   background: #2d2d2d;
@@ -339,7 +339,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #fff;
+  background: var(--card-bg);
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -347,11 +347,11 @@
 
 .epub-reader-header {
   padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: var(--card-bg);
 }
 
 .epub-reader-title {
@@ -379,8 +379,8 @@
 
 .reader-toolbar {
   padding: 10px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fff;
+  border-bottom: 1px solid var(--border-color-light);
+  background: var(--card-bg);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -402,7 +402,7 @@
   padding: 20px;
   overflow: hidden;
   line-height: 1.6;
-  background: #fff;
+  background: var(--card-bg);
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   margin: 20px;
   white-space: pre-wrap;
@@ -428,51 +428,51 @@
 }
 
 .drawer-light-theme {
-  background: #fff;
-  color: #000;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-dark-theme {
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-light-theme .reader-content {
-  background: #fff;
-  color: #000;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-dark-theme .reader-content {
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-light-theme .reader-toolbar {
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .drawer-dark-theme .reader-toolbar {
-  background: #1f1f1f;
-  border-bottom: 1px solid #303030;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .dark-theme .epub-reader-container {
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .dark-theme .epub-reader-header {
-  background: #1f1f1f;
-  border-bottom-color: #303030;
+  background: var(--card-bg);
+  border-bottom-color: var(--border-color);
 }
 
 .epub-reader-container :deep(.ant-drawer-content-wrapper) {
-  background: #fff;
+  background: var(--card-bg);
 }
 
 .dark-theme .epub-reader-container :deep(.ant-drawer-content-wrapper) {
-  background: #1f1f1f;
+  background: var(--card-bg);
 }
 
 .epub-reader-container :deep(.ant-menu) {
@@ -480,17 +480,17 @@
 }
 
 .dark-theme .epub-reader-container :deep(.ant-menu) {
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .dark-theme .epub-reader-container :deep(.ant-menu-item) {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .dark-theme .epub-reader-container :deep(.ant-menu-item-selected) {
   background: #1890ff;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .dark-theme .epub-reader-container :deep(.ant-menu-item:hover) {

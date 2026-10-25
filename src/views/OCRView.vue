@@ -289,10 +289,10 @@ if (savedToken) {
 .image-preview img {
   max-width: 100%;
   max-height: 400px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 8px;
-  background: #fafafa;
+  background: var(--panel-bg);
 }
 
 .language-section {

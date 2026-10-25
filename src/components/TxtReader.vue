@@ -421,8 +421,8 @@ export default {
 
 .reader-toolbar {
   padding: 10px;
-  border-top: 1px solid #f0f0f0;
-  background: #fff;
+  border-top: 1px solid var(--border-color-light);
+  background: var(--card-bg);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -466,7 +466,7 @@ export default {
   flex: 1;
   padding: 20px;
   overflow: hidden;
-  background: #fff;
+  background: var(--card-bg);
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   margin: 20px;
   white-space: pre-wrap;
@@ -491,32 +491,32 @@ export default {
 }
 
 .drawer-light-theme {
-  background: #fff;
-  color: #000;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-dark-theme {
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-light-theme .reader-content {
-  background: #fff;
-  color: #000;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-dark-theme .reader-content {
-  background: #1f1f1f;
-  color: #fff;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .drawer-light-theme .reader-toolbar {
-  background: #fff;
-  border-top: 1px solid #f0f0f0;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color-light);
 }
 
 .drawer-dark-theme .reader-toolbar {
-  background: #1f1f1f;
+  background: var(--card-bg);
   border-top: 1px solid #303030;
 }
 
@@ -526,6 +526,6 @@ export default {
   align-items: center;
   height: 100%;
   font-size: 16px;
-  color: #999;
+  color: var(--text-secondary);
 }
 </style> 

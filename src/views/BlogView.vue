@@ -198,6 +198,7 @@
         v-model="valueHtml"
         :config="editorConfig"
         editor-id="editor-demo-01"
+        @ready="onEditorReady"
       ></vue-ueditor-wrap>
       
       <!-- Markdown编辑器 -->
@@ -272,9 +273,9 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #fff;
+  background: var(--card-bg);
 
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color-light);
   margin-bottom: 16px;
 }
 
@@ -290,7 +291,7 @@
 }
 
 .editor-container .md-editor .md-toolbar {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .editor-container .md-editor .md-content {
@@ -917,6 +918,8 @@ export default {
       //*/
       UEDITOR_HOME_URL: "/UEditor/", // 访问 UEditor 静态资源的根路径，可参考常见问题1
       lang: "zh-cn",
+      // 编辑区域 iframe 自定义样式（支持暗黑模式）
+      iframeCssUrl: "/UEditor/themes/iframe.css",
       // 初始容器高度
       initialFrameHeight: 300,
       serverUrl:
@@ -929,8 +932,38 @@ export default {
   },
   data() {
     return {
-      go_url: this.$remoteDomain  +  "/post/"
+      go_url: this.$remoteDomain  +  "/post/",
+      ueInstance: null,
+      themeObserver: null,
     };
+  },
+  methods: {
+    onEditorReady(editorInstance) {
+      this.ueInstance = editorInstance;
+      this.applyThemeToEditor();
+      // 监听全局主题切换，同步到编辑器 iframe
+      this.themeObserver = new MutationObserver(() => {
+        this.applyThemeToEditor();
+      });
+      this.themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme"],
+      });
+    },
+    applyThemeToEditor() {
+      if (!this.ueInstance) return;
+      const theme = document.documentElement.getAttribute("data-theme") || "light";
+      const doc = this.ueInstance.document;
+      if (doc && doc.body) {
+        doc.body.setAttribute("data-theme", theme);
+      }
+    },
+  },
+  beforeDestroy() {
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+      this.themeObserver = null;
+    }
   }
 };
 </script>

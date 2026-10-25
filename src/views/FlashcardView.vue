@@ -86,16 +86,16 @@
 /* 词典列表项容器 */
 .dict-item {
   padding: 16px;
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
 }
 .dict-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  border-color: #cbd5e1;
+  border-color: var(--border-color);
 }
 .dict-item-header {
   display: flex;
@@ -106,7 +106,7 @@
 .dict-item-name {
   font-size: 16px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -116,7 +116,7 @@
 .dict-item-delete {
   flex-shrink: 0;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   transition: color 0.2s ease;
 }
 .dict-item-delete:hover {
@@ -125,7 +125,7 @@
 .dict-item-meta {
   margin-top: 4px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 /* 单词卡片样式 */
@@ -134,8 +134,8 @@
   max-width: 100%;
   padding: 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, var(--card-bg) 0%, var(--panel-bg) 100%);
+  border: 1px solid var(--border-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s ease;
 }
@@ -151,11 +151,11 @@
   align-items: center;
   margin-bottom: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color-light);
 }
 .word-card-hide-btn {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 .word-card-hide-btn:hover {
@@ -172,7 +172,7 @@
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  color: #64748b;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -194,24 +194,24 @@
 .word-card-text {
   font-size: 32px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   letter-spacing: 0.5px;
 }
 .word-card-ipa {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-style: italic;
 }
 .word-card-meaning {
   font-size: 14px;
   line-height: 1.6;
-  color: #475569;
+  color: var(--text-secondary);
   white-space: pre-wrap;
   text-align: center;
 }
 .word-card-hint {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 8px 0;
   user-select: none;
@@ -223,26 +223,26 @@
 .word-card-remarks {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px dashed var(--border-color-light);
   text-align: center;
 }
 .word-card-remark-item {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-tertiary);
   line-height: 1.6;
 }
 .word-card-remark-label {
   font-weight: 500;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .word-card-remark-value {
-  color: #475569;
+  color: var(--text-secondary);
 }
 .word-card-loading {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .ext {

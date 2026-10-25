@@ -349,13 +349,13 @@ export default defineComponent({
 .plugin-market {
   padding: 24px;
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--panel-bg);
 }
 
 .market-header {
   text-align: center;
   margin-bottom: 40px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .market-header h1 {
@@ -366,7 +366,7 @@ export default defineComponent({
 
 .market-header p {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .plugin-grid {
@@ -379,7 +379,7 @@ export default defineComponent({
 }
 
 .plugin-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -409,12 +409,12 @@ export default defineComponent({
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .plugin-card p {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary);
   margin-bottom: 16px;
   line-height: 1.6;
 }
@@ -449,7 +449,7 @@ export default defineComponent({
 .tips {
   text-align: center;
   margin-top: 40px;
-  color: #6b7280;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;

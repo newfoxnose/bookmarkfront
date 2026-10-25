@@ -220,7 +220,7 @@ export default defineComponent({
         @change="onLockTimeoutChange"
         style="width: 120px"
       />
-      <span style="margin-left: 8px; color: #888">0 表示不自动锁定</span>
+      <span style="margin-left: 8px; color: var(--text-tertiary)">0 表示不自动锁定</span>
     </a-form-item>
     <a-form-item label="左边栏显示待办">
       <a-switch v-model:checked="showTodoInSidebar" @change="onShowTodoChange" />

@@ -1,1 +1,72 @@
-/*可以在这里添加你自己的css*/
+/* UEditor 编辑区域 iframe 样式 - 支持暗黑模式 */
+
+/* 浅色模式（默认） */
+body {
+  background-color: #ffffff;
+  color: rgba(0, 0, 0, 0.88);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 10px;
+}
+
+/* 暗黑模式 */
+body[data-theme="dark"] {
+  background-color: #1f1f1f;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body[data-theme="dark"] p,
+body[data-theme="dark"] div,
+body[data-theme="dark"] span {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] h5,
+body[data-theme="dark"] h6 {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body[data-theme="dark"] a {
+  color: #60a5fa;
+}
+
+body[data-theme="dark"] blockquote {
+  border-left-color: #303030;
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+body[data-theme="dark"] pre {
+  background-color: #141414;
+  color: rgba(255, 255, 255, 0.88);
+  border-color: #303030;
+}
+
+body[data-theme="dark"] code {
+  background-color: #2a2a2a;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body[data-theme="dark"] table {
+  border-color: #303030;
+}
+
+body[data-theme="dark"] table td,
+body[data-theme="dark"] table th {
+  border-color: #303030;
+  background-color: #1f1f1f;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body[data-theme="dark"] hr {
+  border-color: #303030;
+}
+
+body[data-theme="dark"] img {
+  opacity: 0.9;
+}

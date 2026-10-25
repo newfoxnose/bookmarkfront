@@ -88,7 +88,7 @@
     <template #expandedRowRender="{ record }">
       <div v-if="record.fetch_data">
         <pre
-          style="background: #f5f5f5; padding: 8px; border-radius: 4px; max-height: 200px; overflow: auto; margin: 0;">
+          style="background: var(--panel-bg); padding: 8px; border-radius: 4px; max-height: 200px; overflow: auto; margin: 0;">
           {{ JSON.stringify(record.fetch_data, null, 2) }}
         </pre>
         <div v-if="record.formatting && record.formatted_data">

@@ -19,9 +19,9 @@
     >秒</span
   >
 </h3>
-  <div style="border: 1px solid #ccc;margin-top:5px;">
+  <div style="border: 1px solid var(--border-color);margin-top:5px;">
     <Toolbar
-      style="border-bottom: 1px solid #ccc"
+      style="border-bottom: 1px solid var(--border-color)"
       :editor="editorRef"
       :defaultConfig="toolbarConfig"
       :mode="mode"

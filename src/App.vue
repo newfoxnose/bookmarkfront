@@ -519,6 +519,8 @@ export default defineComponent({
     };
     const changeTheme = (checked) => {
       state.theme = checked ? "dark" : "light";
+      // 同步给 html 根元素设置 data-theme，供全局 CSS 变量（Token）切换使用
+      document.documentElement.setAttribute("data-theme", state.theme);
       if (state.theme == "dark") {
         $cookies.set("theme", "dark", "720h");
         logourl.value = "../images/logo-white.png";
@@ -905,6 +907,8 @@ export default defineComponent({
     const showUnlockKeyboard = ref(false);
     const unlockCode = ref('');
     const unlockLoading = ref(false);
+    // 解锁错误提示：直接显示在键盘内，便于区分密码错误与网络异常
+    const unlockError = ref('');
 
     /** 手动锁定页面 */
     const lockPage = () => {
@@ -916,38 +920,46 @@ export default defineComponent({
     const handleUnlockClick = () => {
       showUnlockKeyboard.value = true;
       unlockCode.value = '';
+      unlockError.value = '';
     };
 
     /** 关闭解锁键盘 */
     const closeUnlockKeyboard = () => {
       showUnlockKeyboard.value = false;
       unlockCode.value = '';
+      unlockError.value = '';
     };
 
     /** 验证私有口令并解锁：调用 unlock_screen_ajax 接口 */
     const verifyAndUnlock = (password) => {
-      //允许口令为空
-      //if (!password || !String(password).trim()) {
-      //  message.error('请输入私有口令');
-      //  return;
-      //}
+      if (unlockLoading.value) return;
       unlockLoading.value = true;
+      unlockError.value = '';
       const params = new URLSearchParams();
       params.append('timestamp', new Date().getTime());
       params.append('token', $cookies.get('token'));
       params.append('password', md5(password));
-      proxy.$http.post('/ajax/unlock_screen_ajax', params).then((res) => {
+      // 设置 10s 超时，避免网络差时一直挂起无反馈
+      proxy.$http.post('/ajax/unlock_screen_ajax', params, { timeout: 10000 }).then((res) => {
         unlockLoading.value = false;
         if (res.data.code === 200) {
           isPageLocked.value = false;
           localStorage.removeItem('pageLocked');
           closeUnlockKeyboard();
         } else {
-          message.error('口令错误');
+          // 口令错误：保留键盘、清空输入、在键盘内显示明确提示
+          unlockError.value = '口令错误，请重新输入';
+          unlockCode.value = '';
         }
-      }).catch(() => {
+      }).catch((err) => {
         unlockLoading.value = false;
-        message.error('验证失败');
+        // 区分超时与其他网络异常，给出明确反馈
+        if (err && err.code === 'ECONNABORTED') {
+          unlockError.value = '网络超时，请检查网络后重试';
+        } else {
+          unlockError.value = '网络异常，请稍后重试';
+        }
+        unlockCode.value = '';
       });
     };
 
@@ -1047,6 +1059,7 @@ export default defineComponent({
       showUnlockKeyboard,
       unlockCode,
       unlockLoading,
+      unlockError,
       lockPage,
       handleUnlockClick,
       closeUnlockKeyboard,
@@ -1294,7 +1307,6 @@ export default defineComponent({
 </script>
 
 <template>
-
   <a-layout style="min-height: 100vh" v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
     <!-- 顶部进度条：路由跳转（含懒加载模块下载）期间常驻可见，明确告知点击已生效 -->
     <div class="route-progress" v-show="navPending">
@@ -1441,6 +1453,8 @@ export default defineComponent({
       v-model="unlockCode"
       :visible="showUnlockKeyboard"
       :dark="contenttheme && contenttheme.includes('dark')"
+      :loading="unlockLoading"
+      :error-message="unlockError"
       title="解锁页面"
       @confirm="(v) => verifyAndUnlock(v || unlockCode)"
       @close="closeUnlockKeyboard"
@@ -1494,11 +1508,11 @@ export default defineComponent({
               <a style="margin-left: 20px" @click="showDrawer2(blog.title, blog.id)"><span
                   v-html="highlightKeyword(blog.title, search)"></span></a>
               <template v-if="blog.content">
-                <span style="font-size: 14px; font-weight: normal; margin-left: 10px; color: #666;"
+                <span style="font-size: 14px; font-weight: normal; margin-left: 10px; color: var(--text-secondary);"
                   v-html="getContextWithHighlight(blog.content, search)"></span>
               </template>
             </h3>
-            <div style="color: #999; font-size: 12px; margin-top: 5px;">
+            <div style="color: var(--text-secondary); font-size: 12px; margin-top: 5px;">
               {{ blog.created_at }}
             </div>
           </div>
@@ -1595,7 +1609,6 @@ export default defineComponent({
     </a-form>
     <vue-ueditor-wrap v-model="valueHtml" :config="editorConfig" editor-id="editor-demo-02"></vue-ueditor-wrap>
   </a-modal>
-
 </template>
 
 <style scoped>

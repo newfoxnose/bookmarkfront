@@ -97,6 +97,7 @@ export default {
     const isDarkTheme = ref(false);
     let book = null;
     let rendition = null;
+    let themeObserver = null;
 
     const prevPage = () => {
       if (rendition) {
@@ -243,8 +244,8 @@ export default {
           allowPopups: true
         });
 
-        const isDarkTheme = $cookies.get('contenttheme') === 'dark';
-        
+        const isDarkTheme = $cookies.get('theme') === 'dark';
+
         rendition.themes.default({
           body: {
             font: '16px "PingFang SC", "Microsoft YaHei", sans-serif',
@@ -252,14 +253,14 @@ export default {
             padding: '20px',
             margin: '0',
             background: isDarkTheme ? '#141414' : '#fff',
-            color: isDarkTheme ? '#e6e6e6' : '#000'
+            color: isDarkTheme ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.88)'
           }
         });
 
         rendition.themes.register('dark', {
           body: {
             background: '#141414',
-            color: '#e6e6e6'
+            color: 'rgba(255,255,255,0.88)'
           },
           '::selection': {
             background: '#1890ff',
@@ -276,6 +277,20 @@ export default {
         if (isDarkTheme) {
           rendition.themes.select('dark');
         }
+
+        // 监听全局主题切换，同步到 EPUB 阅读器
+        themeObserver = new MutationObserver(() => {
+          const theme = document.documentElement.getAttribute('data-theme') || 'light';
+          if (theme === 'dark') {
+            rendition.themes.select('dark');
+          } else {
+            rendition.themes.select('default');
+          }
+        });
+        themeObserver.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['data-theme'],
+        });
 
         rendition.on('rendered', (section) => {
           console.log('EPUB渲染完成:', section);
@@ -346,6 +361,10 @@ export default {
     });
 
     onUnmounted(() => {
+      if (themeObserver) {
+        themeObserver.disconnect();
+        themeObserver = null;
+      }
       if (book) {
         book.destroy();
       }
@@ -377,7 +396,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: #fff;
+  background: var(--card-bg);
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -385,11 +404,11 @@ export default {
 
 .epub-reader-header {
   padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: var(--card-bg);
 }
 
 .epub-reader-title {
@@ -410,35 +429,35 @@ export default {
 }
 
 .content-dark-theme {
-  background: #141414;
-  color: #e6e6e6;
+  background: var(--page-bg);
+  color: var(--text-primary);
 }
 
 .content-dark-theme .epub-reader-header {
-  background: #141414;
-  border-bottom-color: #303030;
+  background: var(--page-bg);
+  border-bottom-color: var(--border-color);
 }
 
 .content-dark-theme .epub-reader-container {
-  background: #141414;
+  background: var(--page-bg);
 }
 
 .content-dark-theme :deep(.ant-drawer-content-wrapper) {
-  background: #141414;
+  background: var(--page-bg);
 }
 
 .content-dark-theme :deep(.ant-menu) {
-  background: #141414;
-  color: #e6e6e6;
+  background: var(--page-bg);
+  color: var(--text-primary);
 }
 
 .content-dark-theme :deep(.ant-menu-item) {
-  color: #e6e6e6;
+  color: var(--text-primary);
 }
 
 .content-dark-theme :deep(.ant-menu-item-selected) {
   background: #1890ff;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .content-dark-theme :deep(.ant-menu-item:hover) {
@@ -446,19 +465,19 @@ export default {
 }
 
 .content-dark-theme :deep(.ant-input-number) {
-  background: #1f1f1f;
-  border-color: #434343;
-  color: #e6e6e6;
+  background: var(--card-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
 }
 
 .content-dark-theme :deep(.ant-input-number-input) {
-  color: #e6e6e6;
+  color: var(--text-primary);
 }
 
 .content-dark-theme :deep(.ant-btn) {
-  background: #1f1f1f;
-  border-color: #434343;
-  color: #e6e6e6;
+  background: var(--card-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
 }
 
 .content-dark-theme :deep(.ant-btn:hover) {
@@ -469,40 +488,40 @@ export default {
 .content-dark-theme :deep(.ant-btn-primary) {
   background: #1890ff;
   border-color: #1890ff;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .content-dark-theme :deep(.ant-btn-primary:hover) {
   background: #40a9ff;
   border-color: #40a9ff;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .content-light-theme {
-  background: #fff;
-  color: #000;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .content-light-theme .epub-reader-header {
-  background: #fff;
-  border-bottom-color: #f0f0f0;
+  background: var(--card-bg);
+  border-bottom-color: var(--border-color-light);
 }
 
 .content-light-theme .epub-reader-container {
-  background: #fff;
+  background: var(--card-bg);
 }
 
 .content-light-theme :deep(.ant-drawer-content-wrapper) {
-  background: #fff;
+  background: var(--card-bg);
 }
 
 .content-light-theme :deep(.ant-menu) {
-  background: #fff;
-  color: #000;
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .content-light-theme :deep(.ant-menu-item) {
-  color: #000;
+  color: var(--text-primary);
 }
 
 .content-light-theme :deep(.ant-menu-item-selected) {
