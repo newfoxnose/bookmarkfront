@@ -39,6 +39,7 @@ import {
   ScanOutlined,
   TranslationOutlined,
   MessageOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons-vue";
 import md5 from "js-md5";
 import VirtualKeyboard from "./components/VirtualKeyboard.vue";
@@ -126,7 +127,7 @@ export default defineComponent({
     PlusOutlined,
     CloseOutlined,
     SearchOutlined, SyncOutlined, GlobalOutlined, ApiOutlined, KeyOutlined, FireOutlined, ReadOutlined, GroupOutlined, ScanOutlined,
-    TranslationOutlined, MessageOutlined,
+    TranslationOutlined, MessageOutlined, LoadingOutlined,
     RightOutlined,
     DownOutlined,
     AppstoreOutlined,
@@ -541,10 +542,55 @@ export default defineComponent({
         state.collapsed = true;
       }
     };
-    /** 点击菜单项：导航 + 收起侧栏（移动端） */
-    const navTo = (path) => {
+    /** 点击菜单项：立即高亮 + 加载反馈，再导航 + 收起侧栏（移动端） */
+    const navPending = ref(false);      // 路由跳转中（模块懒加载可能较慢）
+    const navPendingPath = ref("");     // 正在跳转的目标路径
+    const navFlashPath = ref("");       // 点击瞬间的高亮反馈
+    let navPendingSeq = 0;
+    let navFlashTimer = null;
+
+    const clearNavPending = () => {
+      navPending.value = false;
+      navPendingPath.value = "";
+    };
+
+    /** 点击瞬间给出反馈，即使目标路由已缓存或重复点击也能感知 */
+    const flashNavItem = (path) => {
+      navFlashPath.value = path;
+      if (navFlashTimer) clearTimeout(navFlashTimer);
+      navFlashTimer = setTimeout(() => {
+        navFlashPath.value = "";
+      }, 600);
+    };
+
+    const navTo = (item) => {
       handleClick();
-      router.push(path);
+      const path = item.path;
+      // 立即选中，不等路由确认，避免“点了没反应”的错觉
+      if (item.key) state.selectedKeys = [item.key];
+      flashNavItem(path);
+
+      navPendingSeq += 1;
+      const seq = navPendingSeq;
+      // 同一路由不会触发跳转，只保留短暂点击反馈
+      if (route.path === path) {
+        setTimeout(() => {
+          if (seq === navPendingSeq) clearNavPending();
+        }, 500);
+        return;
+      }
+
+      navPendingPath.value = path;
+      navPending.value = true;
+      router
+        .push(path)
+        .catch(() => {})
+        .finally(() => {
+          if (seq !== navPendingSeq) return;
+          nextTick(() => {
+            if (seq === navPendingSeq) clearNavPending();
+          });
+        });
     };
     //弹出编辑书签抽屉
     const drawerclass = ref("");
@@ -956,6 +1002,9 @@ export default defineComponent({
       useremail,
       handleClick,
       navTo,
+      navPending,
+      navPendingPath,
+      navFlashPath,
       onBreakpoint,
       breakpoint_active,
       showDrawer,
@@ -1247,6 +1296,10 @@ export default defineComponent({
 <template>
 
   <a-layout style="min-height: 100vh" v-if="$cookies.get('token') != null && $cookies.get('token') != ''">
+    <!-- 顶部进度条：路由跳转（含懒加载模块下载）期间常驻可见，明确告知点击已生效 -->
+    <div class="route-progress" v-show="navPending">
+      <div class="route-progress-bar"></div>
+    </div>
     <div class="loadingbar" v-show="loadingdone == false">
       <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
         '0%': '#108ee9',
@@ -1303,13 +1356,18 @@ export default defineComponent({
               v-for="element in navMain"
               :key="element.key"
               class="ant-menu-item nav-draggable-item"
-              :class="{ 'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key }"
-              @click="navTo(element.path)"
+              :class="{
+                'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key,
+                'nav-item-pending': navPending && navPendingPath === element.path,
+                'nav-item-flash': navFlashPath === element.path,
+              }"
+              @click="navTo(element)"
             >
               <span class="nav-drag-handle" title="拖动此处调整顺序" @click.stop>⋮⋮</span>
               <span class="nav-menu-item-content" :data-nav-path="element.path">
                 <component v-if="element.icon && ICON_MAP[element.icon]" :is="ICON_MAP[element.icon]" />
                 <span class="nav-menu-label">{{ element.label }}</span>
+                <loading-outlined v-if="navPending && navPendingPath === element.path" class="nav-pending-icon" />
               </span>
             </li>
             <li
@@ -1327,12 +1385,17 @@ export default defineComponent({
                   v-show="element.showIf === 'never' ? false : (element.showIf === 'useremail' ? useremail != 'test@test.com' : true)"
                   :key="element.key"
                   class="ant-menu-item nav-draggable-item"
-                  :class="{ 'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key }"
-                  @click="navTo(element.path)"
+                  :class="{
+                    'ant-menu-item-selected': selectedKeys && selectedKeys[0] === element.key,
+                    'nav-item-pending': navPending && navPendingPath === element.path,
+                    'nav-item-flash': navFlashPath === element.path,
+                  }"
+                  @click="navTo(element)"
                 >
                   <span class="nav-drag-handle" title="拖动此处调整顺序" @click.stop>⋮⋮</span>
                   <span class="nav-menu-item-content" :data-nav-path="element.path">
                     <span class="nav-menu-label">{{ element.label }}</span>
+                    <loading-outlined v-if="navPending && navPendingPath === element.path" class="nav-pending-icon" />
                   </span>
                 </li>
               </ul>
@@ -1630,6 +1693,68 @@ export default defineComponent({
 }
 .nav-chosen {
   background: rgba(24, 144, 255, 0.08);
+}
+
+/* 菜单点击与路由跳转反馈 */
+.nav-menu-custom .ant-menu-item:active {
+  background: rgba(24, 144, 255, 0.2) !important;
+}
+.nav-menu-custom .ant-menu-item.nav-item-pending {
+  background: rgba(24, 144, 255, 0.12);
+}
+.nav-menu-custom.ant-menu-dark .ant-menu-item.nav-item-pending {
+  color: #fff;
+  background: rgba(24, 144, 255, 0.3);
+}
+.nav-menu-custom .ant-menu-item.nav-item-flash {
+  animation: nav-click-flash 0.6s ease-out;
+}
+@keyframes nav-click-flash {
+  0% {
+    background: rgba(24, 144, 255, 0.28);
+  }
+  100% {
+    background: transparent;
+  }
+}
+.nav-pending-icon {
+  margin-left: 8px;
+  font-size: 12px;
+  animation: nav-spin 1s linear infinite;
+}
+@keyframes nav-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* 顶部路由进度条：点击菜单后立即出现，跳转完成即消失 */
+.route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 2000;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(24, 144, 255, 0.12);
+}
+.route-progress-bar {
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #1890ff, #87d068);
+  animation: route-progress-move 0.9s ease-in-out infinite;
+}
+@keyframes route-progress-move {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
 }
 
 .search-div {
