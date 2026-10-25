@@ -563,7 +563,7 @@ export default defineComponent({
     </template>
   </a-modal>
 
-  <a-tabs
+  <a-tabs style="padding-bottom: 25px" 
     v-if="search == ''"
     v-model:activeKey="activeKey"
     @tabClick="clicktab"
