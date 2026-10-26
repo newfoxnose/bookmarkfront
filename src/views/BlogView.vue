@@ -186,7 +186,6 @@
         v-if="!isMarkdownMode"
         v-model="valueHtml"
         :config="editorConfig"
-        editor-id="editor-demo-01"
         @ready="onEditorReady"
       ></vue-ueditor-wrap>
       
@@ -315,7 +314,7 @@ import {
   FormOutlined,
   SearchOutlined
 } from "@ant-design/icons-vue";
-import { onMounted, getCurrentInstance, defineComponent, ref } from "vue";
+import { onMounted, onBeforeUnmount, getCurrentInstance, defineComponent, ref } from "vue";
 import * as qiniu from "qiniu-js";
 import { Base64 } from "js-base64";
 import { useRouter } from "vue-router";
@@ -513,8 +512,9 @@ export default {
       visible.value = false;
       visible_inputpassword.value = false;
       blog_id.value = 0;
-      // 重置编辑器模式
-      isMarkdownMode.value = false;
+      // 注意：不要在此处重置 isMarkdownMode，否则关闭弹窗后 ueditor 会在隐藏状态下重新挂载初始化，
+      // 初始化中途若切换为 Markdown 笔记会触发 UEditor destroy 异常，残留僵尸实例导致后续编辑器无法显示。
+      // 每次打开弹窗时 showDrawer 都会显式设置编辑器模式，无需在此重置。
       // 重置虚拟键盘状态
       showKeyboard.value = false;
     };
@@ -535,12 +535,19 @@ export default {
       window.addEventListener("keydown", handleEvent); //监听按键事件
     });
     const handleEvent = (event) => {
+        // 仅在编辑弹窗打开时响应 Ctrl+S，避免在列表页或其他页面误触发保存、产生垃圾笔记
+        if (!visible.value) {
+          return;
+        }
         if (event.ctrlKey && (event.key === 's' || event.keyCode === 83)) {
           event.preventDefault();
           event.returnValue = false;
           saveOnly();
         }
     };
+    onBeforeUnmount(() => {
+      window.removeEventListener("keydown", handleEvent);
+    });
     const handlepagechange = (page) => {
       if (page != 1) {
         page = currentpage.value;
@@ -900,6 +907,10 @@ export default {
     onEditorReady(editorInstance) {
       this.ueInstance = editorInstance;
       this.applyThemeToEditor();
+      // 重新挂载前先断开旧的观察者，避免累积泄漏
+      if (this.themeObserver) {
+        this.themeObserver.disconnect();
+      }
       // 监听全局主题切换，同步到编辑器 iframe
       this.themeObserver = new MutationObserver(() => {
         this.applyThemeToEditor();
