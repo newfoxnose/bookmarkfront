@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import Antd from "ant-design-vue"; //导入ant design，全局注册
+import Antd, { message } from "ant-design-vue"; //导入ant design，全局注册
 import App from "./App.vue";
 import "ant-design-vue/dist/antd.css"; //for ant design
 import router from "./router";
@@ -29,6 +29,30 @@ axios.defaults.baseURL = "https://bm.riyutool.com";
 //axios.defaults.baseURL = "http://bookmark.com";
 
 axios.defaults.timeout = 120000;   //axios全局超时时间，单位毫秒，120000等于2分钟
+
+/* 响应拦截器：请求失败（断网/超时/服务器错误）时给出全局提示，
+   并广播 request-error 事件，让 RingLoading 环形进度条自动结束，避免卡住 */
+let lastErrorTipTime = 0;   //简单节流，避免并发请求失败时弹出多个提示
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    let tip = "请求失败，请稍后重试";
+    if (error.code === "ECONNABORTED") {
+      tip = "请求超时，请检查网络后重试";
+    } else if (error.message === "Network Error") {
+      tip = "网络异常，请检查网络连接";
+    } else if (error.response) {
+      tip = "服务器异常（" + error.response.status + "），请稍后重试";
+    }
+    const now = Date.now();
+    if (now - lastErrorTipTime > 1000) {
+      lastErrorTipTime = now;
+      message.error(tip);
+    }
+    window.dispatchEvent(new CustomEvent("request-error"));
+    return Promise.reject(error);
+  }
+);
 
 /* 将 axios 挂载到全局，今后，每个组件中，
 都可以直接通过this.$http 代替 axios 发起 Ajax 请求 */

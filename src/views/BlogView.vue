@@ -1,16 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress
-      type="circle"
-      :percent="defaultPercent"
-      status="active"
-      :show-info="false"
-      :stroke-color="{
-        '0%': '#108ee9',
-        '100%': '#87d068',
-      }"
-    />
-  </div>
+  <RingLoading v-model:done="loadingdone" />
   <h3 style="text-align: center;">
     <a-button style="display: none" type="primary" @click="showDrawer('新建笔记', 0, '', false)"><form-outlined />新建</a-button>
     <a-button type="primary" style="margin-left: 8px" @click="showDrawer('新建笔记（MarkDown）', 0, '', true)"><form-outlined />新建（MarkDown）</a-button>
@@ -313,14 +302,6 @@
   margin: 3px;
   margin-right: 5px;
 }
-
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
 </style>
 <script>
 import { message, Modal } from "ant-design-vue";
@@ -343,6 +324,7 @@ import { MdEditor } from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 // 导入虚拟键盘组件
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue';
+import RingLoading from '@/components/RingLoading.vue';
 
 export default {
   components: {
@@ -354,7 +336,8 @@ export default {
     FormOutlined,
     SearchOutlined,
     MdEditor,
-    VirtualKeyboard
+    VirtualKeyboard,
+    RingLoading
   },
   setup() {
     $cookies.set("selectedkey", "5", "720h");
@@ -376,7 +359,6 @@ export default {
     // 是否为Markdown模式
     const isMarkdownMode = ref(false);
 
-    const defaultPercent = ref(10);
     const loadingdone = ref(false);
     const currentpage = ref(1);
     const pagesize = ref(10);
@@ -496,8 +478,7 @@ export default {
               isMarkdownMode.value = false;
               valueHtml.value = res.data.data.blog.content;
             }
-            
-            defaultPercent.value = 100;
+
             loadingdone.value = true;
             formState.value.title = res.data.data.blog.title;
             formState.value.folder_id = res.data.data.blog.folder_id;
@@ -561,14 +542,6 @@ export default {
         }
     };
     const handlepagechange = (page) => {
-      const interval = setInterval(() => {
-        const percent =
-          defaultPercent.value + Math.round(Math.random() * 7 + 2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value > 90) {
-          clearInterval(interval);
-        }
-      }, 100);
       if (page != 1) {
         page = currentpage.value;
       }
@@ -582,21 +555,11 @@ export default {
         pagesize.value = Number(res.data.data.pagesize);
         total.value = res.data.data.total;
         uid.value = res.data.data.uid;
-        defaultPercent.value = 100;
         loadingdone.value = true;
       });
     };
 
     const handleprivatepagechange = (password) => {
-      const interval = setInterval(() => {
-        const percent =
-          defaultPercent.value + Math.round(Math.random() * 7 + 2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value > 90) {
-          clearInterval(interval);
-        }
-      }, 100);
-
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
@@ -609,7 +572,6 @@ export default {
           if (res.data.code == 200) {
             fileitems.value = res.data.data.blog;
             total.value = res.data.data.total;
-            defaultPercent.value = 100;
             loadingdone.value = true;
             visible_inputpassword.value = false;
             show_private.value = true;
@@ -631,7 +593,6 @@ export default {
         fileitems.value = res.data.data.blog;
         pagesize.value = res.data.data.pagesize;
         total.value = res.data.data.total;
-        defaultPercent.value = 100;
         loadingdone.value = true;
       });
     };
@@ -828,7 +789,6 @@ export default {
             fileitems.value = res.data.data.blog;
         pagesize.value = res.data.data.pagesize;
         total.value = res.data.data.total;
-        defaultPercent.value = 100;
         loadingdone.value = true;
           })
           .catch((error) => {
@@ -851,7 +811,6 @@ export default {
       fileitems,
       deletepost,
       fileList: ref([]),
-      defaultPercent,
       loadingdone,
       handlepagechange,
       currentpage,

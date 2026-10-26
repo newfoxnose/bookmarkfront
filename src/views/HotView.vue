@@ -1,10 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-      '0%': '#108ee9',
-      '100%': '#87d068',
-    }" />
- </div>
+  <RingLoading v-model:done="loadingdone" />
 
   <div class="hot-list-container">
 
@@ -36,14 +31,6 @@
 </template>
 
 <style scoped>
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
-
 .hot-list-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -347,15 +334,16 @@
 import { message } from 'ant-design-vue';
 import { SyncOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref, nextTick } from 'vue';
+import RingLoading from '@/components/RingLoading.vue';
 
 export default {
   components: {
     SyncOutlined,
+    RingLoading,
   },
   setup() {
-    $cookies.set('selectedkey','19',"720h") 
-    $cookies.set('openkey','') 
-    const defaultPercent = ref(10);
+    $cookies.set('selectedkey','19',"720h")
+    $cookies.set('openkey','')
     const loadingdone = ref(false);
 
     const { proxy } = getCurrentInstance()
@@ -901,14 +889,6 @@ export default {
     };
 
     onMounted(async () => {
-      const interval = setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
-          clearInterval(interval);
-        }
-      }, 100)
-      
       // 初始化加载数据
       await Promise.all([
         fetchBilibiliData(),
@@ -926,13 +906,11 @@ export default {
       
       // 设置定时器每分钟更新一次时间显示
       setInterval(updateTimeDisplay, 60000);
-      
-      defaultPercent.value = 100;
+
       loadingdone.value = true;
     });
 
     return {
-      defaultPercent,
       loadingdone,
       platforms,
       refreshPlatform,

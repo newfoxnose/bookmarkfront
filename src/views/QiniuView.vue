@@ -1,10 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-      '0%': '#108ee9',
-      '100%': '#87d068',
-    }" />
-  </div>
+  <RingLoading v-model:done="loadingdone" />
   <h3>文件</h3>
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
   <div v-if="qiniu_token != ''">
@@ -73,14 +68,6 @@
   padding: 2px;
   margin: 3px;
 }
-
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
 </style>
 <script>
 import { message } from 'ant-design-vue';
@@ -88,15 +75,16 @@ import { InboxOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import * as qiniu from 'qiniu-js';
 import { Base64 } from "js-base64";
+import RingLoading from '@/components/RingLoading.vue';
 
 export default {
   components: {
     InboxOutlined,
+    RingLoading,
   },
   setup() {
-    $cookies.set('selectedkey','3',"720h") 
-    $cookies.set('openkey','') 
-    const defaultPercent = ref(10);
+    $cookies.set('selectedkey','3',"720h")
+    $cookies.set('openkey','')
     const loadingdone = ref(false);
 
     const { proxy } = getCurrentInstance()
@@ -125,13 +113,6 @@ export default {
     };
     // 获取token和列表
     onMounted(() => {
-      const interval=setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
-          clearInterval(interval);
-        }
-      }, 100)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get('token'));
       params.append("timestamp",new Date().getTime());
@@ -149,7 +130,6 @@ export default {
         else{
           message.error(res.data.msg);
         }
-        defaultPercent.value = 100;
         loadingdone.value = true
       });
     })
@@ -205,7 +185,6 @@ export default {
       handleDrop: e => {
         console.log(e);
       },
-      defaultPercent,
       loadingdone,
       readtext,
       visible,

@@ -171,7 +171,6 @@ export default defineComponent({
               //不在登陆状态
               window.location.href = "/";
             }
-            defaultPercent.value = 100;
             loadingdone.value = true;
           });
       } catch (error) {

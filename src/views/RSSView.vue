@@ -1,10 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-      '0%': '#108ee9',
-      '100%': '#87d068',
-    }" />
- </div>
+  <RingLoading v-model:done="loadingdone" />
   <a-form :model="formState" name="add" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }" autocomplete="off"
     @finish="onFinish" @finishFailed="onFinishFailed">
     <a-form-item label="地址" name="feed_url" :rules="[{ required:true, message: '地址不能为空' }]">
@@ -97,29 +92,20 @@
   </a-drawer>
 </template>
 <style scoped>
-
-
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
 </style>
 <script>
 import { message } from 'ant-design-vue';
 import { FormOutlined, SearchOutlined, LinkOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
+import RingLoading from '@/components/RingLoading.vue';
 
 export default {
   components: {
-    FormOutlined, SearchOutlined, LinkOutlined
+    FormOutlined, SearchOutlined, LinkOutlined, RingLoading
   },
   setup() {
-    $cookies.set('selectedkey','6',"720h") 
-    $cookies.set('openkey','') 
-    const defaultPercent = ref(10);
+    $cookies.set('selectedkey','6',"720h")
+    $cookies.set('openkey','')
     const loadingdone = ref(false);
     const iconLoading = ref(false);
 
@@ -190,13 +176,6 @@ export default {
       }
     };
     onMounted(() => {
-      const interval=setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
-          clearInterval(interval);
-        }
-      }, 100)
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get('token'));
           params.append("timestamp",new Date().getTime());
@@ -206,7 +185,6 @@ export default {
       window.location.href ="/";
     }
         fileitems.value = res.data.data.feed
-        defaultPercent.value = 100;
         loadingdone.value = true
       });
     })
@@ -263,16 +241,8 @@ export default {
       rssItems.value = [];
       rssTitle.value = '';
 
-      defaultPercent.value = 0;
       loadingdone.value = false
-      const interval=setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
-          clearInterval(interval);
-        }
-      }, 100)
-      
+
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
       params.append("timestamp", new Date().getTime());
@@ -284,7 +254,6 @@ export default {
         }
         rssTitle.value = res.data.data.title;
         rssItems.value = res.data.data.xml_json;
-        defaultPercent.value = 100;
         loadingdone.value = true
       });
     };
@@ -313,7 +282,6 @@ export default {
       onClose,
       deletefeed,
       fileList: ref([]),
-      defaultPercent,
       loadingdone,
       iconLoading,
       formState,

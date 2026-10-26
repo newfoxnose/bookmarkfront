@@ -1,10 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-      '0%': '#108ee9',
-      '100%': '#87d068',
-    }" />
-  </div>
+  <RingLoading v-model:done="loadingdone" />
   <!--这个文件不能用自动格式化，否则:data={token:qiniu_token,key:file_key}这部分会异常-->
   <div class="url-form">
     <a-input-search
@@ -325,14 +320,6 @@
   margin: 3px;
 }
 
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
-
 .epub-reader-container {
   position: fixed;
   top: 0;
@@ -504,17 +491,18 @@ import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
 import { Base64 } from "js-base64";
 import TxtReader from '../components/TxtReader.vue';
 import EpubReader from '../components/EpubReader.vue';
+import RingLoading from '@/components/RingLoading.vue';
 
 export default {
   components: {
     InboxOutlined,
     TxtReader,
-    EpubReader
+    EpubReader,
+    RingLoading
   },
   setup() {
-    $cookies.set('selectedkey','20',"720h") 
-    $cookies.set('openkey','') 
-    const defaultPercent = ref(10);
+    $cookies.set('selectedkey','20',"720h")
+    $cookies.set('openkey','')
     const loadingdone = ref(false);
 
     const { proxy } = getCurrentInstance()
@@ -665,13 +653,6 @@ export default {
     };
 
     onMounted(() => {
-      const interval=setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random()*7+2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value>90){
-          clearInterval(interval);
-        }
-      }, 100)
       let params = new URLSearchParams();
       params.append("token", $cookies.get('token'));
       params.append("timestamp",new Date().getTime());
@@ -682,11 +663,10 @@ export default {
         if (res.data.code=="200"){
           fileitems.value = res.data.data.documents
           space.value = res.data.data.space
-        } 
+        }
         else{
           message.error(res.data.msg);
         }
-        defaultPercent.value = 100;
         loadingdone.value = true
       });
     });
@@ -770,7 +750,6 @@ export default {
       handleDrop: e => {
         console.log(e);
       },
-      defaultPercent,
       loadingdone,
       readBook,
       readChunk,

@@ -1,16 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress
-      type="circle"
-      :percent="defaultPercent"
-      status="active"
-      :show-info="false"
-      :stroke-color="{
-        '0%': '#108ee9',
-        '100%': '#87d068',
-      }"
-    />
-  </div>
+  <RingLoading v-model:done="loadingdone" />
 
   <h3 style="text-align: center;">
   <a-button type="primary" @click="save" :loading="iconLoading">保存</a-button>（或者使用快捷键Ctrl+S）
@@ -37,13 +26,6 @@
   </div>
 </template>
 <style scoped>
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
 </style>
 <script>
 import "@wangeditor/editor/dist/css/style.css"; // 引入 css
@@ -59,9 +41,10 @@ import {
   shallowRef,
 } from "vue";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
+import RingLoading from "@/components/RingLoading.vue";
 
 export default {
-  components: { Editor, Toolbar },
+  components: { Editor, Toolbar, RingLoading },
   setup() {
     $cookies.set('selectedkey','2',"720h")
     $cookies.set('openkey','')  
@@ -77,18 +60,9 @@ export default {
 
     const { proxy } = getCurrentInstance();
     const auto_save_count_down = ref(60);
-    const defaultPercent = ref(10);
     const loadingdone = ref(false);
     // ajax 异步获取内容
     onMounted(() => {
-      const interval = setInterval(() => {
-        const percent =
-          defaultPercent.value + Math.round(Math.random() * 7 + 2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value > 90) {
-          clearInterval(interval);
-        }
-      }, 100);
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
       params.append("timestamp", new Date().getTime());
@@ -98,7 +72,6 @@ export default {
           window.location.href = "/";
         }
         valueHtml.value = res.data.data.note;
-        defaultPercent.value = 100;
         loadingdone.value = true;
       });
       setTimeout(() => {
@@ -166,7 +139,6 @@ export default {
       save,
       auto_save_count_down,
       iconLoading,
-      defaultPercent,
       loadingdone,
     };
   },

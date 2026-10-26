@@ -3,6 +3,7 @@ import IndexView from "./views/IndexView.vue";
 
 import bookmarkitem from "./components/bookmarkitem.vue";
 import subfolder from "./components/subfolder.vue";
+import RingLoading from "./components/RingLoading.vue";
 import CryptoJS from 'crypto-js';
 
 import dayjs from "dayjs";
@@ -134,6 +135,7 @@ export default defineComponent({
     VirtualKeyboard,
     PageLockOverlay,
     PageHeader,
+    RingLoading,
   },
   setup() {
     const route = useRoute();
@@ -350,14 +352,6 @@ export default defineComponent({
         $cookies.set("collapsed", 0, "720h");
       }
     });
-    const defaultPercent = ref(5);
-    const increaseloading = () => {
-      const percent = defaultPercent.value + 10;
-      defaultPercent.value = percent > 95 ? 95 : percent;
-    };
-    const finishloading = () => {
-      defaultPercent.value = 100;
-    };
     const showconfirmdelete = (editId) => {
       Modal.confirm({
         title: "确认删除该项目吗？",
@@ -466,9 +460,7 @@ export default defineComponent({
             }
 
             home_stream_ajax(res.data.data.next_folder_index);
-            increaseloading();
           } else {
-            finishloading();
             loadingdone.value = true;
             proxy.$http.post("/ajax/update_http_code/", params).then((res) => {
               //console.log(res.data);
@@ -824,7 +816,6 @@ export default defineComponent({
           } else {
             drawer2visible.value = true;
             valueHtml.value = res.data.data.blog.content;
-            defaultPercent.value = 100;
             loadingdone.value = true;
             blogFormState.value.blog_title = res.data.data.blog.title;
             blogFormState.value.blog_folder_id = res.data.data.blog.folder_id;
@@ -1044,8 +1035,6 @@ export default defineComponent({
       search,
       clearQuestion,
       loadingdone,
-      defaultPercent,
-      increaseloading,
       updatedDrawerTitle,
       showconfirmdelete,
       activeTabKey,
@@ -1312,12 +1301,7 @@ export default defineComponent({
     <div class="route-progress" v-show="navPending">
       <div class="route-progress-bar"></div>
     </div>
-    <div class="loadingbar" v-show="loadingdone == false">
-      <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-        '0%': '#108ee9',
-        '100%': '#87d068',
-      }" />
-    </div>
+    <RingLoading v-model:done="loadingdone" />
     <a-layout-content :class="contenttheme">
       <a-layout>
 

@@ -1,10 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress type="circle" :percent="defaultPercent" status="active" :show-info="false" :stroke-color="{
-      '0%': '#108ee9',
-      '100%': '#87d068',
-    }" />
- </div>
+  <RingLoading v-model:done="loadingdone" />
   <div class="input-section">
     <a-row :gutter="[16, 16]">
       <a-col :xs="24" :sm="24" :md="4">
@@ -53,14 +48,6 @@
 
 </template>
 <style scoped>
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
-
 .content-title {
   margin: 16px;
   text-align: center;
@@ -105,17 +92,18 @@ import { message, Modal } from 'ant-design-vue';
 
 import { EditOutlined, DeleteOutlined, LinkOutlined } from '@ant-design/icons-vue';
 import { onMounted, getCurrentInstance, defineComponent, ref } from 'vue';
+import RingLoading from '@/components/RingLoading.vue';
 
 export default {
   components: {
     EditOutlined,
     DeleteOutlined,
-    LinkOutlined
+    LinkOutlined,
+    RingLoading
   },
   setup() {
     $cookies.set('selectedkey', '15', "720h")
     $cookies.set('openkey', '')
-    const defaultPercent = ref(10);
     const loadingdone = ref(false);
     const iconLoading = ref(false);
 
@@ -250,15 +238,7 @@ export default {
     };
 
     onMounted(() => {
-      const interval = setInterval(() => {
-        const percent = defaultPercent.value + Math.round(Math.random() * 7 + 2);
-        defaultPercent.value = percent > 95 ? 95 : percent;
-        if (defaultPercent.value > 90) {
-          clearInterval(interval);
-        }
-      }, 100)
       loadMonitoringList();
-      defaultPercent.value = 100;
       loadingdone.value = true;
     })
     const deletefeed = (id) => {
@@ -397,7 +377,6 @@ export default {
     return {
       fileitems,
       visible,
-      defaultPercent,
       loadingdone,
       iconLoading,
       columns,

@@ -1,16 +1,5 @@
 <template>
-  <div class="loadingbar" v-show="loadingdone == false">
-    <a-progress
-      type="circle"
-      :percent="defaultPercent"
-      status="active"
-      :show-info="false"
-      :stroke-color="{
-        '0%': '#108ee9',
-        '100%': '#87d068',
-      }"
-    />
-  </div>
+  <RingLoading v-model:done="loadingdone" />
 
   <div class="clearfix" style="text-align: center;padding-top:20px;">
     <a-upload
@@ -39,28 +28,22 @@
   <div id="bm" style="display: none"></div>
 </template>
 <style scoped>
-.loadingbar {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
 </style>
 <script>
 import { UploadOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { onMounted,defineComponent, ref,getCurrentInstance } from "vue";
+import RingLoading from "@/components/RingLoading.vue";
 export default defineComponent({
   components: {
     UploadOutlined,
+    RingLoading,
   },
   setup() {
-    $cookies.set('selectedkey','11',"720h") 
-    $cookies.set('openkey','sub1',"720h") 
+    $cookies.set('selectedkey','11',"720h")
+    $cookies.set('openkey','sub1',"720h")
     const fileList = ref([]);
     const uploading = ref(false);
-    const defaultPercent = ref(10);
     const loadingdone = ref(true);
     const { proxy } = getCurrentInstance()
     onMounted(() => {
@@ -85,7 +68,6 @@ export default defineComponent({
       fileList,
       uploading,
       handleRemove,
-      defaultPercent,
       loadingdone,
     };
   },
@@ -105,13 +87,6 @@ export default defineComponent({
     },
     Upload() {
       this.loadingdone = false;
-      const interval = setInterval(() => {
-        const percent = this.defaultPercent + Math.round(Math.random() * 2 + 1);
-        this.defaultPercent = percent > 95 ? 95 : percent;
-        if (this.defaultPercent > 90) {
-          clearInterval(interval);
-        }
-      }, 300);
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       for (var i = 0; i < this.json_string.length; i++) {
         params.append("json_string[]", this.json_string[i]);
@@ -125,7 +100,6 @@ export default defineComponent({
           // obj.success ? obj.success(res) : null
           message.info(res.data.msg);
           if (res.data.data != null) {
-            this.defaultPercent = 100;
             this.loadingdone = true;
             window.location.href = "/";
           }
@@ -133,6 +107,7 @@ export default defineComponent({
         .catch((error) => {
           // obj.error ? obj.error(error) : null;
           console.log(error);
+          this.loadingdone = true;
         });
     },
   },
