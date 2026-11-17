@@ -901,11 +901,14 @@ export default {
       go_url: this.$remoteDomain  +  "/post/",
       ueInstance: null,
       themeObserver: null,
+      ueKeydownDoc: null,
+      ueKeydownHandler: null,
     };
   },
   methods: {
     onEditorReady(editorInstance) {
       this.ueInstance = editorInstance;
+      this.bindEditorShortcut(editorInstance);
       this.applyThemeToEditor();
       // 重新挂载前先断开旧的观察者，避免累积泄漏
       if (this.themeObserver) {
@@ -928,8 +931,34 @@ export default {
         doc.body.setAttribute("data-theme", theme);
       }
     },
+    /**
+     * UEditor 的编辑区域在 iframe 内，按键事件不会冒泡到父页面，
+     * 因此针对 iframe 文档单独绑定 Ctrl+S，否则富文本模式下无法保存。
+     */
+    bindEditorShortcut(editor) {
+      this.unbindEditorShortcut();
+      const doc = editor && editor.document;
+      if (!doc) return;
+      this.ueKeydownDoc = doc;
+      this.ueKeydownHandler = (event) => {
+        if (event.ctrlKey && (event.key === 's' || event.keyCode === 83)) {
+          event.preventDefault();
+          event.returnValue = false;
+          this.saveOnly();
+        }
+      };
+      doc.addEventListener('keydown', this.ueKeydownHandler, true);
+    },
+    unbindEditorShortcut() {
+      if (this.ueKeydownDoc && this.ueKeydownHandler) {
+        this.ueKeydownDoc.removeEventListener('keydown', this.ueKeydownHandler, true);
+      }
+      this.ueKeydownDoc = null;
+      this.ueKeydownHandler = null;
+    },
   },
-  beforeDestroy() {
+  beforeUnmount() {
+    this.unbindEditorShortcut();
     if (this.themeObserver) {
       this.themeObserver.disconnect();
       this.themeObserver = null;

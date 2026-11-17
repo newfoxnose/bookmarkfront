@@ -379,6 +379,23 @@ export default defineComponent({
       showTodoInSidebar.value = localStorage.getItem('show_todo_in_sidebar') !== 'false';
     };
 
+    /** 左侧菜单底部广告位推送（同一 ins 只推送一次） */
+    const pushSidebarAd = () => {
+      nextTick(() => {
+        const adEl = document.querySelector(".sidebar-ad .adsbygoogle");
+        if (!adEl || adEl.dataset.adLoaded === "1") return;
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          adEl.dataset.adLoaded = "1";
+        } catch (e) {}
+      });
+    };
+
+    // 侧边栏展开时广告位才会渲染，展开后补一次推送
+    watch(() => state.collapsed, (val) => {
+      if (!val) pushSidebarAd();
+    });
+
     onMounted(() => {
       // 监听 localStorage 变化（跨标签页）
       window.addEventListener("storage", handleStorageChange);
@@ -391,12 +408,8 @@ export default defineComponent({
       } else {
         changeTheme(false);
       }
-      // 方形自适应广告加载
-      nextTick(() => {
-        try {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
-      });
+      // 左侧菜单底部广告位加载（存在 ins 元素时才推送）
+      pushSidebarAd();
 
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
@@ -1409,6 +1422,15 @@ export default defineComponent({
               @change="(checked) => { if (checked) lockPage(); }"
             />
           </div>
+          <!-- 左侧菜单底部广告位（200x200） -->
+          <div class="sidebar-ad" v-if="!collapsed">
+            <ins
+              class="adsbygoogle"
+              style="display: inline-block; width: 200px; height: 200px"
+              data-ad-client="ca-pub-6721623848988004"
+              data-ad-slot="3001409339"
+            ></ins>
+          </div>
 
         </a-layout-sider>
         <a-layout-content :class="[contenttheme, { 'has-page-header': route.meta?.title }]" style="padding-bottom: 80px;padding-right:10px;">
@@ -1612,6 +1634,16 @@ export default defineComponent({
   gap: 0;
   overflow: visible;
   position: relative;
+}
+/* 左侧菜单底部广告位：宽度受侧边栏限制，避免撑破布局 */
+.sidebar-ad {
+  margin-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  overflow: hidden;
+}
+.sidebar-ad .adsbygoogle {
+  max-width: 100%;
 }
 /* 菜单内容区：整个区域可点击 */
 .nav-menu-item-content {
