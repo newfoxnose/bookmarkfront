@@ -379,6 +379,29 @@ export default defineComponent({
       showTodoInSidebar.value = localStorage.getItem('show_todo_in_sidebar') !== 'false';
     };
 
+    // Google AdSense 客户端 ID
+    const ADSENSE_CLIENT = "ca-pub-6721623848988004";
+    let adsenseScriptPromise = null;
+
+    /** 懒加载 AdSense 脚本：只注入一次，返回加载完成的 Promise */
+    const ensureAdsenseScript = () => {
+      if (adsenseScriptPromise) return adsenseScriptPromise;
+      adsenseScriptPromise = new Promise((resolve) => {
+        if (document.querySelector('script[src*="adsbygoogle.js"]')) {
+          resolve();
+          return;
+        }
+        const s = document.createElement("script");
+        s.async = true;
+        s.crossOrigin = "anonymous";
+        s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+        s.onload = () => resolve();
+        s.onerror = () => resolve();
+        document.head.appendChild(s);
+      });
+      return adsenseScriptPromise;
+    };
+
     /** 左侧菜单底部广告位推送（同一 ins 只推送一次） */
     const pushSidebarAd = () => {
       nextTick(() => {
@@ -391,9 +414,29 @@ export default defineComponent({
       });
     };
 
-    // 侧边栏展开时广告位才会渲染，展开后补一次推送
+    /**
+     * 把广告脚本的下载推迟到 window load 之后的空闲时机，
+     * 避免与应用首屏的 JS/CSS/接口竞争带宽和 CPU。
+     */
+    const loadAndPushAd = () => {
+      const run = () => ensureAdsenseScript().then(() => pushSidebarAd());
+      const schedule = () => {
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(run, { timeout: 3000 });
+        } else {
+          setTimeout(run, 0);
+        }
+      };
+      if (document.readyState === "complete") {
+        schedule();
+      } else {
+        window.addEventListener("load", schedule, { once: true });
+      }
+    };
+
+    // 侧边栏展开时广告位才会渲染，展开后补一次加载与推送
     watch(() => state.collapsed, (val) => {
-      if (!val) pushSidebarAd();
+      if (!val) loadAndPushAd();
     });
 
     onMounted(() => {
@@ -408,8 +451,10 @@ export default defineComponent({
       } else {
         changeTheme(false);
       }
-      // 左侧菜单底部广告位加载（存在 ins 元素时才推送）
-      pushSidebarAd();
+      // 左侧菜单底部广告位：仅登录布局存在广告位，且延迟到页面加载完成后再加载，避免影响首屏
+      if ($cookies.get("token")) {
+        loadAndPushAd();
+      }
 
       let params = new URLSearchParams(); //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get("token"));
