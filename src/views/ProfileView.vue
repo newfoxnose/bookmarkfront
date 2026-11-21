@@ -16,6 +16,13 @@ export default defineComponent({
     const { proxy } = getCurrentInstance()
     const formState = ref([])
     const showKeyboard = ref(false) // 控制虚拟键盘显示状态
+    // 浏览器标签默认标题（在 index.html 中设置）
+    const DEFAULT_TITLE = '全能书签网';
+    // 将用户的个性化标题同步到浏览器标签，留空则恢复默认标题
+    const applyCustomTitle = (title) => {
+      const trimmed = (title || '').trim();
+      document.title = trimmed || DEFAULT_TITLE;
+    };
     onMounted(() => {
       let params = new URLSearchParams();    //post内容必须这样传递，不然后台获取不到
       params.append("token", $cookies.get('token'));
@@ -53,6 +60,8 @@ export default defineComponent({
           }
           else{
             message.success(res.data.msg);
+            // 保存成功后立即更新浏览器标签标题
+            applyCustomTitle(res.data.data && res.data.data.custom_title);
           }
         }
       });
@@ -151,7 +160,7 @@ export default defineComponent({
     <a-form-item label="邮箱" name="email" :rules="[{ required: true, message: '邮箱不能为空' }]">
       <a-input v-model:value="formState.email" disabled/>
     </a-form-item>
-    <a-form-item label="API KEY" name="api_key">
+        <a-form-item label="API KEY" name="api_key">
       <a-input-group compact>
         <a-input v-model:value="formState.api_key" disabled style="width: calc(100% - 40px)" />
         <a-button type="primary" @click="copyApiKey" style="width: 40px">
@@ -159,6 +168,20 @@ export default defineComponent({
         </a-button>
       </a-input-group>
     </a-form-item>
+    <a-form-item label="浏览器标签标题" name="custom_title">
+      <a-input v-model:value="formState.custom_title" :maxlength="100" placeholder="留空则使用默认标题：全能书签网" />
+    </a-form-item>
+    <a-form-item label="允许登录设备数量" name="online_device_count" :rules="[{ required:false }]">
+      <a-input-number
+        v-model:value="formState.online_device_count"
+        :min="1"
+        :max="29"
+        :precision="0"
+        style="width: 120px"
+      />
+      <span style="margin-left: 8px; color: var(--text-tertiary)">1~29，超出数量时会替换最早登录的设备</span>
+    </a-form-item>
+
 
 
     <h3 class="content-title">修改密码</h3><br>

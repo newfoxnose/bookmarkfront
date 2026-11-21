@@ -474,6 +474,14 @@ export default defineComponent({
 
       if ($cookies.get('token') != null && $cookies.get('token') != '') {
 
+        // 应用用户自定义的浏览器标签标题（留空则保持默认标题）
+        proxy.$http.post("/ajax/get_profile_ajax/", params).then((profile_res) => {
+          const customTitle = profile_res.data && profile_res.data.data && profile_res.data.data.custom_title;
+          if (customTitle && customTitle.trim()) {
+            document.title = customTitle.trim();
+          }
+        });
+
         proxy.$http.post("/ajax/get_folder_ajax/", params).then((folder_res) => {
           if (folder_res.data.code == "401") {
             //不在登陆状态跳转到首页
