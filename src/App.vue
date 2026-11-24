@@ -363,10 +363,26 @@ export default defineComponent({
         onCancel() { },
       });
     };
-    /** 监听 localStorage 变化，实现导航菜单实时更新 */
+    /** 监听 localStorage 变化，实现导航菜单、自动锁屏状态的实时更新 */
     const handleStorageChange = (e) => {
       if (e.key === NAV_ORDER_STORAGE_KEY) {
         loadNavOrder();
+        return;
+      }
+      // 锁定状态跨标签页同步：一个标签页锁定/解锁后，其他标签页跟随
+      if (e.key === 'pageLocked') {
+        if (e.newValue === '1') {
+          isPageLocked.value = true;
+          applyLockUi();
+        } else {
+          // 由 isPageLocked 的监听器重新开始闲置计时
+          isPageLocked.value = false;
+        }
+        return;
+      }
+      // 自动锁定时间变更时，按新值重新计时
+      if (e.key === 'lock_timeout_minutes') {
+        resetIdleTimer();
       }
     };
 
@@ -959,18 +975,68 @@ export default defineComponent({
     provide('folder_list', folder_list);
 
     // ========== 页面锁定功能 ==========
+    /** 是否存在登录 token：未登录（落地页/注册页等）不启用自动锁屏 */
+    const hasLoginToken = () => {
+      const token = $cookies.get('token');
+      return token != null && token !== '';
+    };
+
     // 锁定状态：从 localStorage 恢复（刷新后保持锁定）
-    const isPageLocked = ref(Boolean(localStorage.getItem('pageLocked') === '1'));
+    // 未登录时忽略并清理残留的锁定标记，避免登录后一进站就被锁屏
+    const isPageLocked = ref(false);
+    if (hasLoginToken()) {
+      isPageLocked.value = localStorage.getItem('pageLocked') === '1';
+    } else {
+      localStorage.removeItem('pageLocked');
+    }
     const showUnlockKeyboard = ref(false);
     const unlockCode = ref('');
     const unlockLoading = ref(false);
     // 解锁错误提示：直接显示在键盘内，便于区分密码错误与网络异常
     const unlockError = ref('');
 
-    /** 手动锁定页面 */
-    const lockPage = () => {
+    /** 锁屏后的统一处理：退出全屏并暂停音视频/朗读，避免锁屏后内容仍可见或继续播放 */
+    const applyLockUi = () => {
+      // 全屏时遮罩不在全屏元素内会不可见，锁屏前先退出全屏
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      document.querySelectorAll('video, audio').forEach((el) => {
+        try {
+          el.pause();
+        } catch (e) {
+          // 忽略个别媒体元素的暂停异常
+        }
+      });
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = null;
+      }
+    };
+
+    /** 进入锁定状态（闲置触发、手动锁定、其他标签页同步） */
+    const enterLockedState = () => {
       isPageLocked.value = true;
       localStorage.setItem('pageLocked', '1');
+      applyLockUi();
+    };
+
+    /** 解除锁定状态：清除持久化标记，由 isPageLocked 监听器重新开始计时 */
+    const exitLockedState = () => {
+      isPageLocked.value = false;
+      localStorage.removeItem('pageLocked');
+    };
+
+    /** 手动锁定页面 */
+    const lockPage = () => {
+      enterLockedState();
+    };
+
+    /** 侧边栏锁定开关：开启立即锁定，关闭则唤起口令解锁 */
+    const togglePageLock = (checked) => {
+      if (checked) lockPage();
+      else handleUnlockClick();
     };
 
     /** 点击壁纸唤起解锁键盘 */
@@ -1000,9 +1066,15 @@ export default defineComponent({
       proxy.$http.post('/ajax/unlock_screen_ajax', params, { timeout: 10000 }).then((res) => {
         unlockLoading.value = false;
         if (res.data.code === 200) {
-          isPageLocked.value = false;
-          localStorage.removeItem('pageLocked');
+          exitLockedState();
           closeUnlockKeyboard();
+        } else if (res.data.code === 401) {
+          // 登录状态已失效：清除锁定与失效 token，回到登录页，避免被永久锁在遮罩后
+          exitLockedState();
+          closeUnlockKeyboard();
+          $cookies.set('token', '', '-720h');
+          message.warning('登录状态已失效，请重新登录');
+          window.location.href = '/';
         } else {
           // 口令错误：保留键盘、清空输入、在键盘内显示明确提示
           unlockError.value = '口令错误，请重新输入';
@@ -1027,21 +1099,46 @@ export default defineComponent({
 
     const resetIdleTimer = () => {
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      // 未登录或已锁定时不启动计时，避免落地页/注册页等处写入锁定状态
+      if (!hasLoginToken() || isPageLocked.value) return;
       const minutes = parseInt(localStorage.getItem(LOCK_TIMEOUT_KEY) || String(DEFAULT_LOCK_TIMEOUT), 10);
       if (minutes <= 0 || isPageLocked.value) return;
       idleTimerRef.current = setTimeout(() => {
-        isPageLocked.value = true;
-        localStorage.setItem('pageLocked', '1');
+        enterLockedState();
       }, minutes * 60 * 1000);
     };
 
     let cleanupIdleLock = null;
+    let iframeBindTimer = null;
+    // 记录 iframe 已绑定活动监听的文档，文档被替换后需要重新绑定
+    const boundIframeDocs = new WeakMap();
     onMounted(() => {
-      const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
-      events.forEach((ev) => window.addEventListener(ev, resetIdleTimer));
+      // wheel/touchmove：仅用滚轮或手指滑动时也能算作活动，避免阅读页误锁
+      const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'wheel', 'touchstart', 'touchmove'];
+      events.forEach((ev) => window.addEventListener(ev, resetIdleTimer, { passive: true }));
+
+      // 同源 iframe（如 UEditor 富文本编辑器）内的事件不会冒泡到父窗口，需要单独绑定
+      const bindIframeActivity = () => {
+        document.querySelectorAll('iframe').forEach((frame) => {
+          const doc = frame.contentDocument;
+          if (!doc) return; // 跨域 iframe 无法访问文档，跳过
+          if (boundIframeDocs.get(frame) === doc) return;
+          boundIframeDocs.set(frame, doc);
+          events.forEach((ev) => doc.addEventListener(ev, resetIdleTimer, true));
+        });
+      };
+      bindIframeActivity();
+      // 编辑器等 iframe 是异步插入的，定期扫描新出现的 iframe
+      iframeBindTimer = setInterval(bindIframeActivity, 3000);
+
+      // 自动锁定时间被修改后立即按新值重新计时
+      window.addEventListener('lockTimeoutChanged', resetIdleTimer);
+
       resetIdleTimer();
       cleanupIdleLock = () => {
         events.forEach((ev) => window.removeEventListener(ev, resetIdleTimer));
+        if (iframeBindTimer) clearInterval(iframeBindTimer);
+        window.removeEventListener('lockTimeoutChanged', resetIdleTimer);
         if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
       };
     });
@@ -1052,6 +1149,11 @@ export default defineComponent({
       // 移除自定义事件监听器
       window.removeEventListener("navConfigChanged", handleNavConfigChanged);
       window.removeEventListener("showTodoInSidebarChanged", handleShowTodoChanged);
+    });
+
+    // 解锁成功后重新开始闲置计时，否则解锁后不再产生输入时页面将永远不会自动锁定
+    watch(isPageLocked, (locked) => {
+      if (!locked) resetIdleTimer();
     });
 
     return {
@@ -1116,6 +1218,7 @@ export default defineComponent({
       unlockLoading,
       unlockError,
       lockPage,
+      togglePageLock,
       handleUnlockClick,
       closeUnlockKeyboard,
       verifyAndUnlock,
@@ -1472,7 +1575,7 @@ export default defineComponent({
               :checked="isPageLocked"
               checked-children="锁定"
               un-checked-children="解锁"
-              @change="(checked) => { if (checked) lockPage(); }"
+              @change="togglePageLock"
             />
           </div>
           <!-- 左侧菜单底部广告位（200x200） -->

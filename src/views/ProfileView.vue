@@ -94,20 +94,34 @@ export default defineComponent({
       parseInt(localStorage.getItem(LOCK_TIMEOUT_KEY) || '5', 10)
     );
     let lockTimeoutSaveTimer = null;
+    let pendingLockTimeout = null;
+
+    /** 写入自动锁定时间，并通知 App 立即按新值重新计时 */
+    const saveLockTimeout = (num, silent = false) => {
+      lockTimeoutSaveTimer = null;
+      pendingLockTimeout = null;
+      localStorage.setItem(LOCK_TIMEOUT_KEY, String(num));
+      window.dispatchEvent(new CustomEvent('lockTimeoutChanged'));
+      if (!silent) {
+        message.success(`自动锁定已${num === 0 ? '禁用' : '设为 ' + num + ' 分钟'}`);
+      }
+    };
+
     const onLockTimeoutChange = (val) => {
       const num = parseInt(val, 10);
       if (!isNaN(num) && num >= 0) {
         lockTimeoutMinutes.value = num;
+        pendingLockTimeout = num;
         if (lockTimeoutSaveTimer) clearTimeout(lockTimeoutSaveTimer);
-        lockTimeoutSaveTimer = setTimeout(() => {
-          lockTimeoutSaveTimer = null;
-          localStorage.setItem(LOCK_TIMEOUT_KEY, String(num));
-          message.success(`自动锁定已${num === 0 ? '禁用' : '设为 ' + num + ' 分钟'}`);
-        }, LOCK_TIMEOUT_DEBOUNCE_MS);
+        lockTimeoutSaveTimer = setTimeout(() => saveLockTimeout(num), LOCK_TIMEOUT_DEBOUNCE_MS);
       }
     };
     onUnmounted(() => {
-      if (lockTimeoutSaveTimer) clearTimeout(lockTimeoutSaveTimer);
+      // 离开页面时立即落盘，避免防抖尚未触发导致设置丢失
+      if (lockTimeoutSaveTimer) {
+        clearTimeout(lockTimeoutSaveTimer);
+        if (pendingLockTimeout != null) saveLockTimeout(pendingLockTimeout, true);
+      }
     });
 
     const SHOW_TODO_KEY = 'show_todo_in_sidebar';
